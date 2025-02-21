@@ -1,0 +1,36 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+        x:DataType="vm:CommandTimerViewModel">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+	
+	<!-- These ListBoxItems not working at the item level where they were working at global... -->
+	<Style Selector="ListBoxItem.HourItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{Binding Accent}"></Setter>
+	</Style>
+
+	<Style Selector="ListBoxItem.MinuteItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{Binding Accent}"></Setter>
+	</Style>
+
+	<Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+		<Setter Property="Background" Value="{Binding Accent}"></Setter>
+	</Style>
+
+	<Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+		<Setter Property="Background" Value="{Binding Accent}"/>
+		<Setter Property="BorderBrush" Value="{Binding Accent}"/>
+	</Style>
+
+	<Style Selector="Slider:horizontal /template/ RepeatButton#PART_DecreaseButton /template/ Border#TrackBackground">
+		<Setter Property="Background" Value="{Binding Accent}"/>
+	</Style>
+	
+	<Style Selector="Slider:horizontal /template/ Thumb#thumb">
+		<Setter Property="Background" Value="{Binding Accent}"/>
+	</Style>
+</Styles>

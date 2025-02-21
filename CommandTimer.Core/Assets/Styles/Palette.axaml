@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- Add Resources Here -->
+	<!-- This palette is fallback for any colors not found in the active theme light or dark -->
+	<SolidColorBrush x:Key="ApplicationBrush_Background" Color="#1e1e1e"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Contrast" Color="#1AFFFFFF"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Overlay" Color="#2e2e2e"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Accent" Color="#BD4747"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Inconspicuous" Color="#CFCFCF"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Stripe" Color="#1E1E1E"/>
+	<SolidColorBrush x:Key="ApplicationBrush_DoThingIntended" Color="#84FF84"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Bad" Color="#BD4747"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Text" Color="#FFFFFF"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Highlight" Color="#FFFF00"/>
+	<FontWeight x:Key="ApplicationFontWeight_Light">Light</FontWeight>
+	<FontWeight x:Key="ApplicationFontWeight_Medium">Medium</FontWeight>
+	<FontWeight x:Key="ApplicationFontWeight_Heavy">Bold</FontWeight>
+	<x:Double x:Key="ApplicationFontSize_Header">18</x:Double>
+	<x:Double x:Key="ApplicationFontSize_SubHeader">16</x:Double>
+	<x:Double x:Key="ApplicationFontSize_Attention">15</x:Double>
+	<x:Double x:Key="ApplicationFontSize_Text">14</x:Double>
+	<x:Double x:Key="ApplicationFontSize_Label">12</x:Double>
+	<x:Double x:Key="ApplicationFontSize_SubText">11</x:Double>
+	<x:Double x:Key="ApplicationOpacity_Gradient">1</x:Double>
+</ResourceDictionary>

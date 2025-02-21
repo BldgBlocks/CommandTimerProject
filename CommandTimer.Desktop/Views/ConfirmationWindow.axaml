@@ -1,0 +1,120 @@
+<Window x:Class="CommandTimer.Desktop.Views.ConfirmationWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        MinWidth="200"
+        MinHeight="200"
+        MaxWidth="300"
+        MaxHeight="200"
+        d:DesignHeight="450"
+        d:DesignWidth="800"
+        Background="{DynamicResource ApplicationBrush_Stripe}"
+        CanResize="False"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaToDecorationsHint="True"
+        Icon="avares://CommandTimer/Assets/LogoDerivatives/Logo.ico"
+        ShowInTaskbar="False"
+        SystemDecorations="None"
+        WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d">
+
+    <Border Name="PART_BorderRoot"
+            BorderBrush="Transparent"
+            BorderThickness="0">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <Rectangle Name="PART_RectangleHeader"
+                       Grid.Row="0"
+                       Height="40"
+                       Fill="{DynamicResource ApplicationBrush_Overlay}" />
+
+            <TextBlock Name="PART_TextTitle"
+                       Grid.Row="0"
+                       Margin="15,0,0,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource ApplicationFontSize_Text}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                       Foreground="White"
+                       Text="Confirmation" />
+
+            <!--  Body  -->
+            <TextBlock Name="PART_TextMessage"
+                       Grid.Row="1"
+                       Margin="25"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       FontSize="{DynamicResource ApplicationFontSize_Text}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Text="Are you sure you want to do this?"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
+
+            <ContentPresenter Name="PART_PresenterBody"
+                              IsEnabled="False" />
+
+            <StackPanel Name="PART_StackButtons"
+                        Grid.Row="1"
+                        Margin="0,0,0,45"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+
+                <Button Name="PART_ButtonYes"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Overlay}"
+                        Content="Yes"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        Tapped="Tapped_ButtonYes" />
+
+                <Rectangle Name="PART_RectangleDividerYesNo"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Width="0.5"
+                           Margin="10,0,10,0"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource ApplicationBrush_Accent}" />
+
+                <Button Name="PART_ButtonNo"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Overlay}"
+                        Content="No"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        Tapped="Tapped_ButtonNo" />
+
+                <Rectangle Name="PART_RectangleDividerNoCancel"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Width="0.5"
+                           Margin="10,0,10,0"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource ApplicationBrush_Accent}"
+                           IsVisible="{Binding IsVisible, ElementName=PART_ButtonCancel}" />
+
+                <Button Name="PART_ButtonCancel"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Overlay}"
+                        Content="Cancel"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        IsVisible="False"
+                        Tapped="Tapped_ButtonCancel" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

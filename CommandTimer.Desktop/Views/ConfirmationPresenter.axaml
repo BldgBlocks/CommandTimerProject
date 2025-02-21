@@ -1,0 +1,15 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.ConfirmationPresenter"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             MinWidth="200"
+             MinHeight="200"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             ZIndex="1001"
+             mc:Ignorable="d">
+
+    <ContentPresenter Name="PART_PresenterBody" />
+
+</UserControl>

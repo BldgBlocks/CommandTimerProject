@@ -1,0 +1,2 @@
+﻿The <ApplicationIcon> tags in the .csproj file require a path that is local to this project.
+However logo images are project wide and are generally located in the base project.

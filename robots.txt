@@ -1,0 +1,45 @@
+# Disallow all user agents from crawling the entire site
+User-agent: *
+Disallow: /
+
+# Allow specific search engines to crawl README and LICENSE files only
+User-agent: Googlebot
+Allow: /README.md
+Allow: /LICENSE
+
+User-agent: Bingbot
+Allow:/README.md 
+Allow:/LICENSE 
+
+# Disallow specific scraper user agents from crawling the site entirely 
+ User-Agent:AhrefsBot 
+Disallow:/ 
+
+User-Agent:Baiduspider  
+Disallow:/ 
+
+User-Agent:MJ12bot  
+Disallow:/ 
+
+User-Agent:yandex  
+Disallow:/ 
+
+ #block unknown bots with a generic rule.
+ User-Agent:*ScoutJet* 
+Disallow:/  
+
+ User-Agent:*Scraper* 
+Disallow:/  
+
+ #block generic terms used by bots for identification purposes.
+ User-Agent:*spider*  
+Disallow:/  
+
+ # generic term block - this will match any user agent with "robot" in it.
+ User-Agent:*robot*   
+Disallow:/  
+
+ # catch-all for any remaining bots claiming to be Mozilla compatible browsers:
+  User-Agent=*Mozilla/5.*GECKO/*001*
+   Crawl-delay=10   
+   Disallow:/

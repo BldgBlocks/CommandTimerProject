@@ -1,0 +1,68 @@
+<Window x:Class="CommandTimer.Desktop.Views.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:CommandTimer.Desktop.Views"
+        xmlns:vm="using:CommandTimer.ViewModels;assembly=CommandTimer"
+        Title="Command Timer"
+        MinWidth="600"
+        MinHeight="400"
+        d:DesignHeight="450"
+        d:DesignWidth="800"
+        Background="{DynamicResource ApplicationBrush_Background}"
+        ExtendClientAreaTitleBarHeightHint="30"
+        ExtendClientAreaToDecorationsHint="True"
+        Icon="avares://CommandTimer.Core/Assets/LogoDerivatives/Logo.ico"
+        mc:Ignorable="d">
+
+    <DockPanel Name="RootPanel">
+
+        <Border Name="ClientAreaExtendedToSystemChromeSpace"
+                Height="30"
+                Margin="0"
+                Padding="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Top"
+                Background="{DynamicResource ApplicationBrush_Contrast}"
+                DockPanel.Dock="Top"
+                IsHitTestVisible="False">
+
+            <StackPanel Name="DecorationsBrandingPanel"
+                        IsVisible="True"
+                        Orientation="Horizontal">
+
+                <Image Height="13"
+                       Margin="8,0,0,0"
+                       IsVisible="False"
+                       Source="avares://CommandTimer.Core/Assets/LogoDerivatives/Logo.512x512.png" />
+
+                <TextBlock Margin="6,0,0,0"
+                           Padding="0,2,0,0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="11"
+                           FontStretch="Expanded"
+                           FontWeight="Light"
+                           IsVisible="True"
+                           Text="Command Timer"
+                           TextAlignment="Center" />
+
+            </StackPanel>
+        </Border>
+
+        <Grid Name="MainWindowLayout"
+              DockPanel.Dock="Bottom">
+
+            <views:MainView Name="MainViewControl" />
+
+            <views:MessageViewer Name="MessageOverlayView" />
+
+            <views:InteractionBlocker Name="InteractionBlockerControl" />
+
+            <Panel Name="ContentPresenter" />
+
+        </Grid>
+
+    </DockPanel>
+</Window>

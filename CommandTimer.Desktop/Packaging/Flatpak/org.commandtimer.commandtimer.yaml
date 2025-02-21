@@ -1,0 +1,18 @@
+id: org.commandtimer.commandtimer
+runtime: org.freedesktop.Platform
+runtime-version: '22.08'
+sdk: org.freedesktop.Sdk
+command: command-timer
+finish-args:
+  - --filesystem=home
+modules:
+  - name: minimal-install
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 command-timer.desktop /app/share/applications/command-timer.desktop
+      - install -Dm644 ../../CommandTimer/Resources/command-timer-logo.png /app/share/icons/hicolor/512x512/apps/command-timer-logo.png
+    sources:
+      - type: file
+        path: command-timer.desktop
+      - type: file
+        path: command-timer-logo.png

@@ -1,0 +1,38 @@
+<Application x:Class="CommandTimer.Desktop.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:views="clr-namespace:CommandTimer.Desktop.Views;assembly=CommandTimer.Desktop"
+             RequestedThemeVariant="Dark">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://CommandTimer.Core/Assets/Styles/Palette.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceInclude x:Key="Dark"
+                                 Source="avares://CommandTimer.Core/Assets/Styles/DarkTheme.axaml" />
+                <ResourceInclude x:Key="Light"
+                                 Source="avares://CommandTimer.Core/Assets/Styles/LightTheme.axaml" />
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme DensityStyle="Normal">
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Dark"
+                                       Accent="#BD4747"
+                                       ErrorText="Red" />
+            </FluentTheme.Palettes>
+        </FluentTheme>
+        <StyleInclude Source="avares://CommandTimer.Core/Assets/Styles/ControlStyles.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+        <materialIcons:MaterialIconStyles />
+    </Application.Styles>
+
+
+</Application>

@@ -1,0 +1,106 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.DaysFlyout"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="80"
+             d:DesignWidth="120"
+             mc:Ignorable="d">
+
+
+    <Grid Width="110"
+          Margin="2"
+          ColumnDefinitions="*"
+          RowDefinitions="30, 30">
+
+        <NumericUpDown Name="FlyoutDaysNumeric"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       MinWidth="50"
+                       Margin="0,0,0,0"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       FormatString="N0"
+                       Maximum="365"
+                       Minimum="0"
+                       ShowButtonSpinner="True" />
+
+        <DockPanel Grid.Row="1"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Center"
+                   LastChildFill="True">
+
+            <!--  Days Clear Button  -->
+            <Button Name="DaysClearButton"
+                    Height="30"
+                    MinWidth="34"
+                    Margin="0,0,0,0"
+                    Padding="0,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Click="Click_Clear"
+                    CornerRadius="2"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Zero">
+
+                <materialIcons:MaterialIcon Name="DaysClearIcon"
+                                            Width="20"
+                                            Height="20"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="UndoVariant" />
+            </Button>
+
+            <!--  Days Cancel Button  -->
+            <Button Name="DaysCancelButton"
+                    Height="30"
+                    MinWidth="34"
+                    Margin="0,0,0,0"
+                    Padding="0,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Click="Click_Cancel"
+                    CornerRadius="2"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Cancel">
+
+                <materialIcons:MaterialIcon Name="DaysCancelIcon"
+                                            Width="25"
+                                            Height="25"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource ApplicationBrush_Bad}"
+                                            Kind="Remove" />
+            </Button>
+
+            <!--  Days Accept Button  -->
+            <Button Name="DaysAcceptButton"
+                    Height="30"
+                    MinWidth="30"
+                    Margin="0,0,0,0"
+                    Padding="0,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    Click="Click_Accept"
+                    CornerRadius="2"
+                    DockPanel.Dock="Right"
+                    ToolTip.Tip="Accept">
+
+                <materialIcons:MaterialIcon Name="DaysAcceptIcon"
+                                            Width="25"
+                                            Height="25"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Foreground="{DynamicResource ApplicationBrush_DoThingIntended}"
+                                            Kind="Check" />
+            </Button>
+        </DockPanel>
+    </Grid>
+</UserControl>

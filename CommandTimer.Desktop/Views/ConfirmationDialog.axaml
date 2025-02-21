@@ -1,0 +1,140 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.ConfirmationDialog"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             MinWidth="250"
+             MinHeight="200"
+             MaxWidth="500"
+             MaxHeight="500"
+             d:DesignHeight="350"
+             d:DesignWidth="400"
+             ZIndex="1001"
+             mc:Ignorable="d">
+
+    <Border Name="PART_BorderRoot"
+            Background="{DynamicResource ApplicationBrush_Stripe}"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            CornerRadius="6">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!--  Header  -->
+            <Border Name="PART_BorderHeader"
+                    Grid.Row="0"
+                    Height="40"
+                    Background="{DynamicResource ApplicationBrush_Overlay}"
+                    CornerRadius="6,6,0,0" />
+
+            <TextBlock Name="PART_TextTitle"
+                       Grid.Row="0"
+                       Margin="15,0,0,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource ApplicationFontSize_Text}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                       Foreground="White"
+                       Text="Confirmation" />
+
+            <!--  Body  -->
+            <TextBlock Name="PART_TextMessage"
+                       Grid.Row="1"
+                       Margin="25"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       FontSize="{DynamicResource ApplicationFontSize_Text}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Text="Are you sure you want to do this?"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap" />
+
+            <StackPanel Grid.Row="2"
+                        Margin="40,0,40,0"
+                        VerticalAlignment="Stretch">
+
+                <TextBox Name="PART_PasswordEntry"
+                         MinWidth="250"
+                         Background="{DynamicResource ApplicationBrush_Contrast}"
+                         Classes="revealPasswordButton"
+                         IsVisible="False"
+                         MaxLength="30"
+                         PasswordChar="•"
+                         RevealPassword="False"
+                         Watermark="Enter your password" />
+
+                <TextBlock Name="PART_PasswordEntryTip"
+                           Margin="0,10,0,20"
+                           Foreground="Crimson"
+                           IsVisible="False"
+                           Text="The password is not correct"
+                           TextAlignment="Center" />
+            </StackPanel>
+
+            <ContentPresenter Name="PART_PresenterBody"
+                              IsEnabled="False" />
+
+            <StackPanel Name="PART_StackButtons"
+                        Grid.Row="3"
+                        Margin="0,0,0,45"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal">
+
+                <Button Name="PART_ButtonYes"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Stripe}"
+                        Content="Yes"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        Tapped="Tapped_ButtonYes" />
+
+                <Rectangle Name="PART_RectangleDividerYesNo"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Width="0.5"
+                           Margin="10,0,10,0"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource ApplicationBrush_Accent}" />
+
+                <Button Name="PART_ButtonNo"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Stripe}"
+                        Content="No"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        Tapped="Tapped_ButtonNo" />
+
+                <Rectangle Name="PART_RectangleDividerNoCancel"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Width="0.5"
+                           Margin="10,0,10,0"
+                           VerticalAlignment="Stretch"
+                           Fill="{DynamicResource ApplicationBrush_Accent}"
+                           IsVisible="{Binding IsVisible, ElementName=PART_ButtonCancel}" />
+
+                <Button Name="PART_ButtonCancel"
+                        MinWidth="50"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Stripe}"
+                        Content="Cancel"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                        IsTabStop="False"
+                        IsVisible="False"
+                        Tapped="Tapped_ButtonCancel" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

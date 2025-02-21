@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandTimer.Core", "CommandTimer.Core.csproj", "{29CEFA9E-3A4B-45E8-BC6B-899DC21028EA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandTimer.Desktop", "..\CommandTimer.Desktop\CommandTimer.Desktop.csproj", "{11BA9E94-08C3-4B58-B05E-D04C0493EAB7}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ControlsLibrary", "..\ControlsLibrary\ControlsLibrary.shproj", "{E870A7ED-DA7E-4B2D-9173-D0AD63011602}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B7573DEE-1C08-4DB6-A4A7-8F76A9E75FEC}"
+	ProjectSection(SolutionItems) = preProject
+		..\CHANGES.md = ..\CHANGES.md
+		..\LICENSE.md = ..\LICENSE.md
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29CEFA9E-3A4B-45E8-BC6B-899DC21028EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29CEFA9E-3A4B-45E8-BC6B-899DC21028EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29CEFA9E-3A4B-45E8-BC6B-899DC21028EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29CEFA9E-3A4B-45E8-BC6B-899DC21028EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11BA9E94-08C3-4B58-B05E-D04C0493EAB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11BA9E94-08C3-4B58-B05E-D04C0493EAB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11BA9E94-08C3-4B58-B05E-D04C0493EAB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11BA9E94-08C3-4B58-B05E-D04C0493EAB7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CFD1BAE6-8BFB-4123-B28A-F2B4C290F4BA}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\ControlsLibrary\ControlsLibrary.projitems*{29cefa9e-3a4b-45e8-bc6b-899dc21028ea}*SharedItemsImports = 5
+		..\ControlsLibrary\ControlsLibrary.projitems*{e870a7ed-da7e-4b2d-9173-d0ad63011602}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

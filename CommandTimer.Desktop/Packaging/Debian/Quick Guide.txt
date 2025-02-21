@@ -1,0 +1,6 @@
+
+The 'control' file is a specifically named file. It acts as a manifest file.
+
+When this process is scripted a folder structure is created and the 'control' file
+is placed within the 'DEBIAN' folder... The publish is placed withing .../usr/bin. 
+The dkpg-deb command is run from the parent folder and knows to look for this 'control' file.

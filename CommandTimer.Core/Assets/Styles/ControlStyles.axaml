@@ -1,0 +1,84 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<!-- Add Controls for Previewer Here -->
+		</Border>
+	</Design.PreviewWith>
+
+	<!-- Add Styles Here -->
+
+
+	<!-- Button Styles -->
+	<Style Selector="Button">
+		<Setter Property="FontSize" Value="11"/>
+		<Setter Property="Foreground" Value="{DynamicResource ApplicationBrush_Text}"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource ApplicationBrush_Contrast}"/>
+		<Setter Property="BorderThickness" Value="0"/>
+		<Setter Property="CornerRadius" Value="5"/>
+		<Setter Property="FontWeight" Value="{DynamicResource ApplicationFontWeight_Medium}"/>
+	</Style>
+
+	<!-- TextBox Styles (left,top,right,bottom)-->
+	<Style Selector="TextBox">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Foreground" Value="{DynamicResource ApplicationBrush_Text}"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="BorderThickness" Value="1"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource ApplicationBrush_Accent}"/>
+		<Setter Property="SelectionBrush" Value="{DynamicResource ApplicationBrush_Accent}"/>
+		<Setter Property="FontWeight" Value="{DynamicResource ApplicationFontWeight_Medium}"/>
+	</Style>
+	
+	<Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+		<Setter Property="BorderBrush" Value="{DynamicResource ApplicationBrush_Accent}"/>
+	</Style>
+	
+	<Style Selector="TextBlock">
+		<Setter Property="FontSize" Value="14"/>
+		<Setter Property="Foreground" Value="{DynamicResource ApplicationBrush_Text}"/>
+		<Setter Property="Margin" Value="10,2,0,2"/>
+		<Setter Property="FontWeight" Value="{DynamicResource ApplicationFontWeight_Medium}"/>	
+	</Style>
+
+	<!--  Changing the Fluent Theme is not reliable to update controls without a restart. -->
+	<Style Selector="ListBoxItem.HourItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"></Setter>
+	</Style>
+
+	<Style Selector="ListBoxItem.MinuteItem:selected /template/ ContentPresenter">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"></Setter>
+	</Style>
+
+	<Style Selector="Button#PART_RestoreButton:pointerover">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Overlay}"/>
+	</Style>
+	<Style Selector="Button#PART_MinimizeButton:pointerover">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Overlay}"/>
+	</Style>
+	<Style Selector="Button#PART_FullScreenButton:pointerover">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Overlay}"/>
+	</Style>
+	
+	<!-- These are still needed. Updating the FluentTheme Accent doesn't carry through all controls,
+	it does some, but only throughout after a reboot. No good. 
+	<Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"></Setter>
+	</Style>
+
+	<Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource ApplicationBrush_Accent}"/>
+	</Style>
+
+	<Style Selector="Slider:horizontal /template/ RepeatButton#PART_DecreaseButton /template/ Border#TrackBackground">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"/>
+	</Style>
+	
+	<Style Selector="Slider:horizontal /template/ Thumb#thumb">
+		<Setter Property="Background" Value="{DynamicResource ApplicationBrush_Accent}"/>
+	</Style>
+	-->
+</Styles>

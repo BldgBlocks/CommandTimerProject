@@ -1,0 +1,101 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.StartupDisclaimer"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             Width="350"
+             Height="300"
+             d:DesignHeight="300"
+             d:DesignWidth="350"
+             Background="Transparent"
+             ZIndex="1001"
+             mc:Ignorable="d">
+
+    <Border Name="RootBorder"
+            Margin="0"
+            Padding="10,10,18,10"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Background="{DynamicResource ApplicationBrush_Background}"
+            BorderBrush="Transparent"
+            BorderThickness="0"
+            CornerRadius="16">
+
+        <Grid ColumnDefinitions="*"
+              RowDefinitions="auto,auto,auto,auto">
+            <TextBlock Name="HeaderText"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Padding="0,5,0,5"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="{DynamicResource ApplicationFontSize_Header}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Text="Welcome"
+                       TextAlignment="Center" />
+
+            <StackPanel Grid.Row="1"
+                        Grid.Column="0"
+                        Orientation="Vertical">
+
+                <TextBlock Name="Body1Text"
+                           Padding="0,5,0,5"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Stretch"
+                           FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="Command Timer organizes your commmands and *optionally* operates them no differently than if you enter them in the terminal yourself."
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <TextBlock Name="Body2Text"
+                           Padding="0,5,0,5"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Stretch"
+                           FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="Permissions and safety remain yours to manage. This software comes with NO warranty of any type, and the author takes NO responsibility for any damage caused by the use of this software."
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <TextBlock Name="Body3Text"
+                           Padding="0,5,0,5"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Stretch"
+                           FontSize="{DynamicResource ApplicationFontSize_Text}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                           Text="Use of this software constitutes agreement to these terms."
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="80">
+
+                <Button Name="PART_ButtonQuit"
+                        Width="100"
+                        Height="30"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Contrast}"
+                        Content="Quit"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}" />
+
+                <Button Name="PART_ButtonProceed"
+                        Width="100"
+                        Height="30"
+                        HorizontalContentAlignment="Center"
+                        Background="{DynamicResource ApplicationBrush_Contrast}"
+                        Content="Proceed"
+                        FontSize="{DynamicResource ApplicationFontSize_Text}"
+                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}" />
+            </StackPanel>
+        </Grid>
+		
+    </Border>
+</UserControl>

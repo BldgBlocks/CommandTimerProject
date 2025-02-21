@@ -1,0 +1,222 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.AboutFlyout"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="450"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+
+    <StackPanel Name="RootPanel"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="Transparent"
+                Orientation="Vertical">
+
+        <Separator Background="{DynamicResource ApplicationBrush_Accent}"
+                   Foreground="{DynamicResource ApplicationBrush_Accent}" />
+
+        <TextBlock Name="FlyoutAboutText"
+                   MaxWidth="200"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="{DynamicResource ApplicationFontSize_Text}"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+
+        <Button Name="PrivacyStatementButton"
+                Margin="0,-25,0,5"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center"
+                Background="{DynamicResource ApplicationBrush_Contrast}"
+                Tapped="Tapped_PrivacyStatementButton">
+            <materialIcons:MaterialIcon Name="PrivacyStatementIcon"
+                                        Width="28"
+                                        Height="28"
+                                        Foreground="{DynamicResource ApplicationBrush_Text}"
+                                        Kind="ShieldCheck" />
+        </Button>
+
+		<Separator Background="{DynamicResource ApplicationBrush_Accent}"
+                   Foreground="{DynamicResource ApplicationBrush_Accent}" />
+		
+        <TextBlock Name="FlyoutDonationText"
+                   MaxWidth="200"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="{DynamicResource ApplicationFontSize_Text}"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap" />
+
+        <!--  Donations  -->
+        <StackPanel Grid.Row="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10">
+
+            <!--  Monero Donation  -->
+            <Button Name="DonationButton_Monero"
+                    MinWidth="90"
+                    Margin="0,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="#545358"
+                    Tapped="Tapped_DonationButton_Monero">
+                <Button.Flyout>
+                    <Flyout Placement="Top">
+                        <StackPanel>
+
+                            <Image Name="DonationButton_MoneroQR"
+                                   Width="200"
+                                   Height="200"
+                                   Source="avares://CommandTimer.Core/Assets/CommandTimer_Donations_MoneroQRCode.png"
+                                   Tapped="Tapped_DonationButton_Monero" />
+
+                            <Border Background="{DynamicResource ApplicationBrush_Contrast}"
+                                    CornerRadius="4">
+
+                                <TextBlock Margin="5"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                                           Text="Copied!" />
+                            </Border>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+
+                <StackPanel VerticalAlignment="Center"
+                            Orientation="Horizontal">
+
+                    <TextBlock Name="DonationButton_MoneroText"
+                               Margin="0,0,5,0"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource ApplicationFontSize_Text}"
+                               FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                               Text="Monero" />
+
+                    <Image Name="DonationButton_MoneroIcon"
+                           Width="18"
+                           Height="18"
+                           Source="avares://CommandTimer.Core/Assets/BrandAssets/MoneroIcon.ico" />
+                </StackPanel>
+            </Button>
+
+
+            <!--  BTC Donation  -->
+            <Button Name="DonationButton_Btc"
+                    MinWidth="90"
+                    Margin="0,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="#9D5A0B"
+                    Tapped="Tapped_DonationButton_Btc">
+                <Button.Flyout>
+                    <Flyout Placement="Top">
+                        <StackPanel>
+
+                            <Image Name="DonationButton_BtcQR"
+                                   Width="200"
+                                   Height="200"
+                                   Source="avares://CommandTimer.Core/Assets/CommandTimer_Donations_BtcQRCode.png"
+                                   Tapped="Tapped_DonationButton_Btc" />
+
+                            <Border Background="{DynamicResource ApplicationBrush_Contrast}"
+                                    CornerRadius="4">
+
+                                <TextBlock Margin="5"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                                           Text="Copied!" />
+                            </Border>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+
+                <StackPanel VerticalAlignment="Center"
+                            Orientation="Horizontal">
+
+                    <TextBlock Name="DonationButton_BtcText"
+                               Margin="0,0,5,0"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource ApplicationFontSize_Text}"
+                               FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                               Text="BTC" />
+
+                    <materialIcons:MaterialIcon Name="DonationButton_BtcIcon"
+                                                Width="20"
+                                                Height="20"
+                                                Foreground="{DynamicResource ApplicationBrush_Text}"
+                                                Kind="CurrencyBtc" />
+                </StackPanel>
+            </Button>
+
+            <!--  KoFi Donation  -->
+            <Button Name="DonationButton_KoFi"
+                    MinWidth="90"
+                    Margin="0,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="#72A5F2"
+                    IsVisible="False">
+                <StackPanel VerticalAlignment="Center"
+                            Orientation="Horizontal">
+
+                    <TextBlock Name="DonationButton_KoFiText"
+                               Margin="0,0,5,0"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource ApplicationFontSize_Text}"
+                               FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                               Text="KoFi" />
+
+                    <Image Name="DonationButton_KoFiImage"
+                           Width="18"
+                           Height="18"
+                           Source="avares://CommandTimer.Core/Assets/BrandAssets/KoFiSymbol.png" />
+
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+
+            <!--  Git Donation  -->
+            <Button Name="DonationButton_Git"
+                    Width="90"
+                    MinWidth="90"
+                    Margin="0,0,0,0"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    Background="#0E121B"
+                    IsVisible="False">
+                <StackPanel VerticalAlignment="Center"
+                            Orientation="Horizontal">
+
+                    <TextBlock Name="DonationButton_GitText"
+                               Margin="0,0,5,0"
+                               VerticalAlignment="Center"
+                               FontSize="{DynamicResource ApplicationFontSize_Text}"
+                               FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                               Text="Git" />
+
+                    <materialIcons:MaterialIcon Name="DonationButton_GitIcon"
+                                                Width="20"
+                                                Height="20"
+                                                Foreground="{DynamicResource ApplicationBrush_Text}"
+                                                Kind="Github" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

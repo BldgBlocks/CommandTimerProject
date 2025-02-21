@@ -1,0 +1,458 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.ListView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mm="clr-namespace:CommandTimer.Core.ViewModels.MenuItems;assembly=CommandTimer.Core"
+             xmlns:views="clr-namespace:CommandTimer.Desktop.Views"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="450"
+             d:DesignWidth="1200"
+             x:DataType="vm:ListViewModel"
+             Background="{DynamicResource ApplicationBrush_Background}"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:ListViewModel />
+    </Design.DataContext>
+
+    <Grid Margin="10,0,10,0"
+          ColumnDefinitions="*"
+          RowDefinitions="50, *">
+
+        <!--  Header Area  -->
+        <RelativePanel Name="ListHeader"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="1"
+                       VerticalAlignment="Center">
+
+            <Panel RelativePanel.AlignLeftWithPanel="True"
+                   ZIndex="99">
+
+                <Border Name="BackgroundForLeftAlignedCutOff"
+                        Width="40"
+                        Height="40"
+                        Background="{DynamicResource ApplicationBrush_Background}" />
+            </Panel>
+
+            <StackPanel Name="LeftHeaderStack"
+                        Orientation="Horizontal"
+                        RelativePanel.AlignLeftWithPanel="True"
+                        RelativePanel.AlignVerticalCenterWithPanel="True"
+                        RelativePanel.LeftOf="LibraryButton"
+                        ZIndex="100">
+
+                <!--  Logo  -->
+                <Button Name="LogoButton"
+                        Width="33"
+                        Height="33"
+                        Margin="2,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        IsHitTestVisible="False"
+                        Tapped="Tapped_LogoButton">
+                    <Image Name="LogoImage"
+                           Source="avares://CommandTimer.Core/Assets/LogoDerivatives/Logo.ico" />
+                </Button>
+
+                <!--  App Tag  -->
+                <TextBlock Name="AppTag"
+                           Margin="0,0,0,0"
+                           Padding="0,0,0,0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center"
+                           FontSize="{DynamicResource ApplicationFontSize_Header}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="Command Timer"
+                           TextAlignment="Left" />
+            </StackPanel>
+
+
+            <!--  Add New Library Button  -->
+            <Button Name="AddLibraryButton"
+                    Width="33"
+                    Height="33"
+                    Margin="10,0,10,0"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.LeftOf="LibraryButton"
+                    Tapped="Tapped_NewLibraryButton">
+                <Button.Flyout>
+                    <Flyout Placement="Bottom"
+                            ShowMode="Transient">
+                        <StackPanel Orientation="Vertical">
+
+                            <TextBlock Name="LibraryLabel"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Background="Transparent"
+                                       FontSize="{DynamicResource ApplicationFontSize_Label}"
+                                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                                       Foreground="{DynamicResource ApplicationBrush_Text}"
+                                       Text="Create New Library:"
+                                       TextAlignment="Left" />
+
+                            <views:CustomTextBox Name="NewLibraryName"
+                                                 MinWidth="220"
+                                                 Margin="2,0,0,0"
+                                                 HorizontalAlignment="Left"
+                                                 VerticalAlignment="Center"
+                                                 AcceptWithDismiss="False"
+                                                 Background="Transparent"
+                                                 FontSize="{DynamicResource ApplicationFontSize_Text}"
+                                                 FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                                                 Foreground="{DynamicResource ApplicationBrush_Text}"
+                                                 MaxLength="40"
+                                                 MaxLines="1"
+                                                 TextAlignment="Left"
+                                                 TextWrapping="NoWrap" />
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+
+                <materialIcons:MaterialIcon Name="AddLibraryButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="PlusBoxMultipleOutline" />
+            </Button>
+
+
+            <!--  Library Selection  -->
+            <Button Name="LibraryButton"
+                    Width="140"
+                    Height="35"
+                    Margin="0,0,0,0"
+                    Padding="12,0,14,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.LeftOf="LibrarySpacer"
+                    Tapped="Tapped_LibrarySelection">
+
+                <TextBlock Name="LibrarySelectionText"
+                           Margin="0,0,0,0"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           FontSize="{DynamicResource ApplicationFontSize_Text}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                           LineSpacing="0"
+                           MaxLines="2"
+                           Text="{Binding ActiveLibrary.LibraryName}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <Button.Flyout>
+                    <MenuFlyout ItemsSource="{Binding LibrarySelections}"
+                                Placement="Bottom"
+                                ShowMode="TransientWithDismissOnPointerMoveAway">
+                        <MenuFlyout.ItemContainerTheme>
+                            <ControlTheme x:DataType="mm:MenuItemViewModel"
+                                          BasedOn="{StaticResource {x:Type MenuItem}}"
+                                          TargetType="MenuItem">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type MenuItem}">
+                                            <Border Name="Border"
+                                                    MinWidth="{Binding Width, ElementName=LibraryButton}"
+                                                    Padding="0,2"
+                                                    Background="{Binding BackgroundColor}">
+                                                <Grid ColumnDefinitions="*, Auto">
+
+                                                    <Button Grid.Column="0"
+                                                            MinWidth="120"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Center"
+                                                            Command="{Binding Command}"
+                                                            CommandParameter="{Binding Parameter}"
+                                                            Content="{Binding Header}"
+                                                            CornerRadius="0"
+                                                            FontSize="{DynamicResource ApplicationFontSize_Text}"
+                                                            FontWeight="{DynamicResource ApplicationFontWeight_Medium}" />
+
+                                                    <Button Grid.Column="1"
+                                                            Width="30"
+                                                            Height="30"
+                                                            Margin="0,0,0,0"
+                                                            Background="Transparent"
+                                                            BorderThickness="0"
+                                                            Command="{Binding Command_2}"
+                                                            CommandParameter="{Binding Parameter_2}"
+                                                            IsHitTestVisible="{Binding !IsSelected}"
+                                                            IsVisible="{Binding !IsSelected}">
+
+                                                        <materialIcons:MaterialIcon Name="RemoveIcon"
+                                                                                    Width="25"
+                                                                                    Height="25"
+                                                                                    Foreground="{DynamicResource ApplicationBrush_Bad}"
+                                                                                    Kind="Remove" />
+                                                    </Button>
+                                                </Grid>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </ControlTheme>
+                        </MenuFlyout.ItemContainerTheme>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Border Name="LibrarySpacer"
+                    Width="0"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.LeftOf="AddTimerButton" />
+
+
+            <!--  Add New Timer Button  -->
+            <Button Name="AddTimerButton"
+                    Width="33"
+                    Height="33"
+                    Margin="10,0,10,0"
+                    Click="Tapped_AddNewTimer"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.LeftOf="UserSearchBox">
+                <materialIcons:MaterialIcon Name="AddTimerButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="Add" />
+            </Button>
+
+
+            <!--  User Search Box  -->
+            <AutoCompleteBox Name="UserSearchBox"
+                             Width="245"
+                             Height="33"
+                             FilterMode="Contains"
+                             FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                             RelativePanel.AlignHorizontalCenterWithPanel="True"
+                             RelativePanel.AlignVerticalCenterWithPanel="True"
+                             Tapped="Tapped_UserSearchBox"
+                             Text="{Binding UserSearchEntry, Mode=TwoWay}"
+                             TextChanged="TextChanged_UserSearchBox"
+                             ToolTip.ShowDelay="2000" />
+
+
+            <!--  Quick Filter Button  -->
+            <Button Name="QuickFilterButton"
+                    Width="33"
+                    Height="33"
+                    Margin="10,0,10,0"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.RightOf="UserSearchBox"
+                    Tapped="Tapped_QuickFilterAlt">
+                <materialIcons:MaterialIcon Name="FilterMenu"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="ChevronDoubleRight" />
+            </Button>
+
+
+            <!--  Quick Filter Value  -->
+            <Button Name="QuickFilterValue"
+                    Width="140"
+                    Height="35"
+                    MinWidth="100"
+                    MaxWidth="220"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.RightOf="QuickFilterButton"
+                    Tapped="Tapped_QuickFilterSelection">
+
+                <TextBlock Name="QuickFilterSelectionText"
+                           Margin="0,0,0,0"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           FontSize="{DynamicResource ApplicationFontSize_Text}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                           LineSpacing="0"
+                           MaxLines="2"
+                           Text="{Binding QuickFilter.Header}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap" />
+
+                <Button.Flyout>
+                    <MenuFlyout ItemsSource="{Binding QuickFilters}">
+                        <MenuFlyout.ItemContainerTheme>
+                            <ControlTheme x:DataType="mm:MenuItemViewModel"
+                                          BasedOn="{StaticResource {x:Type MenuItem}}"
+                                          TargetType="MenuItem">
+
+                                <Setter Property="Header" Value="{Binding Header}" />
+                                <Setter Property="ItemsSource" Value="{Binding Items}" />
+                                <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                <Setter Property="Background" Value="{Binding BackgroundColor}" />
+
+                            </ControlTheme>
+                        </MenuFlyout.ItemContainerTheme>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <!--  Sort Strategy Choice  -->
+            <Button Name="SortStrategyButton"
+                    Width="33"
+                    Height="33"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.RightOf="QuickFilterValue"
+                    Tapped="Tapped_SortStrategySelection">
+                <Button.Flyout>
+                    <MenuFlyout ItemsSource="{Binding SortOptions}">
+                        <MenuFlyout.ItemContainerTheme>
+                            <ControlTheme x:DataType="mm:MenuItemViewModel"
+                                          BasedOn="{StaticResource {x:Type MenuItem}}"
+                                          TargetType="MenuItem">
+
+                                <Setter Property="Header" Value="{Binding Header}" />
+                                <Setter Property="ItemsSource" Value="{Binding Items}" />
+                                <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                <Setter Property="Background" Value="{Binding BackgroundColor}" />
+
+                            </ControlTheme>
+                        </MenuFlyout.ItemContainerTheme>
+                    </MenuFlyout>
+                </Button.Flyout>
+                <materialIcons:MaterialIcon Name="SortStrategyIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="Sort" />
+            </Button>
+
+            <!--  Refresh Button  -->
+            <Button Name="RefreshButton"
+                    Width="33"
+                    Height="33"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.RightOf="SortStrategyButton"
+                    Tapped="Tapped_RefreshList">
+                <materialIcons:MaterialIcon Name="RefreshButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="Refresh" />
+            </Button>
+
+			<!--  Bulk Action Button  -->
+			<Button Name="BulkActionButton"
+                    Width="33"
+                    Height="33"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.RightOf="RefreshButton">
+				<materialIcons:MaterialIcon Name="BulkActionButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="ListStatus" />
+			</Button>
+
+            <Panel RelativePanel.AlignRightWithPanel="True"
+                   ZIndex="99">
+
+                <Border Name="BackgroundForRightAlignedCutOff"
+                        Width="80"
+                        Height="40"
+                        Background="{DynamicResource ApplicationBrush_Background}" />
+            </Panel>
+
+            <!--  Settings  -->
+            <Button Name="SettingsButton"
+                    Width="33"
+                    Height="33"
+                    HorizontalAlignment="Right"
+                    Background="{DynamicResource ApplicationBrush_Background}"
+                    Content="Settings"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    RelativePanel.LeftOf="AboutButton"
+                    Tapped="Tapped_Settings"
+                    ZIndex="100">
+                <FlyoutBase.AttachedFlyout>
+                    <Flyout Placement="TopEdgeAlignedRight"
+                            ShowMode="TransientWithDismissOnPointerMoveAway">
+                        <views:SettingsFlyout Name="SettingsView" />
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
+
+                <materialIcons:MaterialIcon Name="SettingsButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="Settings" />
+            </Button>
+
+            <!--  About  -->
+            <Button Name="AboutButton"
+                    Width="33"
+                    Height="33"
+                    Margin="0,0,10,0"
+                    HorizontalAlignment="Right"
+                    Background="{DynamicResource ApplicationBrush_Background}"
+                    Content="About"
+                    RelativePanel.AlignRightWithPanel="True"
+                    RelativePanel.AlignVerticalCenterWith="UserSearchBox"
+                    Tapped="Tapped_About"
+                    ZIndex="100">
+
+                <FlyoutBase.AttachedFlyout>
+                    <Flyout Placement="TopEdgeAlignedRight"
+                            ShowMode="TransientWithDismissOnPointerMoveAway">
+                        <views:AboutFlyout Name="AboutButtonFlyout" />
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
+
+                <materialIcons:MaterialIcon Name="AboutButtonIcon"
+                                            Width="25"
+                                            Height="25"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="About" />
+            </Button>
+        </RelativePanel>
+
+        <!--  Dynamic List  -->
+        <ScrollViewer Grid.Row="1"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="1"
+                      Margin="0,0,0,0"
+                      Padding="0,0,0,0"
+                      HorizontalAlignment="Left">
+
+            <ItemsControl Name="TimerItemControl"
+                          Margin="0,0,10,0"
+                          Background="Transparent"
+                          ItemsSource="{Binding RelevantCommandTimers}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <views:CommandTimerItem />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

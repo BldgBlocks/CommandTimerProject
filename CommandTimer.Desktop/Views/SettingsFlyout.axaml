@@ -1,0 +1,395 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.SettingsFlyout"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mm="clr-namespace:CommandTimer.Core.ViewModels.MenuItems;assembly=CommandTimer.Core"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="500"
+             d:DesignWidth="300"
+             x:DataType="vm:SettingsFlyoutViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <!--
+            This only sets the DataContext for the previewer in an IDE,
+            to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs)
+        -->
+        <vm:SettingsFlyoutViewModel />
+    </Design.DataContext>
+
+    <StackPanel Name="RootPanel"
+                MinWidth="200"
+                MinHeight="200"
+                Margin="10"
+                Background="Transparent"
+                Orientation="Vertical">
+
+        <DockPanel LastChildFill="True">
+
+            <TextBlock Margin="12,0,0,0"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Center"
+                       DockPanel.Dock="Left"
+                       FontSize="{DynamicResource ApplicationFontSize_Header}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Text="Settings:" />
+
+            <!--  Theme  -->
+            <Button Name="ThemeButtonTop"
+                    Width="30"
+                    Height="30"
+                    Margin="5,0,0,0"
+                    Padding="0,0,0,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    DockPanel.Dock="Right"
+                    Tapped="Tapped_ThemeSelection">
+                <Button.Flyout>
+                    <MenuFlyout ItemsSource="{Binding ThemeSelections}"
+                                ShowMode="TransientWithDismissOnPointerMoveAway">
+                        <MenuFlyout.ItemContainerTheme>
+                            <ControlTheme x:DataType="mm:MenuItemViewModel"
+                                          BasedOn="{StaticResource {x:Type MenuItem}}"
+                                          TargetType="MenuItem">
+
+                                <Setter Property="Header" Value="{Binding Header}" />
+                                <Setter Property="ItemsSource" Value="{Binding Items}" />
+                                <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="CommandParameter" Value="{Binding Parameter}" />
+                                <Setter Property="Background" Value="{Binding BackgroundColor}" />
+
+                            </ControlTheme>
+                        </MenuFlyout.ItemContainerTheme>
+                    </MenuFlyout>
+                </Button.Flyout>
+
+                <materialIcons:MaterialIcon Name="ThemeMenuTop"
+                                            Width="26"
+                                            Height="26"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="ThemeLightDark" />
+            </Button>
+        </DockPanel>
+
+        <Separator Name="TopSeparator"
+                   Background="{Binding AccentColorSelection}" />
+
+        <CheckBox Name="ShouldAnimateCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Allow Animations"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldAnimate, Mode=TwoWay}" />
+
+        <CheckBox Name="ShouldExecuteOnTimerCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Allow Timers"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldExecuteOnTimer, Mode=TwoWay}" />
+
+        <CheckBox Name="ShouldNotifExpireCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Allow Timer Notifications To Expire"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldAutoNotificationsExpire, Mode=TwoWay}" />
+
+        <!--  AutoStart Options  -->
+        <StackPanel Name="AutoStartOptionsPanel"
+                    Orientation="Horizontal"
+                    Spacing="5">
+
+            <CheckBox Name="ShouldAutoStartCheckBox"
+                      Margin="10,0,0,0"
+                      Content="Allow AutoStart"
+                      FontSize="{DynamicResource ApplicationFontSize_Label}"
+                      FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                      IsChecked="{Binding ShouldAutoStart, Mode=TwoWay}" />
+
+            <Button Name="StartAutoStartButton"
+                    Height="30"
+                    Tapped="Tapped_StartAutoStartsButton">
+                <materialIcons:MaterialIcon Name="StartAutoStartIcon"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="StopwatchStart" />
+            </Button>
+
+            <Button Name="StopAutoStartButton"
+                    Height="30"
+                    Tapped="Tapped_StopAutoStartsButton">
+                <materialIcons:MaterialIcon Name="StopAutoStartIcon"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="StopwatchStopOutline" />
+            </Button>
+        </StackPanel>
+
+        <CheckBox Name="ShouldExpandColorBarCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Expand Color Bar"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldExpandColorBar, Mode=TwoWay}" />
+
+        <CheckBox Name="ShouldStripeCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Stripe list items"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldStripeList, Mode=TwoWay}" />
+
+        <CheckBox Name="ShouldLogCheckBox"
+                  Margin="10,0,0,0"
+                  Content="Activity Logging"
+                  FontSize="{DynamicResource ApplicationFontSize_Label}"
+                  FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                  IsChecked="{Binding ShouldLog, Mode=TwoWay}" />
+
+        <StackPanel Name="PromptOptionsPanel"
+                    Orientation="Horizontal"
+                    Spacing="5">
+
+            <CheckBox Name="ShouldPromptCheckBox"
+                      Margin="10,0,0,0"
+                      Content="Prompt By Default"
+                      FontSize="{DynamicResource ApplicationFontSize_Label}"
+                      FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                      IsChecked="{Binding ShouldPromptByDefault, Mode=TwoWay}" />
+
+            <Button Name="PromptPasswordButton"
+                    Height="30"
+                    Padding="5"
+                    Tapped="Tapped_PromptPasswordButton">
+                <Panel>
+                    <materialIcons:MaterialIcon Name="PromptPasswordIconTrue"
+                                                Width="20"
+                                                Height="20"
+                                                Foreground="Gold"
+                                                IsVisible="{Binding ShouldUsePasswordConfirmation}"
+                                                Kind="LockCheck" />
+
+                    <materialIcons:MaterialIcon Name="PromptTruePasswordIconFalse"
+                                                Width="20"
+                                                Height="20"
+                                                Foreground="{DynamicResource ApplicationBrush_Text}"
+                                                IsVisible="{Binding !ShouldUsePasswordConfirmation}"
+                                                Kind="UnlockedVariantOutline" />
+                </Panel>
+            </Button>
+
+        </StackPanel>
+
+        <!--  Database Options  -->
+        <StackPanel Name="BackupOptionsPanel"
+                    Orientation="Horizontal"
+                    Spacing="5">
+
+            <CheckBox Name="ShouldCleanDatabaseCheckBox"
+                      Margin="10,0,0,0"
+                      Content="Create Backup On Start"
+                      FontSize="{DynamicResource ApplicationFontSize_Label}"
+                      FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                      IsChecked="{Binding ShouldCleanDatabase, Mode=TwoWay}" />
+
+            <Button Name="RestoreBackupButton"
+                    Height="30"
+                    Padding="5"
+                    Tapped="Tapped_RestoreBackupButton">
+                <materialIcons:MaterialIcon Name="RestoreBackupIcon"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="DatabaseCheck" />
+            </Button>
+
+            <Button Name="CreateBackupButton"
+                    Height="30"
+                    Padding="5"
+                    Tapped="Tapped_CreateBackupButton">
+                <materialIcons:MaterialIcon Name="CreateBackupIcon"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="DatabaseAdd" />
+            </Button>
+
+            <Button Name="EraseBackupsButton"
+                    Height="30"
+                    Padding="5"
+                    Tapped="Tapped_EraseBackupsButton">
+                <materialIcons:MaterialIcon Name="EraseBackupsIcon"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="{DynamicResource ApplicationBrush_Text}"
+                                            Kind="DatabaseRemoveOutline" />
+            </Button>
+        </StackPanel>
+
+        <!--  Sliders  -->
+        <StackPanel Name="SliderVerticalStack"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Stretch">
+            <StackPanel Name="SliderHorizontalStack"
+                        Margin="28,0,0,-15"
+                        HorizontalAlignment="Stretch"
+                        Orientation="Horizontal">
+                <TextBlock FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="Backup Versions" />
+
+                <TextBlock FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="{Binding #BackupVersionsSlider.Value}" />
+            </StackPanel>
+
+            <Slider Name="BackupVersionsSlider"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    FontSize="{DynamicResource ApplicationFontSize_Label}"
+                    IsSnapToTickEnabled="True"
+                    Maximum="10"
+                    Minimum="0"
+                    SmallChange="1"
+                    TickFrequency="1"
+                    Value="{Binding BackupVersionsToKeep, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,0,0">
+            <StackPanel Margin="28,0,0,-15"
+                        Orientation="Horizontal">
+                <TextBlock FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="Max Lines" />
+
+                <TextBlock FontSize="{DynamicResource ApplicationFontSize_Label}"
+                           FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                           Text="{Binding #MaxLinesSlider.Value}" />
+
+            </StackPanel>
+
+            <Slider Name="MaxLinesSlider"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    FontSize="{DynamicResource ApplicationFontSize_Label}"
+                    IsSnapToTickEnabled="True"
+                    Maximum="5"
+                    Minimum="1"
+                    SmallChange="1"
+                    TickFrequency="1"
+                    Value="{Binding MaxLines, Mode=TwoWay}" />
+        </StackPanel>
+
+        <Grid Margin="12,0,0,0"
+              ColumnDefinitions="*, auto, auto"
+              RowDefinitions="18, 18">
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Margin="28,0,0,10"
+                       FontSize="{DynamicResource ApplicationFontSize_Label}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Text="Accent Color" />
+
+            <!--  Accent Color Picker  -->
+            <Border Name="ColorBar"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,0,0,0"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    Background="{Binding AccentColorSelection}"
+                    BorderBrush="{DynamicResource ApplicationBrush_Text}"
+                    CornerRadius="4"
+                    PointerEntered="PointerEntered_ColorBar"
+                    PointerExited="PointerExited_ColorBar"
+                    Tapped="Tapped_ColorBar">
+                <FlyoutBase.AttachedFlyout>
+                    <!--  Flyout with Color Picker  -->
+                    <Flyout Placement="TopEdgeAlignedLeft"
+                            PlacementAnchor="TopLeft"
+                            ShowMode="Transient">
+                        <StackPanel Width="300"
+                                    Margin="20,0,20,0"
+                                    HorizontalAlignment="Right"
+                                    Orientation="Vertical">
+
+                            <!--  Color Spectrum/Slider  -->
+                            <ColorView Name="ColorPickerControl"
+                                       Margin="-20,0,-20,0"
+                                       ColorChanged="Changed_ColorPick"
+                                       ColorSpectrumShape="Ring"
+                                       IsVisible="True"
+                                       Color="{Binding AccentColorSelection.Color, Mode=OneWay}" />
+
+                            <!--  Apply and Cancel Buttons  -->
+                            <StackPanel Margin="5"
+                                        HorizontalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="20">
+
+                                <Button Width="70"
+                                        Height="35"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Content="Cancel"
+                                        FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                                        Tapped="Tapped_CancelColor" />
+
+                                <Button Name="ColorApplyButton"
+                                        Width="70"
+                                        Height="35"
+                                        Margin="0,0,5,0"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Content="Apply"
+                                        FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                                        IsDefault="True"
+                                        Tapped="Tapped_ApplyColor" />
+
+                            </StackPanel>
+                        </StackPanel>
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
+            </Border>
+
+            <!--  Reset Color Button  -->
+            <Button Name="ResetColorButton"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Width="20"
+                    Height="20"
+                    Margin="5,0,0,0"
+                    Padding="4"
+                    Tapped="Tapped_ResetAccentColor">
+                <materialIcons:MaterialIcon Name="ResetColorButtonIcon"
+                                            Width="18"
+                                            Height="18"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="UndoVariant" />
+            </Button>
+
+            <!--  System Color Button  -->
+            <Button Name="SystemColorButton"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Width="20"
+                    Height="20"
+                    Margin="5,0,0,0"
+                    Padding="4"
+                    Tapped="Tapped_UseSystemColor">
+                <materialIcons:MaterialIcon Name="SystemColorButtonIcon"
+                                            Width="18"
+                                            Height="18"
+                                            Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
+                                            Kind="PaletteSwatchVariant" />
+            </Button>
+        </Grid>
+    </StackPanel>
+
+</UserControl>

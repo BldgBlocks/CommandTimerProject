@@ -1,0 +1,33 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.MessageViewer"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CommandTimer.Desktop.Views"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="400"
+             d:DesignWidth="500"
+             x:DataType="vm:MessageViewerViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MessageViewerViewModel />
+    </Design.DataContext>
+
+    <Canvas Name="MessageCanvas"
+            IsHitTestVisible="True">
+
+        <ItemsControl Name="MessageList"
+                      Canvas.Top="60"
+                      Canvas.Right="30"
+                      Width="400"
+                      ItemsSource="{Binding Messages}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <views:MessageControl Tapped="Tapped_ItemTapped" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </Canvas>
+</UserControl>

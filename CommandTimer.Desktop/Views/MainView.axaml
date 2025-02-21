@@ -1,0 +1,44 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.MainView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="450"
+             d:DesignWidth="1200"
+             x:DataType="vm:MainViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Grid Name="MainViewBaseGrid"
+          ColumnDefinitions="*"
+          RowDefinitions="*, 1, auto">
+
+        <!--  Content Panel in the right column  -->
+        <Panel Grid.Row="0"
+               Grid.Column="0">
+
+            <ContentPresenter Name="MainViewMain" />
+
+        </Panel>
+
+        <!--  Horizontal GridSplitter between rows  -->
+        <Rectangle Grid.Row="1"
+                   Grid.ColumnSpan="1"
+                   Fill="Black" />
+
+        <!--  Bottom Row Content  -->
+        <Panel Grid.Row="2"
+               Grid.ColumnSpan="1"
+               MinHeight="30"
+               MaxHeight="60">
+
+            <ContentPresenter Name="MainViewBottom" />
+
+        </Panel>
+
+    </Grid>
+</UserControl>

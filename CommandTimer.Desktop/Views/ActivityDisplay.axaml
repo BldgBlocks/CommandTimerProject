@@ -1,0 +1,86 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.ActivityDisplay"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:CommandTimer.Desktop.Views"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="50"
+             d:DesignWidth="1400"
+             x:DataType="vm:ActivityDisplayViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:ActivityDisplayViewModel />
+    </Design.DataContext>
+
+    <!--  Horizontal Panel 1  -->
+    <WrapPanel Grid.Row="0"
+               Grid.Column="0"
+               Grid.ColumnSpan="3"
+               MaxHeight="60"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               Orientation="Horizontal">
+
+        <TextBlock Name="LibrariesLabel"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                   Text="Libraries: " />
+
+        <TextBlock Name="LibrariesValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="2" />
+
+        <TextBlock Name="Spacer01"
+                   Text="  " />
+
+        <TextBlock Name="CommandsLabel"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                   Text="Commands: " />
+
+        <TextBlock Name="CurrentCommandsValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="(34 current)" />
+
+        <TextBlock Name="TotalCommandsValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="(35 Total)" />
+
+        <TextBlock Name="ActiveCommandsValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="(4 Active)" />
+
+        <TextBlock Name="Spacer02"
+                   Text="  " />
+
+        <TextBlock Name="NextTimerLabel"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Heavy}"
+                   Text=" Next Timer: " />
+
+        <TextBlock Name="CommandNameValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="Recording Stop" />
+
+        <TextBlock Name="CompletesInLabel"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="completes in" />
+
+        <TextBlock Name="CompletesInValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="35:10" />
+
+        <TextBlock Name="CompletesAtLabel"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="at" />
+
+        <TextBlock Name="CompletesAtValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Text="3:10pm." />
+
+        <TextBlock Name="CurrentTimeValue"
+                   FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                   Foreground="Gray"
+                   Text="Current Time: 3:10pm." />
+    </WrapPanel>
+</UserControl>

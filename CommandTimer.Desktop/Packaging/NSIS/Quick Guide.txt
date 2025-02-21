@@ -1,0 +1,16 @@
+﻿1. Publish the app for windows as a self contained build.
+	- This gives you a folder of files even if you select single-file build.
+2. Navigate to that build and zip the folder.
+3. Open NSIS Quick Setup Script Generator, download if needed, and load/configure the profile to generate install exe.
+	- Setup is really simple. Future may create a custom script that is run that is included in the project.
+	- * Change the version *
+4. This will install and register the application on the Windows machine and create an uninstaller.
+
+**************************
+
+ALT:
+1. Publish the app for windows as a self contained build.
+	- This gives you a folder of files even if you select single-file build.
+2. Navigate to that build folder.
+3. Navigate to the NSIS folder within, right click the .nsi file, choose 'Compile NSIS Script'
+4. This will open NSIS, compile and package the folder contents, and output to the * .../Documents/CommandTimer/Windows/Distributables * folder.

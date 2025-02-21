@@ -1,0 +1,7 @@
+﻿[Desktop Entry]
+Name=Command Timer
+Exec=flatpak run org.commandtimer.commandtimer
+Icon=command-timer-icon
+Type=Application
+Categories=Utility;
+Keywords=command;timer;terminal;

@@ -1,0 +1,45 @@
+<UserControl x:Class="CommandTimer.Desktop.Views.MessageControl"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
+             d:DesignHeight="200"
+             d:DesignWidth="800"
+             x:DataType="vm:MessageControlViewModel"
+             mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MessageControlViewModel />
+    </Design.DataContext>
+
+    <StackPanel Margin="0,5,0,5"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+
+        <Border Margin="0,0,0,0"
+                Background="{Binding Background}"
+                BorderBrush="{DynamicResource ApplicationBrush_Accent}"
+                BorderThickness="8,0,0,1"
+                CornerRadius="6,0,6,0">
+
+            <TextBlock Name="MessageTextBlock"
+                       MinWidth="200"
+                       MinHeight="30"
+                       MaxWidth="300"
+                       Margin="0,0,0,0"
+                       Padding="5"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Background="Transparent"
+                       FontSize="{DynamicResource ApplicationFontSize_Text}"
+                       FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
+                       Foreground="{Binding Foreground}"
+                       LineSpacing="3"
+                       MaxLines="5"
+                       Text="{Binding Message}"
+                       TextAlignment="Left"
+                       TextWrapping="Wrap" />
+        </Border>
+    </StackPanel>
+</UserControl>

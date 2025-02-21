@@ -1,0 +1,18 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- Add Resources Here - Colors defined here are for axaml file use. -->
+	<SolidColorBrush x:Key="ApplicationBrush_Background" Color="#1e1e1e"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Contrast" Color="#1Acccccc"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Overlay" Color="#3e3e3e"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Accent" Color="#BD4747"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Inconspicuous" Color="#CFCFCF"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Stripe" Color="#161616"/>
+	<SolidColorBrush x:Key="ApplicationBrush_DoThingIntended" Color="#84FF84"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Bad" Color="#BD4747"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Text" Color="#F7F7F7"/>
+	<SolidColorBrush x:Key="ApplicationBrush_Highlight" Color="#FFFF00"/>
+	<FontWeight x:Key="ApplicationFontWeight_Light">Light</FontWeight>
+	<FontWeight x:Key="ApplicationFontWeight_Medium">Normal</FontWeight>
+	<FontWeight x:Key="ApplicationFontWeight_Heavy">Bold</FontWeight>
+	<x:Double x:Key="ApplicationOpacity_Gradient">0.85</x:Double>
+</ResourceDictionary>
