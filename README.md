@@ -1,8 +1,10 @@
 # Command Timer - Timing & Organization of Commands #
-
+  
 Organize your complex commands that can take a lot of time, research, trial and effort.
 Use friendly naming, description, ordering, categorizing, and coloring to help sort and find
 what you are looking for. You can also share your libraries with others.
+
+<img src="https://github.com/BldgBlocks/CommandTimerProject/blob/main/CommandTimer.Desktop/Assets/Resources/IntroSlider_Linux_1920px_30fps.gif" alt="IntroSlider">
 
 ## Introduction ##
 
