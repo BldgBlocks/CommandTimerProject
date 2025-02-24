@@ -21,5 +21,5 @@ This project is still in development. It is functional, but features are still b
 
 ## Support ##
 
-Monero - "87vRCaVUdbs63TeiWdsVwBKBiQo8RiGMUPy2K65ya7QLBWVF8nSmQVmdvx9AiMB8eU1LnPcUk2K4Q1gRmULRAFMsFxS7rgE"
-BTC - "bc1qqhqrlm5hkd994ehmwju8ju2swmu38wczcrhvrf"
+- Monero: "87vRCaVUdbs63TeiWdsVwBKBiQo8RiGMUPy2K65ya7QLBWVF8nSmQVmdvx9AiMB8eU1LnPcUk2K4Q1gRmULRAFMsFxS7rgE"
+- BTC: "bc1qqhqrlm5hkd994ehmwju8ju2swmu38wczcrhvrf"
