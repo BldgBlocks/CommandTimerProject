@@ -16,6 +16,7 @@ in a very flexible and transparent way. Command Timer provides some friendly way
 
 This project is still in development. It is functional, but features are still being added. See the roadmap below.
 
+- Linux depends on having Kitty installed until fixed. 
 - Linux theme colors are not detected (Windows is supported) and will require something to parse them
 - User memorable image tag per item
 
