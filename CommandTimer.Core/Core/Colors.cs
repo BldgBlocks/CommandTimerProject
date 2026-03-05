@@ -85,7 +85,7 @@ public static class Colors {
             }
         }
         if (themeVariant == ThemeVariant.Light) {
-            if (DarkDefaults.TryGetValue(resourceKey, out var lightColor)) {
+            if (LightDefaults.TryGetValue(resourceKey, out var lightColor)) {
                 brush = new(lightColor);
                 return true;
             }
@@ -97,7 +97,7 @@ public static class Colors {
     public static bool TryGetBrush(string resourceKey, out SolidColorBrush brush, ThemeVariant? themeVariant = null) {
         if (Application.Current is not Application current)
             throw new Exceptions.ApplicationException($"Application not found.");
-        var found = current.Resources.TryGetResource(resourceKey, themeVariant ?? current.RequestedThemeVariant, out var value);
+        var found = current.Resources.TryGetResource(resourceKey, themeVariant ?? current.ActualThemeVariant, out var value);
         brush = value as SolidColorBrush ?? new SolidColorBrush(Avalonia.Media.Colors.Purple);
         return found;
     }
