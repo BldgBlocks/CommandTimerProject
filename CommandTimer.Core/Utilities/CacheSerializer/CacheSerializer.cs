@@ -221,7 +221,7 @@ public partial class CacheSerializer : ISerializer {
         PurgeData(filePath);
 
         var files = GetFilesWithRootName(fileName).Where(IsBackupFile)
-                                                  .OrderBy(i => ExtractVersionNumber(fileName))
+                                                  .OrderBy(i => ExtractVersionNumber(i))
                                                   .ToArray();
         if (files.Length is 0) return;
 
@@ -238,16 +238,13 @@ public partial class CacheSerializer : ISerializer {
 
     public void Serialize<T>(string key, T value, string fileName) {
         string filePath = GetPathForFileNameWithExtension(fileName);
-        string jsonText;
 
         _changes[filePath] = _changes.TryGetValue(filePath, out int count) ? ++count : 1;
 
         try {
             var data = GetData(filePath);
-            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(value, typeof(T), _jsonOptions));
-
-            jsonText = doc.RootElement.GetRawText();
-            data[key] = JsonDocument.Parse(jsonText).RootElement;
+            var jsonText = JsonSerializer.Serialize(value, typeof(T), _jsonOptions);
+            data[key] = JsonDocument.Parse(jsonText).RootElement.Clone();
 
             _onCommit(this);
         }
@@ -324,8 +321,8 @@ public partial class CacheSerializer : ISerializer {
     private void MakeFileJson(string filePath) {
         try {
             if (File.Exists(filePath)) {
-                using StreamReader reader = new(filePath);
-                if (reader.ReadLine()?.Contains('{') is false) {
+                var content = File.ReadAllText(filePath);
+                if (!content.Contains('{')) {
                     File.WriteAllText(filePath, JSON_BASE_TOKEN);
                 }
             }
