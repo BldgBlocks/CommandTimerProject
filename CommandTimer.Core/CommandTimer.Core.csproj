@@ -74,6 +74,10 @@
     </AvaloniaResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CommandTimer.Core\ViewModels\" />
+  </ItemGroup>
+
   <Import Project="..\ControlsLibrary\ControlsLibrary.projitems" Label="Shared" />
 	
 </Project>
