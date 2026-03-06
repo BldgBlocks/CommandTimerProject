@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Threading.Tasks;
 
 
 namespace CommandTimer.Core.ViewModels;
@@ -15,12 +14,12 @@ public partial class CommandTimerViewModel : ViewModelBase {
 
     public CommandTimerViewModel() {
         Data = new CommandTimerData();
-        Subscribe();
+        Engine = new CommandTimerEngine(this);
     }
 
     public CommandTimerViewModel(CommandTimerData data) {
         Data = data;
-        Subscribe();
+        Engine = new CommandTimerEngine(this);
     }
 
     public static CommandTimerViewModel Create(string name = PLACEHOLDER_NAME) {
@@ -40,23 +39,11 @@ public partial class CommandTimerViewModel : ViewModelBase {
         return clone;
     }
 
-    private void Subscribe() {
-        /// Runs all the time for UI
-        WillCall.Subscribe(Core.Settings.Keys.WillCall_Key_On100ms, Core.Settings.Keys.WillCall_Interval_On100ms, EventHandler_UpdateCountdown);
-        /// Runs only when active.
-        WillCall.Subscribe(WillCallExecutionKey, ExecutionUpdateInterval.Milliseconds, EventHandler_CheckExecution);
-    }
-
-    public void Unsubscribe() {
-        WillCall.Unsubscribe(Core.Settings.Keys.WillCall_Key_On100ms, Core.Settings.Keys.WillCall_Interval_On100ms, EventHandler_UpdateCountdown);
-        WillCall.Unsubscribe(WillCallExecutionKey, ExecutionUpdateInterval.Milliseconds, EventHandler_CheckExecution);
-    }
+    public void Unsubscribe() => Engine.Unsubscribe();
 
 
     //... Fields
 
-    public static readonly TimeSpan ExecutionThreshold = TimeSpan.FromMilliseconds(500);
-    public static readonly TimeSpan ExecutionUpdateInterval = TimeSpan.FromMilliseconds(100);
     public static readonly TimeSpan MinimumTimer = CommandTimerData.MinimumTimer;
     public static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
 
@@ -65,16 +52,13 @@ public partial class CommandTimerViewModel : ViewModelBase {
     public const string PLACEHOLDER_DESCRIPTION = CommandTimerData.PLACEHOLDER_DESCRIPTION;
     public string CountDownFormat => TimeSpanTillExecution.Duration() > OneDay ? @"dd\:hh\:mm\:ss" : @"hh\:mm\:ss";
 
-    private const string WillCallExecutionKey = "CommandTimerItemExecution";
-
-    private bool _executionGate;
-
     public enum TimeModeChoice { Duration, Time, Date }
 
 
-    //... Data
+    //... Data & Engine
 
     internal CommandTimerData Data { get; }
+    internal CommandTimerEngine Engine { get; }
 
 
     //...
@@ -88,64 +72,13 @@ public partial class CommandTimerViewModel : ViewModelBase {
     public override void Unserialize()
         => ServiceProvider.Get<ISerializer>().Unserialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", LibraryName);
 
-    private void EventHandler_UpdateCountdown(object? sender, EventArgs args) {
-        Update_Countdown();
-    }
-
-    private void EventHandler_CheckExecution(object? sender, EventArgs args) {
-        CheckTimeTillExecution();
-    }
-
     public void Update_Countdown()
         => CountdownTillExecution = TimeSpanTillExecution.ToString(CountDownFormat);
 
-    private void CheckTimeTillExecution() {
-        if (IsActive is false) return;
-        if (TimeSpanTillExecution < ExecutionThreshold) {
-            if (IsLoop && Enum.Equals(TimeMode, TimeModeChoice.Time | TimeModeChoice.Duration)) {
-                StartTime = StartTime.Add(TargetTimeSpanTillExecution);
+    public void ExecuteCommand() => Engine.ExecuteCommand();
 
-                if (StartTime < DateTime.Now) StartTime = DateTime.Now;
 
-                IsActive = true;
-            }
-            else {
-                /// Leave start time as the last start time.
-                IsActive = false;
-            }
-
-            if (Core.Settings.ShouldExecuteOnTimer.Value) {
-                Core.MessageRelay.OnMessagePosted(this, $"Executing [{Name}]", Core.MessageRelay.MessageCategory.User, Core.Settings.ShouldAutoNotificationsExpire.Value ? 0 : 100);
-                ExecuteCommand();
-            }
-        }
-    }
-
-    public async void ExecuteCommand() {
-        if (_executionGate) return;
-        _executionGate = true;
-
-        if (string.IsNullOrWhiteSpace(Command) || Command == CommandTimerViewModel.PLACEHOLDER_COMMAND) {
-            Core.MessageRelay.OnMessagePosted(this, $"Executing [{Name}]: The command is empty...", Core.MessageRelay.MessageCategory.User);
-
-            _executionGate = false;
-            return;
-        }
-
-        SystemInteraction.Execute.Command(Command, Name, IsShowTerminal);
-
-        /// Minimum time removes accidental double clicks and such.
-        int minDelay = 1;
-        /// If active timer should loop, then ensure time is not so fast that the user can not respond.
-        if (IsLoop && IsActive && TargetTimeSpanTillExecution <= TimeSpan.FromSeconds(5)) {
-            Core.MessageRelay.OnMessagePosted(this, $"Executing [{Name}]: A minimum execution timer is being enforced.", Core.MessageRelay.MessageCategory.User);
-            minDelay = 5;
-        }
-
-        await Task.Delay(TimeSpan.FromSeconds(minDelay));
-
-        _executionGate = false;
-    }
+    //... UI Methods
 
     public void IndexBackgroundStripe(int index) {
         if (index % 2 == 0) {
