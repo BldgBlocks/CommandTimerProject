@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -55,7 +56,7 @@ public partial class App : Application {
     public static Task<string?> CopyFromClipboardAsync() {
         if (MainWindow.Instance is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
 
-        return clipboard.GetTextAsync();
+        return ClipboardExtensions.TryGetTextAsync(clipboard);
     }
 
     public override void OnFrameworkInitializationCompleted() {
