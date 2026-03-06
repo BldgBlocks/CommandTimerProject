@@ -3,9 +3,9 @@ using Avalonia.Media;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 
@@ -14,8 +14,13 @@ namespace CommandTimer.Core.ViewModels;
 public partial class CommandTimerViewModel : ViewModelBase {
 
     public CommandTimerViewModel() {
+        Data = new CommandTimerData();
         Subscribe();
+    }
 
+    public CommandTimerViewModel(CommandTimerData data) {
+        Data = data;
+        Subscribe();
     }
 
     public static CommandTimerViewModel Create(string name = PLACEHOLDER_NAME) {
@@ -52,12 +57,12 @@ public partial class CommandTimerViewModel : ViewModelBase {
 
     public static readonly TimeSpan ExecutionThreshold = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan ExecutionUpdateInterval = TimeSpan.FromMilliseconds(100);
-    public static readonly TimeSpan MinimumTimer = TimeSpan.FromSeconds(10);
+    public static readonly TimeSpan MinimumTimer = CommandTimerData.MinimumTimer;
     public static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
 
-    public const string PLACEHOLDER_COMMAND = "Enter a command here...";
-    public const string PLACEHOLDER_NAME = "Enter a name";
-    public const string PLACEHOLDER_DESCRIPTION = "Enter a description";
+    public const string PLACEHOLDER_COMMAND = CommandTimerData.PLACEHOLDER_COMMAND;
+    public const string PLACEHOLDER_NAME = CommandTimerData.PLACEHOLDER_NAME;
+    public const string PLACEHOLDER_DESCRIPTION = CommandTimerData.PLACEHOLDER_DESCRIPTION;
     public string CountDownFormat => TimeSpanTillExecution.Duration() > OneDay ? @"dd\:hh\:mm\:ss" : @"hh\:mm\:ss";
 
     private const string WillCallExecutionKey = "CommandTimerItemExecution";
@@ -67,14 +72,18 @@ public partial class CommandTimerViewModel : ViewModelBase {
     public enum TimeModeChoice { Duration, Time, Date }
 
 
+    //... Data
+
+    internal CommandTimerData Data { get; }
+
+
     //...
 
-    [JsonIgnore]
     public CommandTimerLibrary Library
         => LibraryManager.FindLibrary(LibraryName) ?? LibraryManager.CurrentLibrary;
 
     public override void Serialize()
-        => ServiceProvider.Get<ISerializer>().Serialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", this, LibraryName);
+        => ServiceProvider.Get<ISerializer>().Serialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", Data, LibraryName);
 
     public override void Unserialize()
         => ServiceProvider.Get<ISerializer>().Unserialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", LibraryName);
@@ -151,95 +160,105 @@ public partial class CommandTimerViewModel : ViewModelBase {
     public void ResetBackground() => Background = Core.Colors.ApplicationBrush_Transparent;
 
 
-    //... Bindings
+    //... Bindings — UI-only properties (not serialized)
 
-    [JsonInclude]
-    [JsonPropertyName("Background")]
     private SolidColorBrush _Background = Core.Colors.ApplicationBrush_Transparent;
-    [JsonIgnore]
     public SolidColorBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
 
-    [JsonInclude]
-    [JsonPropertyName("Accent")]
     private SolidColorBrush _Accent = Core.Colors.ApplicationBrush_Accent;
-    [JsonIgnore]
     public SolidColorBrush Accent { get => _Accent; set => SetProperty(ref _Accent, value, Save.No, Notify.Yes); }
 
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel> CopyMoveSelections { get; } = [];
 
-    [JsonInclude]
-    [JsonPropertyName("Name")]
-    private string _Name = PLACEHOLDER_NAME;
-    [JsonIgnore]
-    public string Name { get => _Name; set => SetProperty(ref _Name, value, Save.No, Notify.Yes); }
 
-    [JsonInclude]
-    [JsonPropertyName("LibraryName")]
-    private string _Library = LibraryManager.DEFAULT_LIBRARY;
-    [JsonIgnore]
-    public string LibraryName { get => _Library; set => SetProperty(ref _Library, value, Save.No, Notify.Yes); }
+    //... Bindings — Delegated to Data (ViewModel setters add Save/Notify behavior)
 
-    [JsonInclude]
-    [JsonPropertyName("Description")]
-    private string _Description = PLACEHOLDER_DESCRIPTION;
-    [JsonIgnore]
-    public string Description { get => _Description; set => SetProperty(ref _Description, value, Save.Yes, Notify.Yes); }
+    public string Name {
+        get => Data.Name;
+        set { var old = Data.Name; Data.Name = value; SetPropertyNotify(old, value); }
+    }
+
+    public string LibraryName {
+        get => Data.LibraryName;
+        set { var old = Data.LibraryName; Data.LibraryName = value; SetPropertyNotify(old, value); }
+    }
+
+    public string Description {
+        get => Data.Description;
+        set { var old = Data.Description; Data.Description = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public string Command {
+        get => Data.Command;
+        set { var old = Data.Command; Data.Command = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsLog {
+        get => Data.IsLog;
+        set { var old = Data.IsLog; Data.IsLog = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsShowTerminal {
+        get => Data.IsShowTerminal;
+        set { var old = Data.IsShowTerminal; Data.IsShowTerminal = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public TimeModeChoice TimeMode {
+        get => (TimeModeChoice)Data.TimeMode;
+        set { var old = (TimeModeChoice)Data.TimeMode; Data.TimeMode = (CommandTimerData.TimeModeChoice)value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsLoop {
+        get => Data.IsLoop;
+        set { var old = Data.IsLoop; Data.IsLoop = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsAutoStart {
+        get => Data.IsAutoStart;
+        set { var old = Data.IsAutoStart; Data.IsAutoStart = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsPromptForExecute {
+        get => Data.IsPromptForExecute;
+        set { var old = Data.IsPromptForExecute; Data.IsPromptForExecute = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public bool IsFavorite {
+        get => Data.IsFavorite;
+        set { var old = Data.IsFavorite; Data.IsFavorite = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public SolidColorBrush ColorBarColor {
+        get => Data.ColorBarColor;
+        set { var old = Data.ColorBarColor; Data.ColorBarColor = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public TimeSpan TargetTimeSpanTillExecution {
+        get => Data.TargetTimeSpanTillExecution;
+        set {
+            if (value < MinimumTimer) {
+                Core.MessageRelay.OnMessagePosted(this, "A minimum timer value has been enforced. \r\nConsider changing settings.", Core.MessageRelay.MessageCategory.User);
+                value = MinimumTimer;
+            }
+            var old = Data.TargetTimeSpanTillExecution;
+            Data.TargetTimeSpanTillExecution = value;
+            SetPropertySaveNotify(old, value);
+        }
+    }
+
+    public DateTime TargetDateTillExecution {
+        get => Data.TargetDateTillExecution;
+        set { var old = Data.TargetDateTillExecution; Data.TargetDateTillExecution = value; SetPropertySaveNotify(old, value); }
+    }
+
+    public DateTime StartTime {
+        get => Data.StartTime;
+        set { var old = Data.StartTime; Data.StartTime = value; SetPropertySaveNotify(old, value); }
+    }
 
 
-    [JsonInclude]
-    [JsonPropertyName("Command")]
-    private string _Command = PLACEHOLDER_COMMAND;
-    [JsonIgnore]
-    public string Command { get => _Command; set => SetProperty(ref _Command, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsLog")]
-    private bool _IsLog = true;
-    [JsonIgnore]
-    public bool IsLog { get => _IsLog; set => SetProperty(ref _IsLog, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsShowTerminal")]
-    private bool _IsShowTerminal;
-    [JsonIgnore]
-    public bool IsShowTerminal { get => _IsShowTerminal; set => SetProperty(ref _IsShowTerminal, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsTimeMode")]
-    private TimeModeChoice _IsTimeMode;
-    [JsonIgnore]
-    public TimeModeChoice TimeMode { get => _IsTimeMode; set => SetProperty(ref _IsTimeMode, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsLoop")]
-    private bool _IsLoop;
-    [JsonIgnore]
-    public bool IsLoop { get => _IsLoop; set => SetProperty(ref _IsLoop, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsAutoStart")]
-    private bool _IsAutoStart;
-    [JsonIgnore]
-    public bool IsAutoStart { get => _IsAutoStart; set => SetProperty(ref _IsAutoStart, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("IsPromptForExecute")]
-    private bool _IsPromptForExecute;
-    [JsonIgnore]
-    public bool IsPromptForExecute { get => _IsPromptForExecute; set => SetProperty(ref _IsPromptForExecute, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonIgnore]
     private bool _IsActive;
-    [JsonIgnore]
     public bool IsActive {
         get => _IsActive;
         set {
@@ -252,67 +271,14 @@ public partial class CommandTimerViewModel : ViewModelBase {
     }
 
 
-    [JsonInclude]
-    [JsonPropertyName("IsFavorite")]
-    private bool _IsFavorite;
-    [JsonIgnore]
-    public bool IsFavorite { get => _IsFavorite; set => SetProperty(ref _IsFavorite, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("ColorBarColor")]
-    private SolidColorBrush _ColorBarColor = Core.Colors.ApplicationBrush_Accent;
-    [JsonIgnore]
-    public SolidColorBrush ColorBarColor { get => _ColorBarColor; set => SetProperty(ref _ColorBarColor, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonInclude]
-    [JsonPropertyName("TargetTimeSpan")]
-    private TimeSpan _TargetTimeSpanTillExecution = MinimumTimer;
-    [JsonIgnore]
-    public TimeSpan TargetTimeSpanTillExecution {
-        get => _TargetTimeSpanTillExecution;
-        set {
-            if (value < MinimumTimer) {
-                Core.MessageRelay.OnMessagePosted(this, "A minimum timer value has been enforced. \r\nConsider changing settings.", Core.MessageRelay.MessageCategory.User);
-                value = MinimumTimer;
-            }
-
-            SetProperty(ref _TargetTimeSpanTillExecution, value, Save.Yes, Notify.Yes);
-        }
-    }
-
-    [JsonInclude]
-    [JsonPropertyName("TargetDate")]
-    private DateTime _TargetDateTillExecution = DateTime.Today.AddDays(1);
-    [JsonIgnore]
-    public DateTime TargetDateTillExecution {
-        get => _TargetDateTillExecution;
-        set {
-            SetProperty(ref _TargetDateTillExecution, value, Save.Yes, Notify.Yes);
-        }
-    }
-
-    [JsonInclude]
-    [JsonPropertyName("StartTime")]
-    private DateTime _StartTime;
-    [JsonIgnore]
-    public DateTime StartTime { get => _StartTime; set => SetProperty(ref _StartTime, value, Save.Yes, Notify.Yes); }
-
-
-    [JsonIgnore]
-    private string _CountdownTillExecution = MinimumTimer.ToString(@"hh\:mm\:ss");
-    [JsonIgnore]
+    private string _CountdownTillExecution = CommandTimerData.MinimumTimer.ToString(@"hh\:mm\:ss");
     public string CountdownTillExecution { get => _CountdownTillExecution; set => SetProperty(ref _CountdownTillExecution, value); }
 
 
-    [JsonIgnore]
     private int _MaxLines = 1;
-    [JsonIgnore]
     public int MaxLines { get => _MaxLines; set => SetProperty(ref _MaxLines, value); }
 
 
-    [JsonIgnore]
     public TimeSpan TimeSpanTillExecution {
         get {
             switch (TimeMode) {
@@ -374,22 +340,18 @@ public partial class CommandTimerViewModel : ViewModelBase {
 
     //... Animated Transition Properties
 
-    [JsonIgnore]
     private Double _Opacity;
     /// <summary>
     /// Not bound through axaml. The code behind binds a transition that monitors this property and is bound to a control.
     /// </summary>
-    [JsonIgnore]
     public Double Opacity { get => _Opacity; set => SetProperty(ref _Opacity, value); }
 
 
-    [JsonIgnore]
     private Thickness _PaddingLeft;
     /// <summary>
     /// Not bound through axaml. The code behind binds a transition that monitors this property and is bound to a control.
     /// </summary>
     /// 
-    [JsonIgnore]
     public Thickness PaddingLeft { get => _PaddingLeft; set => SetProperty(ref _PaddingLeft, value); }
 
     public void TimeStrategyCommand(string parameter) {
@@ -401,6 +363,30 @@ public partial class CommandTimerViewModel : ViewModelBase {
         }
         else if (string.Equals(parameter, "Date", StringComparison.OrdinalIgnoreCase)) {
             TimeMode = TimeModeChoice.Date;
+        }
+    }
+
+
+    //... Delegation Helpers
+
+    /// <summary>
+    /// Notify-only: value already written to Data. Fires PropertyChanged if changed.
+    /// </summary>
+    private void SetPropertyNotify<T>(T oldValue, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null) {
+        if (!EqualityComparer<T>.Default.Equals(oldValue, newValue)) {
+            OnPropertyChanged(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// Save + Notify: value already written to Data. Fires PropertyChanged and serializes if changed.
+    /// </summary>
+    private void SetPropertySaveNotify<T>(T oldValue, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null) {
+        if (!EqualityComparer<T>.Default.Equals(oldValue, newValue)) {
+            OnPropertyChanged(propertyName);
+            if (ShouldSerialize) {
+                Serialize();
+            }
         }
     }
 }

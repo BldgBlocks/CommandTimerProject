@@ -87,8 +87,10 @@ public partial class CommandTimerLibrary {
     public void Serialize() 
         => ServiceProvider.Get<ISerializer>().Serialize($"{Core.Settings.Keys.LibraryPrefix}{LibraryName}", this, LibraryName);
 
-    private CommandTimerViewModel? Deserialize(string name)
-        => ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerViewModel>($"{Core.Settings.Keys.CommandTimerPrefix}{name}", LibraryName);
+    private CommandTimerViewModel? Deserialize(string name) {
+        var data = ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerData>($"{Core.Settings.Keys.CommandTimerPrefix}{name}", LibraryName);
+        return data is not null ? new CommandTimerViewModel(data) : null;
+    }
 
     //... Names
 
