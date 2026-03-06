@@ -147,8 +147,8 @@ public partial class App : Application {
         var message = FlattenException(exception);
 
         /// Avalonia Dbus nuisance
-        if (exception is AggregateException 
-            && message.Contains("com.canonical.AppMenu.Registrar")
+        if ((exception is AggregateException 
+            && message.Contains("com.canonical.AppMenu.Registrar"))
             || message.Contains("The name is not activatable")) {
             /// Avalonia Dbus integration is causing exceptions.
             /// Ignore the exception.
@@ -157,13 +157,12 @@ public partial class App : Application {
 
         /// Here you log, display error messages, or attempt recovery
         LogException(context, exception);
-        ShowUserError($"Source: {exception.Source} {message}");
+        ShowUserError($"[{context}] Source: {exception.Source} {message}");
         /// Optionally, decide if you can continue or should initiate shutdown
     }
 
     private void LogException(string context, Exception ex) {
-        /// Implement your logging here
-
+        Core.MessageRelay.OnMessagePosted(nameof(App), $"[{context}] {ex.GetType().Name}: {ex.Message}", Core.MessageRelay.MessageCategory.Exception);
     }
 
     private static string FlattenException(Exception exception) {
@@ -187,7 +186,7 @@ public partial class App : Application {
 
     private void ShowUserError(string message) {
         int limit = 3000;
-        Core.MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message);
+        Core.MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, Core.MessageRelay.MessageCategory.Exception, 100);
     }
 
     private static void SetupSerialization() {

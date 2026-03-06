@@ -340,15 +340,15 @@ public partial class CommandTimerItem : UserControl {
         this.Opacity = 0;
         this.Padding = new Thickness(1400, 0, 0, 0);
 
-        _fadeInTransition = DoubleTransitionHelper
-            .CreateAnimation()
+        _fadeInTransition = Transition
+            .CreateAnimation<DoubleTransition>()
             .WithProperty(Visual.OpacityProperty)
             .WithTime(400)
             .WithEasing(new LinearEasing())
             .WithBind(this, nameof(CommandTimerViewModel.Opacity), out _fadeInTransitionToken);
 
-        _slideInTransition = ThicknessTransitionHelper
-            .CreateAnimation()
+        _slideInTransition = Transition
+            .CreateAnimation<ThicknessTransition>()
             .WithProperty(PaddingProperty)
             .WithTime(600)
             .WithEasing(new CircularEaseInOut())

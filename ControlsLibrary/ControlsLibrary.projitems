@@ -10,10 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)NaturalStringComparer.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RelativePointTransitionHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ThicknessTransitionHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TransformTransitionHelper.cs" />
-    <Compile Include="..\ControlsLibrary\DoubleTransitionHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Transition.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ListItemDragHandler.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ShowEditableOnHover.cs" />
   </ItemGroup>

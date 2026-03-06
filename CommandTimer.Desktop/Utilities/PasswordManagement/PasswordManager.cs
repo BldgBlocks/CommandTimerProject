@@ -5,6 +5,15 @@ using System.Linq;
 using System.Security.Cryptography;
 
 namespace CommandTimer.Desktop.Utilities;
+
+/// <summary>
+/// Simple access control for preventing accidental command execution.
+/// This is a UI speed bump, not a security boundary.
+/// The hash is stored in the user's config JSON alongside other settings.
+/// A user with filesystem access can bypass this by editing the config — this is by design.
+/// OS-level credential storage (keyring/keychain) was deliberately avoided to prevent
+/// platform keyring dependencies, popups, and failures on minimal Linux installs.
+/// </summary>
 public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
 
     private ISerializer _serializer;
@@ -41,11 +50,9 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
     }
 
     private static (byte[] Salt, byte[] Hash) Encrypt(string password) {
-        byte[] salt = new Byte[16];
-        RandomNumberGenerator rng = RandomNumberGenerator.Create();
-        rng.GetBytes(salt);
+        byte[] salt = RandomNumberGenerator.GetBytes(16);
 
-        var deriveBytes = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
+        using var deriveBytes = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
         var hash = deriveBytes.GetBytes(32);
 
         return (salt, hash);
@@ -67,10 +74,13 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
         var storedSalt = new byte[storedSaltLength];
         Array.Copy(_data, storedSalt, storedSaltLength);
 
-        var deriveBytes = new Rfc2898DeriveBytes(password, storedSalt, 100000, HashAlgorithmName.SHA256);
+        using var deriveBytes = new Rfc2898DeriveBytes(password, storedSalt, 100000, HashAlgorithmName.SHA256);
         var trialHash = deriveBytes.GetBytes(32);
 
-        return trialHash.SequenceEqual(_data.Skip(storedSaltLength).ToArray());
+        var storedHash = new byte[32];
+        Array.Copy(_data, storedSaltLength, storedHash, 0, 32);
+
+        return CryptographicOperations.FixedTimeEquals(trialHash, storedHash);
     }
 
     public void Store(string password) {

@@ -9,10 +9,17 @@ namespace CommandTimer.Desktop.Views;
 public partial class StartupDisclaimer : UserControl {
 
     /// <summary>
-    /// This class ideally is only shown the first time the application starts, 
-    /// leading to no access to this class to trigger a static constructor.
-    /// However, serialization must be subscribed to so that its values can be written.
-    /// The [ModuleInitializer] attribute is used to guarantee initialization at startup.
+    /// This class ideally is only shown the first time the application starts,
+    /// leading to no access to this class to trigger a static constructor on subsequent launches.
+    /// However, its serialized value (HaveShownDisclaimer) lives in global_data alongside everything else.
+    /// When serialization is triggered, every serializable thing must write its current state — 
+    /// if this class was never accessed this session, no static constructor fires, no subscription exists,
+    /// and the value gets silently dropped from the next write.
+    /// 
+    /// [ModuleInitializer] is method-scoped (not class-scoped like static constructors) and runs 
+    /// unconditionally when the assembly loads, regardless of whether the type is ever accessed.
+    /// This guarantees the ActionRelay serialization subscription exists every session,
+    /// protecting data persistence even when the disclaimer UI is irrelevant.
     /// </summary>
     [ModuleInitializer]
     public static void Initialize() {
