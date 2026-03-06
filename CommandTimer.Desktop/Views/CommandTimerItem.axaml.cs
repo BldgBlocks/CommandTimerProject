@@ -146,7 +146,7 @@ public partial class CommandTimerItem : UserControl {
             }
         };
         pasteItem.Click += async (s, e) => {
-            if (await App.CopyFromClipboardAsync<string>() is string cast) {
+            if (await App.CopyFromClipboardAsync() is string cast) {
                 try {
                     var color = Core.Colors.ParseHexToColor(cast);
                     viewModel.ColorBarColor = new SolidColorBrush(color);

@@ -239,17 +239,17 @@ public partial class CustomTextBox : UserControl {
                 break;
             case Key.Right:
                 if (TextBox.SelectedText.Length == 0) return;
+                TextBox.CaretIndex = Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd);
+                TextBox.SelectionStart = TextBox.CaretIndex;
+                TextBox.SelectionEnd = TextBox.CaretIndex;
                 TextBox.Focus();
-                TextBox.SelectionStart = -1;
-                TextBox.SelectionEnd = -1;
-                TextBox.CaretIndex = Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd); ;
                 break;
             case Key.Left:
                 if (TextBox.SelectedText.Length == 0) return;
-                TextBox.Focus();
-                TextBox.SelectionStart = -1;
-                TextBox.SelectionEnd = -1;
                 TextBox.CaretIndex = Math.Min(TextBox.SelectionStart, TextBox.SelectionEnd);
+                TextBox.SelectionStart = TextBox.CaretIndex;
+                TextBox.SelectionEnd = TextBox.CaretIndex;
+                TextBox.Focus();
                 break;
             default:
                 return;
@@ -336,6 +336,7 @@ public partial class CustomTextBox : UserControl {
     /// - Monitors window for clicks off the control.
     /// </remarks>
     private async void OnGotFocus(object? sender, GotFocusEventArgs args) {
+        _accepted = false;
         _parentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
         _parentWindow?.AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
 

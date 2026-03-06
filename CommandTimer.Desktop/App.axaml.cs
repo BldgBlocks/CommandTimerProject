@@ -44,20 +44,18 @@ public partial class App : Application {
     }
 
     public static async void CopyToClipboard(string text) {
-        if (TopLevel.GetTopLevel(MainWindow.Instance) is not TopLevel topLevel) return;
-        if (topLevel.Clipboard is null) return;
+        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return;
         try {
-            await topLevel.Clipboard.SetTextAsync(text);
+            await clipboard.SetTextAsync(text);
         }
         /// Disregard clipboard exceptions
         catch (Exception) { }
     }
 
-    public static Task<string?> CopyFromClipboardAsync<T>() {
-        if (TopLevel.GetTopLevel(MainWindow.Instance) is not TopLevel topLevel) return Task.FromResult<string?>(string.Empty);
-        if (topLevel.Clipboard is null) return Task.FromResult<string?>(string.Empty);
+    public static Task<string?> CopyFromClipboardAsync() {
+        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
 
-        return topLevel.Clipboard.GetTextAsync();
+        return clipboard.GetTextAsync();
     }
 
     public override void OnFrameworkInitializationCompleted() {

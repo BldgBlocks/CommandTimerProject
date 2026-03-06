@@ -11,6 +11,8 @@ namespace CommandTimer.Core.Utilities;
 
 public static partial class CommandTimerItemSortExtensions {
 
+    private static readonly NaturalStringComparer _naturalComparer = new();
+
     /// <summary>
     /// Method chaining version of ObservableCollection.Clear()
     /// </summary>
@@ -41,14 +43,13 @@ public static partial class CommandTimerItemSortExtensions {
     /// Modifies list in place
     /// </summary>
     public static void SortByName(this List<CommandTimerViewModel> list) {
-        var comparer = new NaturalStringComparer();
         list.Sort((x, y) => {
             /// First, compare by IsFavorite, with true coming first
             int favoriteCompare = y.IsFavorite.CompareTo(x.IsFavorite);
             if (favoriteCompare != 0) return favoriteCompare;
 
             /// If IsFavorite is the same, then compare by name naturally
-            return comparer.Compare(x.Name, y.Name);
+            return _naturalComparer.Compare(x.Name, y.Name);
         });
     }
 
@@ -57,7 +58,6 @@ public static partial class CommandTimerItemSortExtensions {
     /// and finally by name if times are equal.
     /// </summary>
     public static void SortByTime(this List<CommandTimerViewModel> list) {
-        var comparer = new NaturalStringComparer();
         list.Sort((x, y) => {
             /// First, compare by IsFavorite, with true coming first
             int favoriteCompare = y.IsFavorite.CompareTo(x.IsFavorite);
@@ -68,7 +68,7 @@ public static partial class CommandTimerItemSortExtensions {
             if (timeCompare != 0) return timeCompare;
 
             /// If time spans are equal, then compare by name naturally
-            return comparer.Compare(x.Name, y.Name);
+            return _naturalComparer.Compare(x.Name, y.Name);
         });
     }
 
@@ -108,10 +108,10 @@ public static partial class CommandTimerItemSortExtensions {
     }
 
     public static IEnumerable<string> SortByName(this IEnumerable<string> list) {
-        return list.OrderBy(static x => x, new NaturalStringComparer());
+        return list.OrderBy(static x => x, _naturalComparer);
     }
 
     public static IEnumerable<T> SortByName<T>(this IEnumerable<T> list, Func<T, string> getString) where T : class {
-        return list.OrderBy(x => getString(x), new NaturalStringComparer());
+        return list.OrderBy(x => getString(x), _naturalComparer);
     }
 }
