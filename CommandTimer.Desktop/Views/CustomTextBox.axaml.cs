@@ -200,19 +200,25 @@ public partial class CustomTextBox : UserControl {
 
     //...
 
+    private int _pendingCaretPosition = -1;
+    private int _pendingSelectionStart = -1;
+    private int _pendingSelectionEnd = -1;
+
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
         _accepted = false;
         _lastEntry = TextBox?.Text ?? string.Empty;
 
-        TextBox?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble, true);
+        TextBox?.AddHandler(KeyDownEvent, OnKeyDown_CaptureSelection, RoutingStrategies.Tunnel);
+        TextBox?.AddHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition, RoutingStrategies.Bubble, true);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
         /// Global Setting
-        TextBox?.RemoveHandler(KeyDownEvent, OnKeyDown);
+        TextBox?.RemoveHandler(KeyDownEvent, OnKeyDown_CaptureSelection);
+        TextBox?.RemoveHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition);
     }
 
     //...
@@ -226,6 +232,35 @@ public partial class CustomTextBox : UserControl {
         _initializedEntry = TextBox?.Text ?? string.Empty;
     }
 
+    /// <summary>
+    /// Tunnel phase: captures selection edge positions before the TextBox processes the key.
+    /// Only intervenes for bare Left/Right with an active selection — Avalonia collapses
+    /// to the caret position instead of the correct edge. All other combinations
+    /// (Ctrl, Shift, Ctrl+Shift) are left to the TextBox's native handling.
+    /// </summary>
+    private void OnKeyDown_CaptureSelection(object? sender, KeyEventArgs e) {
+        if (TextBox is null) return;
+        if (e.Key is not (Key.Left or Key.Right)) return;
+        if (e.KeyModifiers is not KeyModifiers.None) return;
+        if (TextBox.SelectedText.Length == 0) return;
+
+        _pendingCaretPosition = e.Key is Key.Left
+            ? Math.Min(TextBox.SelectionStart, TextBox.SelectionEnd)
+            : Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd);
+    }
+
+    /// <summary>
+    /// Bubble phase (KeyUp): the TextBox has finished processing. Apply the corrected caret position.
+    /// </summary>
+    private void OnKeyUp_ApplyCaretPosition(object? sender, KeyEventArgs e) {
+        if (TextBox is null) return;
+        if (_pendingCaretPosition < 0) return;
+        if (e.Key is not (Key.Left or Key.Right)) return;
+
+        TextBox.CaretIndex = _pendingCaretPosition;
+        _pendingCaretPosition = -1;
+    }
+
     public void OnKeyDown(object? sender, KeyEventArgs e) {
         if (TextBox is null) return;
 
@@ -236,20 +271,6 @@ public partial class CustomTextBox : UserControl {
                 break;
             case Key.Escape:
                 CancelEntry();
-                break;
-            case Key.Right:
-                if (TextBox.SelectedText.Length == 0) return;
-                TextBox.CaretIndex = Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd);
-                TextBox.SelectionStart = TextBox.CaretIndex;
-                TextBox.SelectionEnd = TextBox.CaretIndex;
-                TextBox.Focus();
-                break;
-            case Key.Left:
-                if (TextBox.SelectedText.Length == 0) return;
-                TextBox.CaretIndex = Math.Min(TextBox.SelectionStart, TextBox.SelectionEnd);
-                TextBox.SelectionStart = TextBox.CaretIndex;
-                TextBox.SelectionEnd = TextBox.CaretIndex;
-                TextBox.Focus();
                 break;
             default:
                 return;
