@@ -201,8 +201,6 @@ public partial class CustomTextBox : UserControl {
     //...
 
     private int _pendingCaretPosition = -1;
-    private int _pendingSelectionStart = -1;
-    private int _pendingSelectionEnd = -1;
 
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
