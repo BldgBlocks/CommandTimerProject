@@ -34,7 +34,7 @@ public record LibrarySelectionsMenu : Menu<MenuItemViewModel> {
     }
     public void ReloadItems() {
         _items.Clear();
-        LibraryManager.LibrariesByName.ForEach(library => {
+        ServiceProvider.Get<ILibraryManager>().LibraryNames.ForEach(library => {
             _items.Add(new MenuItemViewModel(library, MenuItemViewModel.Empty, _selected, _removed));
         });
     }

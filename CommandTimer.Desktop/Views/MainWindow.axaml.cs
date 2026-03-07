@@ -57,8 +57,9 @@ public partial class MainWindow : Window {
     }
 
     private static void AddDefaultTimers() {
-        LibraryManager.LoadLibraryToCurrent(LibraryManager.DEFAULT_LIBRARY);
+        var libraryManager = ServiceProvider.Get<ILibraryManager>();
+        libraryManager.SetCurrent(Core.Settings.Keys.DefaultLibrary);
         ServiceProvider.Get<IDefaultTimerCollection>().Timers
-                       .ForEach(timer => LibraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
+                       .ForEach(timer => libraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
     }
 }

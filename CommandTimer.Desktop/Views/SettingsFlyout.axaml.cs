@@ -21,6 +21,8 @@ namespace CommandTimer.Desktop.Views;
 
 public partial class SettingsFlyout : UserControl {
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+
     private FlyoutBase? _colorBarFlyout;
 
     public SettingsFlyout() {
@@ -241,7 +243,8 @@ public partial class SettingsFlyout : UserControl {
                                                    .Show(window.MainWindowLayout);
             if (result is false) return;
 
-            LibraryManager.CleanDatabase();
+            LibraryManager.BackupLibraries();
+            LibraryManager.CleanLibraries();
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) {

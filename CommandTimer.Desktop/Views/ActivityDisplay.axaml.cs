@@ -10,6 +10,8 @@ namespace CommandTimer.Desktop.Views;
 
 public partial class ActivityDisplay : UserControl {
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+
     public ActivityDisplay() {
         InitializeComponent();
 

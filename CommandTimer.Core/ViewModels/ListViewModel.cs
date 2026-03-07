@@ -19,6 +19,7 @@ public partial class ListViewModel : ViewModelBase {
     private const int FULL_ANIMATION_BEFORE_RAMP = 7;
     private CancellationTokenSource _cts = new();
     private LibrarySelectionsMenu _libraryMenu;
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
 
     //... Constructor
 
@@ -112,7 +113,7 @@ public partial class ListViewModel : ViewModelBase {
     //...
 
     [JsonIgnore]
-    private CommandTimerLibrary _ActiveLibrary = new() { LibraryName = LibraryManager.DEFAULT_LIBRARY };
+    private CommandTimerLibrary _ActiveLibrary = new() { LibraryName = Core.Settings.Keys.DefaultLibrary };
     [JsonIgnore]
     public CommandTimerLibrary ActiveLibrary {
         get => _ActiveLibrary;
@@ -141,7 +142,7 @@ public partial class ListViewModel : ViewModelBase {
         get => _LibrarySelection;
         set {
             if (SetProperty(ref _LibrarySelection, value, Save.No, Notify.Yes, nameof(LibrarySelection))) {
-                LibraryManager.LoadLibraryToCurrent(value);
+                LibraryManager.SetCurrent(value);
             }
         }
     }
@@ -158,7 +159,7 @@ public partial class ListViewModel : ViewModelBase {
             if (value is null) return;
             if (SetProperty(ref _LibrarySelection, value.Header, Save.Yes, Notify.Yes)) {
                 Serialized_LibrarySelection = value.Header;
-                LibraryManager.LoadLibraryToCurrent(value.Header);
+                LibraryManager.SetCurrent(value.Header);
             }
         }
     }
@@ -343,7 +344,7 @@ public partial class ListViewModel : ViewModelBase {
     public void ReloadLibrarySelections() {
         _libraryMenu.ReloadItems(LibrarySelections);
         if (ActiveLibrary.LibraryName != LibrarySelection.Header) {
-            LibraryManager.LoadLibraryToCurrent(LibrarySelection.Header);
+            LibraryManager.SetCurrent(LibrarySelection.Header);
         }
     }
 }

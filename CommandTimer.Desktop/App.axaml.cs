@@ -66,6 +66,7 @@ public partial class App : Application {
 
         /// Services
         SetupSerialization();
+        ServiceProvider.Set<ILibraryManager>(new LibraryManager());
 
         MessageLogger.Create(SystemInteraction.Files.GetPlatformLogFile()).StartLogging();
 
@@ -84,10 +85,6 @@ public partial class App : Application {
             desktop.Exit += (sender, e) => {
                 ServiceProvider.Get<ISerializer>().Commit();
             };
-        }
-
-        if (Design.IsDesignMode is false) {
-            LibraryManager.CleanDatabase();
         }
 
         /// Fluent Theme Accent Color

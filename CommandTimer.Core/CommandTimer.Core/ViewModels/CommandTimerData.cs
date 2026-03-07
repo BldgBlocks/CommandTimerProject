@@ -33,7 +33,7 @@ public class CommandTimerData {
 
     [JsonInclude]
     [JsonPropertyName("LibraryName")]
-    private string _Library = LibraryManager.DEFAULT_LIBRARY;
+    private string _Library = Core.Settings.Keys.DefaultLibrary;
     [JsonIgnore]
     public string LibraryName { get => _Library; set => _Library = value; }
 

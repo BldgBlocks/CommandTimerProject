@@ -12,6 +12,8 @@ public static class Settings {
 
     public static class Keys {
 
+        public static readonly string DefaultLibrary = "Default";
+
         public static readonly string ListView = "ListView:Settings";
 
         public static readonly string ActivityView = "Activity:Settings";

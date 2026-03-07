@@ -51,10 +51,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
 
     private static (byte[] Salt, byte[] Hash) Encrypt(string password) {
         byte[] salt = RandomNumberGenerator.GetBytes(16);
-
-        using var deriveBytes = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-        var hash = deriveBytes.GetBytes(32);
-
+        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100000, HashAlgorithmName.SHA256, 32);
         return (salt, hash);
     }
 
@@ -74,8 +71,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
         var storedSalt = new byte[storedSaltLength];
         Array.Copy(_data, storedSalt, storedSaltLength);
 
-        using var deriveBytes = new Rfc2898DeriveBytes(password, storedSalt, 100000, HashAlgorithmName.SHA256);
-        var trialHash = deriveBytes.GetBytes(32);
+        byte[] trialHash = Rfc2898DeriveBytes.Pbkdf2(password, storedSalt, 100000, HashAlgorithmName.SHA256, 32);
 
         var storedHash = new byte[32];
         Array.Copy(_data, storedSaltLength, storedHash, 0, 32);

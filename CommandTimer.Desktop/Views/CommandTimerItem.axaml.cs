@@ -28,6 +28,8 @@ public partial class CommandTimerItem : UserControl {
 
     //... Fields
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+
     private NumericUpDownBinding? _secondsFlyoutBinding;
     private NumericUpDownBinding? _daysFlyoutBinding;
     private FlyoutBase? _colorBarFlyout;
@@ -258,10 +260,10 @@ public partial class CommandTimerItem : UserControl {
         var copyCommand = new RelayCommand<object?>(Command_CopyTimerTo);
         var moveCommand = new RelayCommand<object?>(Command_MoveTimerTo);
 
-        List<MenuItemViewModel> copySubMenu = LibraryManager.LibrariesByName
+        List<MenuItemViewModel> copySubMenu = LibraryManager.LibraryNames
             .Select(libraryName => new MenuItemViewModel(libraryName, [], copyCommand))
             .ToList();
-        List<MenuItemViewModel> moveSubMenu = LibraryManager.LibrariesByName
+        List<MenuItemViewModel> moveSubMenu = LibraryManager.LibraryNames
             .Where(libraryName => libraryName != viewModel.LibraryName)
             .Select(libraryName => new MenuItemViewModel(libraryName, [], moveCommand))
             .ToList();

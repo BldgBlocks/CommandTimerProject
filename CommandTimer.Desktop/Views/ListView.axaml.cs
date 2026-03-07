@@ -30,6 +30,7 @@ public partial class ListView : UserControl {
         DataContext = listViewModel;
     }
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
 
     //...
 
@@ -103,13 +104,13 @@ public partial class ListView : UserControl {
             if (NewLibraryName.Parameter is string parameter) {
                 if (parameter == "rename") {
                     var clone = LibraryManager.RenameLibrary(viewModel.ActiveLibrary, NewLibraryName.Text);
-                    LibraryManager.LoadLibraryToCurrent(clone.LibraryName);
+                    LibraryManager.SetCurrent(clone.LibraryName);
                 }
                 else if (parameter == "new") {
-                    LibraryManager.LoadLibraryToCurrent(NewLibraryName.Text);
+                    LibraryManager.SetCurrent(NewLibraryName.Text);
                 }
                 else {
-                    LibraryManager.LoadLibraryToCurrent(NewLibraryName.Text);
+                    LibraryManager.SetCurrent(NewLibraryName.Text);
                 }
             }
             AddLibraryButton.Flyout?.Hide();

@@ -47,9 +47,9 @@ public partial class CommandTimerLibrary {
     //...
 
     public CommandTimerLibrary Load() {
-        IsLoaded = false;
+        if (IsLoaded) return this;
+
         IsLoading = true;
-        //TimerNames = new HashSet<string>(TimerNames.SortByName());
         _shouldNotifyChange = false;
 
         var copyOfNames = TimerNames.ToList();

@@ -63,6 +63,8 @@ public partial class CommandTimerViewModel : ViewModelBase {
 
     //...
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+
     public CommandTimerLibrary Library
         => LibraryManager.FindLibrary(LibraryName) ?? LibraryManager.CurrentLibrary;
 
