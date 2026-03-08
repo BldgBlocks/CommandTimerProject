@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 
 namespace CommandTimer.Core.Utilities;
@@ -11,7 +11,7 @@ public static partial class SystemInteraction {
 
         /// <summary>
         /// Resolves the user's preferred terminal emulator on Linux.
-        /// Checks: $TERMINAL env var → x-terminal-emulator → xdg-terminal-exec → common fallbacks.
+        /// Checks: $TERMINAL env var ? x-terminal-emulator ? xdg-terminal-exec ? common fallbacks.
         /// Result is cached after first successful lookup.
         /// </summary>
         private static string? DetectLinuxTerminal() {
@@ -151,3 +151,4 @@ public static partial class SystemInteraction {
 
     }
 }
+

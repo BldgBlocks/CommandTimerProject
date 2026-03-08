@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
@@ -174,3 +174,4 @@ public class ListItemDragHandler {
         DragDrop.DoDragDropAsync(e, _data, DragDropEffects.Move);
     }
 }
+

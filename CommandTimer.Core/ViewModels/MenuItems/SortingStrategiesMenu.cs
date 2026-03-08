@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -22,3 +22,4 @@ public record SortingStrategiesMenu : Menu<MenuItemViewModel_CommandTimers> {
     public override string Description { get; } = "Sorting as opposed to filtering.";
     public override IEnumerable<MenuItemViewModel_CommandTimers> Items { get; }
 }
+

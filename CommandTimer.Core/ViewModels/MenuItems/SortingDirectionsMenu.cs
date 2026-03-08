@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 
@@ -21,3 +21,4 @@ public record SortingDirectionsMenu : Menu<MenuItemViewModel_CommandTimers> {
     public override string Description { get; } = "Change direction of final sort order.";
     public override IEnumerable<MenuItemViewModel_CommandTimers> Items { get; }
 }
+

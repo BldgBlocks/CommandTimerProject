@@ -1,4 +1,4 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 
@@ -71,3 +71,4 @@ public class MenuItemViewModel : ViewModelBase {
     private SolidColorBrush _BackgroundColor;
     public SolidColorBrush BackgroundColor { get => _BackgroundColor; set => SetProperty(ref _BackgroundColor, value); }
 }
+

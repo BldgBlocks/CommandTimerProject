@@ -1,5 +1,6 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Media;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -58,13 +59,14 @@ public partial class MessageControlViewModel : ViewModelBase {
 
 
     [JsonInclude]
-    private IBrush _Background = Core.Colors.ApplicationBrush_Overlay;
+    private IBrush _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
     [JsonIgnore]
     public IBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
     [JsonInclude]
-    private IBrush _Foreground = Core.Colors.ApplicationBrush_Text;
+    private IBrush _Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
     [JsonIgnore]
     public IBrush Foreground { get => _Foreground; set => SetProperty(ref _Foreground, value, Save.No, Notify.Yes); }
 
 }
+

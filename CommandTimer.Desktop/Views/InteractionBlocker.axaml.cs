@@ -77,3 +77,4 @@ public partial class InteractionBlocker : UserControl {
         return this;
     }
 }
+

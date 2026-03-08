@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ public partial class LibraryManager : ILibraryManager {
     }
 
 
-    //... Public Methods — ILibraryManager
+    //... Public Methods � ILibraryManager
 
     public void SetCurrent(string libraryName) {
         if (string.IsNullOrWhiteSpace(libraryName)) return;
@@ -269,3 +269,4 @@ public partial class LibraryManager : ILibraryManager {
     private void OnLibraryAdded() => LibraryAdded?.Invoke(nameof(LibraryManager), EventArgs.Empty);
     private void OnLibraryRemoved() => LibraryRemoved?.Invoke(nameof(LibraryManager), EventArgs.Empty);
 }
+

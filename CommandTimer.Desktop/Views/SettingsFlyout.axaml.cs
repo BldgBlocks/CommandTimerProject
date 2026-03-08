@@ -285,7 +285,7 @@ public partial class SettingsFlyout : UserControl {
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? Core.Colors.ApplicationBrush_Accent : Core.Colors.ApplicationBrush_Transparent;
+            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
         }
     }
 
@@ -295,7 +295,7 @@ public partial class SettingsFlyout : UserControl {
     public void Changed_ColorPick(object sender, ColorChangedEventArgs args) => Sync_ColorPick();
     private void Sync_ColorPick() {
         ColorApplyButton.Background = new SolidColorBrush(ColorPickerControl.Color);
-        ColorApplyButton.Foreground = new SolidColorBrush(Core.Colors.GetSlidingContrastColor(ColorPickerControl.Color));
+        ColorApplyButton.Foreground = new SolidColorBrush(ColorUtilities.GetSlidingContrastColor(ColorPickerControl.Color));
     }
 
     private void ColorPick_KeyDown(object sender, KeyEventArgs args) {
@@ -346,8 +346,9 @@ public partial class SettingsFlyout : UserControl {
     private void Tapped_ResetAccentColor(object sender, TappedEventArgs args) {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
 
-        var accentBrush = nameof(Core.Colors.ApplicationBrush_Accent);
-        if (Core.Colors.TryGetDefaultBrush(accentBrush, out var defaultBrush)) {
+        var accentBrush = nameof(IColorProvider.ApplicationBrush_Accent);
+        if (ServiceProvider.Get<IColorProvider>() is CommandTimer.Desktop.Utilities.ColorProvider.AvaloniaColorProvider provider
+            && provider.TryGetDefaultBrush(accentBrush, out var defaultBrush)) {
             viewModel.AccentColorSelection = defaultBrush;
         }
     }
@@ -437,3 +438,5 @@ public partial class SettingsFlyout : UserControl {
             => tooltip.OnPointerOver((Control)s!, "Require a password for confirmation windows", properties);
     }
 }
+
+

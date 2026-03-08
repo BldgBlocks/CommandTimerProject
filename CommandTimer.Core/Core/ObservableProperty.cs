@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace CommandTimer.Core;
@@ -26,5 +26,6 @@ public class ObservableProperty<T>(T _value) {
         return _value ?? throw new InvalidOperationException("The static property must be initialized before use.");
     }
 }
+
 
 

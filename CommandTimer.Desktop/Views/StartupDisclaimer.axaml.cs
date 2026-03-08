@@ -79,3 +79,4 @@ public partial class StartupDisclaimer : UserControl {
         App.Shutdown();
     }
 }
+

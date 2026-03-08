@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities.DependencyInversion;
+using CommandTimer.Core.Utilities.DependencyInversion;
 
 namespace CommandTimer.Desktop.Utilities;
 public class PasswordRule_MinimumCharacters(int MinimumCharacters) : IPasswordFormatValidation {
@@ -12,3 +12,5 @@ public class PasswordRule_MinimumCharacters(int MinimumCharacters) : IPasswordFo
         return decision;
     }
 }
+
+

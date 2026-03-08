@@ -1,4 +1,4 @@
-﻿using Avalonia.Styling;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -23,3 +23,4 @@ public record ThemeSelectionsMenu : Menu<MenuItemViewModel> {
     public override string Description { get; } = "Light/Dark color schemes for the application.";
     public override IEnumerable<MenuItemViewModel> Items { get; }
 }
+

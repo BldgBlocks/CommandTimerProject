@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -40,3 +40,4 @@ public class NaturalStringComparer : IComparer<string> {
         return 0; // They matched completely
     }
 }
+

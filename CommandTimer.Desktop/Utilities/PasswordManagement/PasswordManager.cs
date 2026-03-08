@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core;
+using CommandTimer.Core;
 using CommandTimer.Core.Utilities.DependencyInversion;
 using System;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace CommandTimer.Desktop.Utilities;
 /// Simple access control for preventing accidental command execution.
 /// This is a UI speed bump, not a security boundary.
 /// The hash is stored in the user's config JSON alongside other settings.
-/// A user with filesystem access can bypass this by editing the config — this is by design.
+/// A user with filesystem access can bypass this by editing the config � this is by design.
 /// OS-level credential storage (keyring/keychain) was deliberately avoided to prevent
 /// platform keyring dependencies, popups, and failures on minimal Linux installs.
 /// </summary>
@@ -107,3 +107,5 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
     public string Reason => string.Join(", ", _Reasons);
 
 }
+
+

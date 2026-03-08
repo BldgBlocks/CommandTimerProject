@@ -1,4 +1,4 @@
-﻿using CommandTimer.Desktop.Views;
+using CommandTimer.Desktop.Views;
 using CommandTimer.Core.Utilities;
 using System.Threading.Tasks;
 
@@ -17,3 +17,5 @@ public class AskTheUserForMe : IAskTheUser {
                                  .Show(window.MainWindowLayout);
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Threading;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
@@ -348,3 +348,4 @@ public partial class ListViewModel : ViewModelBase {
         }
     }
 }
+

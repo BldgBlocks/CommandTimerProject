@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CommandTimer.Core;
 
@@ -32,3 +32,4 @@ public static class MessageRelay {
         public int Priority { get; set; }
     }
 }
+

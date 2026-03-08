@@ -123,7 +123,7 @@ public partial class ListView : UserControl {
             NewLibraryName.TextBox.Focus();
             NewLibraryName.TextBox.CaretIndex = 0;
             NewLibraryName.BackgroundBorder!.BorderThickness = new Thickness(1);
-            NewLibraryName.BackgroundBorder.BorderBrush = Core.Colors.ApplicationBrush_Accent;
+            NewLibraryName.BackgroundBorder.BorderBrush = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
         };
 
         base.OnLoaded(e);
@@ -202,13 +202,13 @@ public partial class ListView : UserControl {
     private void MeasureLibrarySelection() {
         if (DataContext is not ListViewModel viewModel) return;
 
-        LibrarySelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)Core.Colors.GetSetting<double>("ApplicationFontSize_SubHeader"), 10, viewModel.LibrarySelection.Header, LibrarySelectionText, LibraryButton);
+        LibrarySelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)ResourceHelper.GetResourceOrThrow<double>("ApplicationFontSize_SubHeader"), 10, viewModel.LibrarySelection.Header, LibrarySelectionText, LibraryButton);
     }
 
     private void MeasureQuickFilterSelection() {
         if (DataContext is not ListViewModel viewModel) return;
 
-        QuickFilterSelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)Core.Colors.GetSetting<double>("ApplicationFontSize_SubHeader"), 10, viewModel.QuickFilter.Header, QuickFilterSelectionText, QuickFilterValue);
+        QuickFilterSelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)ResourceHelper.GetResourceOrThrow<double>("ApplicationFontSize_SubHeader"), 10, viewModel.QuickFilter.Header, QuickFilterSelectionText, QuickFilterValue);
     }
 
     private void LibraryManager_CurrentLibraryChanging(object? sender, CommandTimerLibrary e) {
@@ -236,7 +236,7 @@ public partial class ListView : UserControl {
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? Core.Colors.ApplicationBrush_Accent : Core.Colors.ApplicationBrush_Transparent;
+            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
         }
     }
 
@@ -393,3 +393,7 @@ public partial class ListView : UserControl {
             => tooltip.OnPointerOver((Control)s!, "Perform bulk actions", properties);
     }
 }
+
+
+
+

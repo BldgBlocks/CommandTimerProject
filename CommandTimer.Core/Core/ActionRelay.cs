@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CommandTimer.Core;
 public static class ActionRelay {
@@ -24,3 +24,4 @@ public static class ActionRelay {
         public object? Data { get; set; }
     }
 }
+

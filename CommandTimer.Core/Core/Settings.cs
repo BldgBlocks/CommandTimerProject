@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
+using CommandTimer.Core.Utilities;
 
 namespace CommandTimer.Core;
 
@@ -111,7 +112,8 @@ public static class Settings {
     /// Global Setting
     /// </summary>
     /// <remarks>Choose the accent color of the application.</remarks>
-    public static readonly ObservableProperty<SolidColorBrush> AccentColorSelection = new(new SolidColorBrush(Core.Colors.ApplicationColor_Accent));
+    public static ResourceBackedObservableProperty AccentColorSelection => ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent;
 }
+
 
 

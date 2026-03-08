@@ -1,4 +1,5 @@
 using Avalonia;
+using CommandTimer.Core.Utilities;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
@@ -88,8 +89,8 @@ public partial class MessageControl : UserControl {
     private void EventHandler_ActualThemeVariantChanged(object? sender, EventArgs e) {
         if (DataContext is not MessageControlViewModel viewModel) return;
 
-        viewModel.Background = Core.Colors.ApplicationBrush_Overlay;
-        viewModel.Foreground = Core.Colors.ApplicationBrush_Text;
+        viewModel.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
+        viewModel.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
     }
 
     private async Task PlayRemoveAnimation() {
@@ -104,3 +105,5 @@ public partial class MessageControl : UserControl {
         }
     }
 }
+
+

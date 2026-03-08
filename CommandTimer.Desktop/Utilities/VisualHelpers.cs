@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -81,3 +81,5 @@ public static class VisualHelpers {
         return new Size(formattedText.Width, formattedText.Height);
     }
 }
+
+

@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommandTimer.Core.Utilities;
 using System;
@@ -137,3 +137,4 @@ public static class IOUtils {
         }
     }
 }
+

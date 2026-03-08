@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
@@ -13,3 +13,4 @@ public partial class MessageViewerViewModel : ViewModelBase {
     public ObservableCollection<MessageControlViewModel> Messages { get; } = [];
 
 }
+

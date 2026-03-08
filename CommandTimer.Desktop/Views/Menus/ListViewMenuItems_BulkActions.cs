@@ -1,4 +1,5 @@
-﻿using Avalonia;
+using Avalonia;
+using CommandTimer.Core.Utilities;
 using Avalonia.Controls;
 using Avalonia.Media;
 using CommandTimer.Core.ViewModels;
@@ -49,7 +50,7 @@ public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserP
                                                             .Show(UserPromptAreaWillCover);
                      if (result is true) {
                          var timers = ViewModel.RelevantCommandTimers.ToList();
-                         timers.ForEach(f => f.ColorBarColor = Core.Colors.ApplicationBrush_Accent);
+                         timers.ForEach(f => f.ColorBarColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value);
                      }
                  }
                  catch (OperationCanceledException) { }
@@ -82,3 +83,6 @@ public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserP
     );
     public IReadOnlyList<MenuItem> Items => _Items;
 }
+
+
+

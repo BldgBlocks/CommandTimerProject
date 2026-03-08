@@ -134,7 +134,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         var contextMenu = new ContextMenu {
-            Background = Core.Colors.ApplicationBrush_Background
+            Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Background.Value
         };
         var copyItem = new MenuItem() { Header = "Copy" };
         var pasteItem = new MenuItem() { Header = "Paste" };
@@ -150,7 +150,7 @@ public partial class CommandTimerItem : UserControl {
         pasteItem.Click += async (s, e) => {
             if (await App.CopyFromClipboardAsync() is string cast) {
                 try {
-                    var color = Core.Colors.ParseHexToColor(cast);
+                    var color = ColorUtilities.ParseHexToColor(cast);
                     viewModel.ColorBarColor = new SolidColorBrush(color);
                     UpdateControl_AccentColors();
                 }
@@ -173,7 +173,7 @@ public partial class CommandTimerItem : UserControl {
             flyout.Items.ForEach(menuFlyoutItem => {
                 if (menuFlyoutItem is MenuItem menuItem) {
                     if (string.Equals(menuItem.Header?.ToString(), viewModel.TimeMode.ToString(), StringComparison.OrdinalIgnoreCase)) {
-                        menuItem.Background = Core.Colors.ApplicationBrush_Accent;
+                        menuItem.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
                     }
                     else menuItem.Background = Brushes.Transparent;
                 }
@@ -334,7 +334,7 @@ public partial class CommandTimerItem : UserControl {
 
     private void SetAccentToGlobal(CommandTimerViewModel viewModel) {
         this.Styles.Remove(_accentStyle);
-        viewModel.Accent = Core.Colors.ApplicationBrush_Accent;
+        viewModel.Accent = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
     }
 
     public async void BindAnimations() {
@@ -468,7 +468,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         /// Text Colors - CustomTextBox Immutable brush must be set in code-behind.
-        var textColor = Core.Colors.ApplicationBrush_Text;
+        var textColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
         NameBlock.Foreground = textColor;
         DescriptionBlock.Foreground = textColor;
         CommandBlock.Foreground = textColor;
@@ -479,13 +479,13 @@ public partial class CommandTimerItem : UserControl {
 
         viewModel.Update_Countdown();
         if (viewModel.IsActive is true) {
-            ActiveIndicatorIcon.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
-            CountdownBlock.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
+            ActiveIndicatorIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value;
+            CountdownBlock.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value;
             CountdownBlock.FontWeight = FontWeight.SemiBold;
         }
         else {
-            ActiveIndicatorIcon.Foreground = Core.Colors.ApplicationBrush_Inconspicuous;
-            CountdownBlock.Foreground = Core.Colors.ApplicationBrush_Inconspicuous;
+            ActiveIndicatorIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value;
+            CountdownBlock.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value;
             CountdownBlock.FontWeight = FontWeight.Light;
         }
     }
@@ -497,7 +497,7 @@ public partial class CommandTimerItem : UserControl {
             StartStopIcon.Height = 27;
             StartStopIcon.Width = 27;
             StartStopIcon.Kind = MaterialIconKind.Stop;
-            StartStopIcon.Foreground = Core.Colors.ApplicationBrush_Bad;
+            StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value;
             StartStopIcon.IsHitTestVisible = true;
             StartStopButton.IsHitTestVisible = true;
         }
@@ -506,7 +506,7 @@ public partial class CommandTimerItem : UserControl {
                 StartStopIcon.Height = 27;
                 StartStopIcon.Width = 27;
                 StartStopIcon.Kind = MaterialIconKind.Play;
-                StartStopIcon.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
+                StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value;
                 StartStopIcon.IsHitTestVisible = true;
                 StartStopButton.IsHitTestVisible = true;
             }
@@ -514,7 +514,7 @@ public partial class CommandTimerItem : UserControl {
                 StartStopIcon.Height = 20;
                 StartStopIcon.Width = 20;
                 StartStopIcon.Kind = MaterialIconKind.No;
-                StartStopIcon.Foreground = Core.Colors.ApplicationBrush_Bad;
+                StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value;
                 StartStopIcon.IsHitTestVisible = false;
                 StartStopButton.IsHitTestVisible = false;
             }
@@ -524,13 +524,13 @@ public partial class CommandTimerItem : UserControl {
     private void UpdateControl_Favorite() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        FavoriteIcon.Foreground = viewModel.IsFavorite ? Core.Colors.ApplicationBrush_Highlight : Core.Colors.ApplicationBrush_Contrast;
+        FavoriteIcon.Foreground = viewModel.IsFavorite ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Highlight.Value : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Contrast.Value;
     }
 
     private void UpdateControl_PromptForExecute() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        PromptExecuteIcon.Foreground = viewModel.IsPromptForExecute ? Brushes.Red : Core.Colors.ApplicationBrush_Inconspicuous;
+        PromptExecuteIcon.Foreground = viewModel.IsPromptForExecute ? Brushes.Red : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value;
     }
 
 
@@ -599,7 +599,7 @@ public partial class CommandTimerItem : UserControl {
 
     private void Sync_ColorPick() {
         ColorApplyButton.Background = new SolidColorBrush(ColorPickerControl.Color);
-        ColorApplyButton.Foreground = new SolidColorBrush(Core.Colors.GetSlidingContrastColor(ColorPickerControl.Color));
+        ColorApplyButton.Foreground = new SolidColorBrush(ColorUtilities.GetSlidingContrastColor(ColorPickerControl.Color));
     }
 
     private void Tapped_ColorBar(object sender, TappedEventArgs args) {
@@ -823,3 +823,5 @@ public partial class CommandTimerItem : UserControl {
             => tooltip.OnPointerOver((Control)s!, "Start/Stop timer", properties);
     }
 }
+
+

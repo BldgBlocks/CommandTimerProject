@@ -397,3 +397,4 @@ public partial class CustomTextBox : UserControl {
         if (!_accepted) CancelEntry();
     }
 }
+

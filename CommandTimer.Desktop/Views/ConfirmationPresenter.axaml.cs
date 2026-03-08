@@ -112,3 +112,4 @@ public partial class ConfirmationPresenter : UserControl {
         Hide();
     }
 }
+

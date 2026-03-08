@@ -1,7 +1,6 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using CommandTimer.Core.Utilities;
 using Avalonia.Interactivity;
-using System;
 
 namespace CommandTimer.Desktop.Views;
 
@@ -12,10 +11,12 @@ public partial class TextEntryPopup : UserControl {
     }
 
     protected override void OnLoaded(RoutedEventArgs e) {
-        Entry.BackgroundBorder!.BorderBrush = Core.Colors.ApplicationBrush_Accent;
+        Entry.BackgroundBorder!.BorderBrush = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
         Entry.BackgroundBorder!.BorderThickness = new Avalonia.Thickness(1);
 
         base.OnLoaded(e);
     }
 
 }
+
+

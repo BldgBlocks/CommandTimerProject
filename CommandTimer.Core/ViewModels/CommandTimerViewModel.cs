@@ -1,4 +1,4 @@
-ï»¿using Avalonia;
+using Avalonia;
 using Avalonia.Media;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
@@ -91,23 +91,23 @@ public partial class CommandTimerViewModel : ViewModelBase {
         }
     }
 
-    public void StripeBackground() => Background = Core.Colors.ApplicationBrush_Stripe;
-    public void ResetBackground() => Background = Core.Colors.ApplicationBrush_Transparent;
+    public void StripeBackground() => Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Stripe.Value;
+    public void ResetBackground() => Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
 
 
-    //... Bindings â€” UI-only properties (not serialized)
+    //... Bindings — UI-only properties (not serialized)
 
-    private SolidColorBrush _Background = Core.Colors.ApplicationBrush_Transparent;
+    private SolidColorBrush _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
     public SolidColorBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
 
-    private SolidColorBrush _Accent = Core.Colors.ApplicationBrush_Accent;
+    private SolidColorBrush _Accent = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
     public SolidColorBrush Accent { get => _Accent; set => SetProperty(ref _Accent, value, Save.No, Notify.Yes); }
 
     public ObservableCollection<MenuItemViewModel> CopyMoveSelections { get; } = [];
 
 
-    //... Bindings â€” Delegated to Data (ViewModel setters add Save/Notify behavior)
+    //... Bindings — Delegated to Data (ViewModel setters add Save/Notify behavior)
 
     public string Name {
         get => Data.Name;
@@ -325,3 +325,4 @@ public partial class CommandTimerViewModel : ViewModelBase {
         }
     }
 }
+

@@ -2,7 +2,7 @@ using CommandTimer.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 
-namespace CommandTimer.Core.Utilities;
+namespace CommandTimer.Core.Utilities.DependencyInversion;
 
 public interface ILibraryManager {
 
@@ -34,3 +34,4 @@ public interface ILibraryManager {
     void BackupLibraries();
     void CleanLibraries();
 }
+

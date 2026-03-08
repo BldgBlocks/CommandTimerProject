@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -10,7 +11,7 @@ public class JsonConverter_SolidColorBrush : JsonConverter<SolidColorBrush> {
         if (reader.TokenType == JsonTokenType.String) {
             var hexValue = reader.GetString();
             if (string.IsNullOrWhiteSpace(hexValue) is false) {
-                return new SolidColorBrush(Core.Colors.ParseHexToColor(hexValue));
+                return new SolidColorBrush(ColorUtilities.ParseHexToColor(hexValue));
             }
             else {
                 return new SolidColorBrush(Avalonia.Media.Colors.Purple);
@@ -24,6 +25,7 @@ public class JsonConverter_SolidColorBrush : JsonConverter<SolidColorBrush> {
             writer.WriteStringValue("#800080");
             return;
         }
-        writer.WriteStringValue(Core.Colors.ToHex(value.Color));
+        writer.WriteStringValue(ColorUtilities.ToHex(value.Color));
     }
 }
+

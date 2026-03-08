@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -207,3 +207,4 @@ public partial class CommandTimerLibrary {
         timer.Serialize();
     }
 }
+

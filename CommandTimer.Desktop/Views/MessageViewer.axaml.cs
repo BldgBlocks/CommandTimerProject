@@ -23,7 +23,7 @@ public partial class MessageViewer : UserControl {
 
         Core.MessageRelay.MessagePosted += MessageRelay_MessagePosted;
 
-        WillCall.Subscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
+        ServiceProvider.Get<ITimerProvider>().Subscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
@@ -31,7 +31,7 @@ public partial class MessageViewer : UserControl {
 
         Core.MessageRelay.MessagePosted -= MessageRelay_MessagePosted;
 
-        WillCall.Unsubscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
+        ServiceProvider.Get<ITimerProvider>().Unsubscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
     }
 
     private void MessageTick_Elapsed(object? sender, EventArgs e) {
@@ -89,3 +89,4 @@ public partial class MessageViewer : UserControl {
         }
     }
 }
+

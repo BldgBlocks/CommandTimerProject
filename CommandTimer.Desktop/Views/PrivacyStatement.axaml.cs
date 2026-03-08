@@ -149,3 +149,4 @@ public partial class PrivacyStatement : UserControl {
         Canvas.SetTop(control, top);
     }
 }
+

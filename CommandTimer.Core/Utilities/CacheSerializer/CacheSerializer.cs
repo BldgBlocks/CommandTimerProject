@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -383,3 +383,4 @@ public partial class CacheSerializer : ISerializer {
     [GeneratedRegex(@".{0,3}\((\d{1,2})\)")]
     private static partial Regex DecodeVersionNumberRegex();
 }
+

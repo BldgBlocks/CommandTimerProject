@@ -115,13 +115,13 @@ public partial class ConfirmationDialog : UserControl {
     private void ValidatePassword() {
         var passwordValidation = ServiceProvider.Get<IPasswordValidation>();
         if (passwordValidation.Validate(PART_PasswordEntry.Text ?? string.Empty) || (_overrideValidation?.Invoke(PART_PasswordEntry.Text ?? string.Empty)).GetValueOrDefault()) {
-            PART_PasswordEntryTip.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
+            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value;
             PART_PasswordEntryTip.Text = "Granted";
             _tcs.TrySetResult(true);
             Hide();
         }
         else {
-            PART_PasswordEntryTip.Foreground = Core.Colors.ApplicationBrush_Bad;
+            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value;
             PART_PasswordEntryTip.Text = "The password is incorrect.";
         }
     }
@@ -246,3 +246,5 @@ public partial class ConfirmationDialog : UserControl {
         PART_PasswordEntryTip.Text = passwordFormatValidation.Reason;
     }
 }
+
+

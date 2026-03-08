@@ -1,6 +1,7 @@
-﻿namespace CommandTimer.Core.ViewModels;
+namespace CommandTimer.Core.ViewModels;
 public partial class MainWindowModel : ViewModelBase {
 
 
 
 }
+

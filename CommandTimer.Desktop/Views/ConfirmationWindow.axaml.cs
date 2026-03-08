@@ -122,3 +122,4 @@ public partial class ConfirmationWindow : Window {
         return this;
     }
 }
+

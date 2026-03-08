@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using static CommandTimer.Core.MessageRelay;
 
@@ -49,3 +49,4 @@ public class MessageLogger {
         }
     }
 }
+

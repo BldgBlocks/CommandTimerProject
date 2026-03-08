@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -105,3 +105,5 @@ public class CustomTipTimer : IShowToolTip {
         _isEnabled = false;
     }
 }
+
+

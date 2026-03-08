@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using System;
 
 namespace CommandTimer.Desktop;
@@ -22,3 +22,5 @@ class Program {
             .LogToTrace();
 
 }
+
+

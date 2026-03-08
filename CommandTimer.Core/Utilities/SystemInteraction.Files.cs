@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 
 namespace CommandTimer.Core.Utilities;
@@ -53,3 +53,4 @@ public static partial class SystemInteraction {
         }
     }
 }
+

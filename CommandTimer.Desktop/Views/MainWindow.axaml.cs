@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CommandTimer.Core;
 using CommandTimer.Core.Utilities;
@@ -63,3 +63,5 @@ public partial class MainWindow : Window {
                        .ForEach(timer => libraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
     }
 }
+
+

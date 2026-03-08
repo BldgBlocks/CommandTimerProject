@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
@@ -13,6 +13,7 @@ using CommandTimer.Core;
 using CommandTimer.Core.Converters;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels;
+using CommandTimer.Desktop.Utilities.ColorProvider;
 using CommandTimer.Desktop.Views;
 using System;
 using System.Linq;
@@ -65,6 +66,8 @@ public partial class App : Application {
         BindingPlugins.DataValidators.RemoveAt(0);
 
         /// Services
+        ServiceProvider.Set<ITimerProvider>(new CommandTimer.Desktop.Utilities.TimerProvider.AvaloniaTimerProvider());
+        ServiceProvider.Set<IColorProvider>(new AvaloniaColorProvider());
         SetupSerialization();
         ServiceProvider.Set<ILibraryManager>(new LibraryManager());
 
@@ -225,3 +228,5 @@ public partial class App : Application {
         }
     }
 }
+
+

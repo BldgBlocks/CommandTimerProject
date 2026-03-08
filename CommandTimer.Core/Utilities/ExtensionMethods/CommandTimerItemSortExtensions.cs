@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Deserialized
+// Ignore Spelling: Deserialized
 
 using CommandTimer.Core.ViewModels;
 using ControlsLibrary;
@@ -115,3 +115,4 @@ public static partial class CommandTimerItemSortExtensions {
         return list.OrderBy(x => getString(x), _naturalComparer);
     }
 }
+

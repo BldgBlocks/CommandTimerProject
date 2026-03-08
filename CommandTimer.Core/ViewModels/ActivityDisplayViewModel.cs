@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels {
@@ -27,3 +27,4 @@ namespace CommandTimer.Core.ViewModels {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-﻿using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -41,3 +41,4 @@ public record LibrarySelectionsMenu : Menu<MenuItemViewModel> {
     public MenuItemViewModel? GetMenuItem(string itemName)
         => Items.FirstOrDefault((item) => item.Header == itemName);
 }
+

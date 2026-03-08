@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Serializable
+// Ignore Spelling: Serializable
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Generic;
@@ -51,3 +51,4 @@ public class ViewModelBase : ObservableObject {
     }
 
 }
+

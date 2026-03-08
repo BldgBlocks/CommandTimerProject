@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.VisualTree;
@@ -98,3 +98,4 @@ public class NumericUpDownBinding(FlyoutBase flyout, Button target, NumericUpDow
     public void Exited(object? sender, PointerEventArgs args) => target.Cursor = new Cursor(StandardCursorType.Arrow);
 
 }
+
