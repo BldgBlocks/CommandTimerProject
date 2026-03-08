@@ -17,7 +17,7 @@ public partial class ConfirmationPresenter : UserControl {
         Background = Brushes.Transparent,
         Focusable = true,
         Opacity = 0,
-        Transitions = [new DoubleTransition() { 
+        Transitions = [new DoubleTransition() {
             Duration = TimeSpan.FromSeconds(0.5),
             Easing = new SineEaseOut(),
             Property = OpacityProperty,
@@ -87,7 +87,7 @@ public partial class ConfirmationPresenter : UserControl {
         dialog._cancel = cancel;
         if (dialog._yes is not null) {
             dialog._yes.Tapped += dialog.Tapped_ButtonYes;
-        }        
+        }
         if (dialog._no is not null) {
             dialog._no.Tapped += dialog.Tapped_ButtonNo;
         }

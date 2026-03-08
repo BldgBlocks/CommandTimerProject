@@ -1,11 +1,10 @@
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
+using CommandTimer.Core.Static.Exceptions;
 using CommandTimer.Core.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace CommandTimer.Desktop.Utilities.ColorProvider;
 
@@ -26,7 +25,7 @@ public class AvaloniaColorProvider : IColorProvider {
 
     private void InitializeDefaults() {
         if (Application.Current is not Application current)
-            throw new Core.Exceptions.ApplicationException($"Application not found.");
+            throw new Exceptions.ApplicationException($"Application not found.");
 
         var properties = typeof(IColorProvider).GetProperties()
             .Where(p => p.PropertyType == typeof(ResourceBackedObservableProperty))
@@ -58,7 +57,7 @@ public class AvaloniaColorProvider : IColorProvider {
 
     public bool TryGetDefaultBrush(string resourceKey, out SolidColorBrush brush, ThemeVariant? themeVariant = null) {
         if (Application.Current is not Application current)
-            throw new Core.Exceptions.ApplicationException($"Application not found.");
+            throw new Exceptions.ApplicationException($"Application not found.");
 
         themeVariant ??= current.RequestedThemeVariant;
         if (themeVariant == ThemeVariant.Dark) {
@@ -79,7 +78,7 @@ public class AvaloniaColorProvider : IColorProvider {
 
     private static bool TryGetBrushFromResources(string resourceKey, out SolidColorBrush brush, ThemeVariant? themeVariant = null) {
         if (Application.Current is not Application current)
-            throw new Core.Exceptions.ApplicationException($"Application not found.");
+            throw new Exceptions.ApplicationException($"Application not found.");
         var found = current.Resources.TryGetResource(resourceKey, themeVariant ?? current.ActualThemeVariant, out var value);
         brush = value as SolidColorBrush ?? new SolidColorBrush(Avalonia.Media.Colors.Purple);
         return found;
@@ -87,7 +86,7 @@ public class AvaloniaColorProvider : IColorProvider {
 
     private static SolidColorBrush GetBrushFromResources(string resourceKey) {
         if (Application.Current is not Application current)
-            throw new Core.Exceptions.ApplicationException($"Application not found.");
+            throw new Exceptions.ApplicationException($"Application not found.");
 
         if (current.Resources.TryGetResource(resourceKey, current.ActualThemeVariant, out var value) is false)
             return new SolidColorBrush(Avalonia.Media.Colors.Purple);

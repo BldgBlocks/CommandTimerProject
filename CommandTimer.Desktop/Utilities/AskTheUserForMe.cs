@@ -1,8 +1,8 @@
 using CommandTimer.Desktop.Views;
-using CommandTimer.Core.Utilities;
 using System.Threading.Tasks;
 
 namespace CommandTimer.Desktop.Utilities;
+
 public class AskTheUserForMe : IAskTheUser {
 
 

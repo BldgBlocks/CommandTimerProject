@@ -2,12 +2,12 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using static CommandTimer.Core.Settings;
+using static CommandTimer.Core.Static.Settings;
 
 namespace CommandTimer.Desktop.Views;
 
@@ -21,7 +21,7 @@ public partial class MessageViewer : UserControl {
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
 
-        Core.MessageRelay.MessagePosted += MessageRelay_MessagePosted;
+        MessageRelay.MessagePosted += MessageRelay_MessagePosted;
 
         ServiceProvider.Get<ITimerProvider>().Subscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
     }
@@ -29,7 +29,7 @@ public partial class MessageViewer : UserControl {
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
-        Core.MessageRelay.MessagePosted -= MessageRelay_MessagePosted;
+        MessageRelay.MessagePosted -= MessageRelay_MessagePosted;
 
         ServiceProvider.Get<ITimerProvider>().Unsubscribe(Keys.WillCall_Key_OnOneSecond, Keys.WillCall_Interval_OnOneSecond, MessageTick_Elapsed);
     }
@@ -51,13 +51,13 @@ public partial class MessageViewer : UserControl {
         }
     }
 
-    private void MessageRelay_MessagePosted(object? sender, Core.MessageRelay.MessageEventArgs e) {
+    private void MessageRelay_MessagePosted(object? sender, MessageRelay.MessageEventArgs e) {
         Dispatcher.UIThread?.Invoke(() => {
             if (DataContext is not MessageViewerViewModel viewModel) return;
 
             var transient = !(e.Priority >= 100 ||
-                e.Category is Core.MessageRelay.MessageCategory.Log or
-                Core.MessageRelay.MessageCategory.Exception);
+                e.Category is MessageRelay.MessageCategory.Log or
+                MessageRelay.MessageCategory.Exception);
 
             /// Bug Fix: Was only displaying each whole line of text, leaving the rest cut off. NewLine fixes.
             var newItem = new MessageControlViewModel() { Message = e.Message + Environment.NewLine, Priority = e.Priority, Transient = transient };

@@ -1,7 +1,3 @@
-using CommandTimer.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
@@ -54,7 +50,7 @@ public partial class CommandTimerLibrary {
 
         var copyOfNames = TimerNames.ToList();
         foreach (var name in copyOfNames) {
-            if (_timerInstances.Any((o) => o.Name == name)) continue;  
+            if (_timerInstances.Any((o) => o.Name == name)) continue;
             if (Deserialize(name) is CommandTimerViewModel fromSavedData) {
                 _timerInstances.Add(fromSavedData);
             }
@@ -62,7 +58,7 @@ public partial class CommandTimerLibrary {
                 TryRemoveName(name);
                 AddToLibrary(CommandTimerViewModel.Create(name));
                 /// Will trigger serialization at ViewModel level.
-                Core.MessageRelay.OnMessagePosted(this, $"No data was found for '{name}'. A default template has been added.", Core.MessageRelay.MessageCategory.User);
+                MessageRelay.OnMessagePosted(this, $"No data was found for '{name}'. A default template has been added.", MessageRelay.MessageCategory.User);
             }
         }
 
@@ -84,23 +80,23 @@ public partial class CommandTimerLibrary {
         IsLoaded = false;
     }
 
-    public void Serialize() 
-        => ServiceProvider.Get<ISerializer>().Serialize($"{Core.Settings.Keys.LibraryPrefix}{LibraryName}", this, LibraryName);
+    public void Serialize()
+        => ServiceProvider.Get<ISerializer>().Serialize($"{Settings.Keys.LibraryPrefix}{LibraryName}", this, LibraryName);
 
     private CommandTimerViewModel? Deserialize(string name) {
-        var data = ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerData>($"{Core.Settings.Keys.CommandTimerPrefix}{name}", LibraryName);
+        var data = ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerData>($"{Settings.Keys.CommandTimerPrefix}{name}", LibraryName);
         return data is not null ? new CommandTimerViewModel(data) : null;
     }
 
     //... Names
 
-    private bool TryAddName(string name) 
+    private bool TryAddName(string name)
         => TimerNames.Add(name);
 
     private bool TryRemoveName(string name)
         => TimerNames.Remove(name);
 
-    public bool ContainsName(string name) 
+    public bool ContainsName(string name)
         => TimerNames.Contains(name);
 
     public CommandTimerViewModel? GetSingleTimerInstance(string name) {

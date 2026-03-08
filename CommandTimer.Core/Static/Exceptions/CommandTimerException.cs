@@ -1,6 +1,4 @@
-using System;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static.Exceptions;
 
 public static class Exceptions {
 

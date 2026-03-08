@@ -1,9 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommandTimer.Core;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.Utilities.DependencyInversion;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Desktop.Utilities;
 
 namespace CommandTimer.Desktop.Views;
@@ -58,7 +57,7 @@ public partial class MainWindow : Window {
 
     private static void AddDefaultTimers() {
         var libraryManager = ServiceProvider.Get<ILibraryManager>();
-        libraryManager.SetCurrent(Core.Settings.Keys.DefaultLibrary);
+        libraryManager.SetCurrent(Settings.Keys.DefaultLibrary);
         ServiceProvider.Get<IDefaultTimerCollection>().Timers
                        .ForEach(timer => libraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
     }

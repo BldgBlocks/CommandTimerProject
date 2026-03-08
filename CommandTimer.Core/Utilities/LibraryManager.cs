@@ -1,8 +1,4 @@
-using CommandTimer.Core.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 
 namespace CommandTimer.Core.ViewModels;
 
@@ -32,7 +28,7 @@ public partial class LibraryManager : ILibraryManager {
     private HashSet<string> Serialized_LibraryNames = [];
     public IEnumerable<string> LibraryNames => [.. Serialized_LibraryNames];
 
-    private string Serialized_CurrentLibraryName = Core.Settings.Keys.DefaultLibrary;
+    private string Serialized_CurrentLibraryName = Settings.Keys.DefaultLibrary;
 
     private HashSet<CommandTimerLibrary> _libraries = [];
     public IEnumerable<CommandTimerLibrary> Libraries => [.. _libraries];
@@ -40,7 +36,7 @@ public partial class LibraryManager : ILibraryManager {
 
     //... Fields
 
-    private CommandTimerLibrary _CurrentLibrary = new() { LibraryName = Core.Settings.Keys.DefaultLibrary };
+    private CommandTimerLibrary _CurrentLibrary = new() { LibraryName = Settings.Keys.DefaultLibrary };
     public CommandTimerLibrary CurrentLibrary {
         get => _CurrentLibrary;
         private set {
@@ -108,7 +104,7 @@ public partial class LibraryManager : ILibraryManager {
     public void BackupLibraries() {
         var serializer = ServiceProvider.Get<ISerializer>();
         _libraries.ForEach(library => serializer.BackupFile(library.LibraryName));
-        serializer.BackupFile(Core.Settings.DEFAULT_DATA_FILE);
+        serializer.BackupFile(Settings.DEFAULT_DATA_FILE);
     }
 
     /// <summary>
@@ -122,7 +118,7 @@ public partial class LibraryManager : ILibraryManager {
             _libraries.ForEach(library => library.Load());
 
             /// Re-serialize global data (settings, password, etc.)
-            Core.ActionRelay.OnActionPosted(nameof(LibraryManager), Core.Settings.Keys.ActionRelay_Serialization);
+            ActionRelay.OnActionPosted(nameof(LibraryManager), Settings.Keys.ActionRelay_Serialization);
             SerializeState();
 
             /// Re-serialize all libraries and timers in sorted order
@@ -138,10 +134,10 @@ public partial class LibraryManager : ILibraryManager {
         catch (Exception ex) {
             /// Restore from the backup created before this method was called
             var serializer = ServiceProvider.Get<ISerializer>();
-            serializer.RestoreFile(Core.Settings.DEFAULT_DATA_FILE);
+            serializer.RestoreFile(Settings.DEFAULT_DATA_FILE);
             _libraries.ForEach(library => serializer.RestoreFile(library.LibraryName));
 
-            Core.MessageRelay.OnMessagePosted(nameof(LibraryManager), $"Library cleaning failed. Previous files restored. {ex.Message}", Core.MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(nameof(LibraryManager), $"Library cleaning failed. Previous files restored. {ex.Message}", MessageRelay.MessageCategory.User);
         }
     }
 
@@ -160,13 +156,13 @@ public partial class LibraryManager : ILibraryManager {
     }
 
     private CommandTimerLibrary? GetFromLoaded(string libraryName) => _libraries.FirstOrDefault((o) => o.LibraryName == libraryName);
-    private CommandTimerLibrary? GetFromSaveData(string libraryName) => ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerLibrary>($"{Core.Settings.Keys.LibraryPrefix}{libraryName}", libraryName);
+    private CommandTimerLibrary? GetFromSaveData(string libraryName) => ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerLibrary>($"{Settings.Keys.LibraryPrefix}{libraryName}", libraryName);
     private CommandTimerLibrary CreateNewLibrary(string libraryName) => new() { LibraryName = libraryName.Trim() };
 
     private void DeserializeState() {
         var serializer = ServiceProvider.Get<ISerializer>();
-        var prefix = Core.Settings.Keys.LibraryManagerPrefix;
-        var dataFile = Core.Settings.DEFAULT_DATA_FILE;
+        var prefix = Settings.Keys.LibraryManagerPrefix;
+        var dataFile = Settings.DEFAULT_DATA_FILE;
 
         /// Try current key, fall back to legacy key for existing save files
         var libraries = serializer.Deserialize<HashSet<string>>($"{prefix}{nameof(LibraryNames)}", dataFile)
@@ -184,8 +180,8 @@ public partial class LibraryManager : ILibraryManager {
 
     private void SerializeState() {
         var serializer = ServiceProvider.Get<ISerializer>();
-        var prefix = Core.Settings.Keys.LibraryManagerPrefix;
-        var dataFile = Core.Settings.DEFAULT_DATA_FILE;
+        var prefix = Settings.Keys.LibraryManagerPrefix;
+        var dataFile = Settings.DEFAULT_DATA_FILE;
 
         serializer.Serialize($"{prefix}{nameof(LibraryNames)}", Serialized_LibraryNames, dataFile);
         serializer.Serialize($"{prefix}{nameof(Serialized_CurrentLibraryName)}", Serialized_CurrentLibraryName, dataFile);
@@ -234,19 +230,19 @@ public partial class LibraryManager : ILibraryManager {
     private void InitializeLibraries() {
         /// Default Case
         if (Serialized_LibraryNames.Count is 0) {
-            PersistLibrary(GetLibrary(Core.Settings.Keys.DefaultLibrary).Load());
+            PersistLibrary(GetLibrary(Settings.Keys.DefaultLibrary).Load());
         }
 
         /// Load all libraries into memory
         LibraryNames.ForEach(l => PersistLibrary(GetLibrary(l).Load()));
 
         /// Restore last-selected library as current
-        var libraryToLoad = FindLibrary(Serialized_CurrentLibraryName)?.LibraryName ?? LibraryNames.FirstOrDefault() ?? Core.Settings.Keys.DefaultLibrary;
+        var libraryToLoad = FindLibrary(Serialized_CurrentLibraryName)?.LibraryName ?? LibraryNames.FirstOrDefault() ?? Settings.Keys.DefaultLibrary;
         CurrentLibrary = GetLibrary(libraryToLoad);
         CurrentLibrary.Load();
 
         /// Self-healing re-serialize from memory
-        if (Core.Settings.ShouldCleanDatabase.Value) {
+        if (Settings.ShouldCleanDatabase.Value) {
             BackupLibraries();
             CleanLibraries();
         }

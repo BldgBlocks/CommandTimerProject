@@ -1,11 +1,9 @@
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace CommandTimer.Core.ViewModels.MenuItems;
+
 public record LibrarySelectionsMenu : Menu<MenuItemViewModel> {
 
     private readonly RelayCommand<object?> _selected;

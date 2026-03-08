@@ -1,8 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using CommandTimer.Core;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Static;
 using CommandTimer.Desktop.Utilities;
 using System;
 
@@ -32,10 +31,10 @@ public partial class AboutFlyout : UserControl {
     }
 
     private void Tapped_DonationButton_Monero(object? sender, TappedEventArgs args)
-        => App.CopyToClipboard(Core.Settings.Keys.DonationKey_Monero);
+        => App.CopyToClipboard(Settings.Keys.DonationKey_Monero);
 
     private void Tapped_DonationButton_Btc(object? sender, TappedEventArgs args)
-        => App.CopyToClipboard(Core.Settings.Keys.DonationKey_Btc);
+        => App.CopyToClipboard(Settings.Keys.DonationKey_Btc);
 
     private void Tapped_PrivacyStatementButton(object? sender, TappedEventArgs args)
         => PrivacyStatement.Get().Show((MainWindow.Instance as MainWindow)?.MainWindowLayout!);

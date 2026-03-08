@@ -1,9 +1,6 @@
 using Avalonia;
 using Avalonia.Media;
-using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
 
@@ -69,10 +66,10 @@ public partial class CommandTimerViewModel : ViewModelBase {
         => LibraryManager.FindLibrary(LibraryName) ?? LibraryManager.CurrentLibrary;
 
     public override void Serialize()
-        => ServiceProvider.Get<ISerializer>().Serialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", Data, LibraryName);
+        => ServiceProvider.Get<ISerializer>().Serialize($"{Settings.Keys.CommandTimerPrefix}{Name}", Data, LibraryName);
 
     public override void Unserialize()
-        => ServiceProvider.Get<ISerializer>().Unserialize($"{Core.Settings.Keys.CommandTimerPrefix}{Name}", LibraryName);
+        => ServiceProvider.Get<ISerializer>().Unserialize($"{Settings.Keys.CommandTimerPrefix}{Name}", LibraryName);
 
     public void Update_Countdown()
         => CountdownTillExecution = TimeSpanTillExecution.ToString(CountDownFormat);
@@ -173,7 +170,7 @@ public partial class CommandTimerViewModel : ViewModelBase {
         get => Data.TargetTimeSpanTillExecution;
         set {
             if (value < MinimumTimer) {
-                Core.MessageRelay.OnMessagePosted(this, "A minimum timer value has been enforced. \r\nConsider changing settings.", Core.MessageRelay.MessageCategory.User);
+                MessageRelay.OnMessagePosted(this, "A minimum timer value has been enforced. \r\nConsider changing settings.", MessageRelay.MessageCategory.User);
                 value = MinimumTimer;
             }
             var old = Data.TargetTimeSpanTillExecution;

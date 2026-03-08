@@ -1,10 +1,9 @@
 using Avalonia.Media;
-using CommandTimer.Core.Utilities;
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.Converters;
+
 public class JsonConverter_SolidColorBrush : JsonConverter<SolidColorBrush> {
 
     public override SolidColorBrush? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) {

@@ -5,9 +5,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Themes.Fluent;
-using CommandTimer.Core;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.Utilities.DependencyInversion;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels;
 using CommandTimer.Core.ViewModels.MenuItems;
 using CommandTimer.Desktop.Utilities;
@@ -15,7 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using static CommandTimer.Core.Settings;
+using static CommandTimer.Core.Static.Settings;
 
 namespace CommandTimer.Desktop.Views;
 
@@ -29,7 +29,7 @@ public partial class SettingsFlyout : UserControl {
         InitializeComponent();
 
         /// Settings Flyout
-        if (ServiceProvider.Get<ISerializer>().Deserialize<SettingsFlyoutViewModel>(Core.Settings.Keys.GlobalSettings, Core.Settings.DEFAULT_DATA_FILE) is not SettingsFlyoutViewModel settingsViewModel) {
+        if (ServiceProvider.Get<ISerializer>().Deserialize<SettingsFlyoutViewModel>(Settings.Keys.GlobalSettings, Settings.DEFAULT_DATA_FILE) is not SettingsFlyoutViewModel settingsViewModel) {
             settingsViewModel = new SettingsFlyoutViewModel();
         }
         DataContext = settingsViewModel;
@@ -42,12 +42,12 @@ public partial class SettingsFlyout : UserControl {
         }
 
         /// Bind changes from the static settings class even though the view model will likely be authoritative and serialized.
-        Core.Settings.ShouldAnimate.ValueChanged += ShouldAnimate_ValueChanged;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged += ShouldExecuteOnTimer_ValueChanged;
-        Core.Settings.ShouldLog.ValueChanged += ShouldLog_ValueChanged;
-        Core.Settings.ShouldPromptByDefault.ValueChanged += ShouldPromptByDefault_ValueChanged;
-        Core.Settings.ShouldAutoNotificationsExpire.ValueChanged += ShouldAutoNotificationsExpire_ValueChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged += ShouldExpandColorBar_ValueChanged;
+        Settings.ShouldAnimate.ValueChanged += ShouldAnimate_ValueChanged;
+        Settings.ShouldExecuteOnTimer.ValueChanged += ShouldExecuteOnTimer_ValueChanged;
+        Settings.ShouldLog.ValueChanged += ShouldLog_ValueChanged;
+        Settings.ShouldPromptByDefault.ValueChanged += ShouldPromptByDefault_ValueChanged;
+        Settings.ShouldAutoNotificationsExpire.ValueChanged += ShouldAutoNotificationsExpire_ValueChanged;
+        Settings.ShouldExpandColorBar.ValueChanged += ShouldExpandColorBar_ValueChanged;
         if (DataContext is SettingsFlyoutViewModel viewModel) {
             viewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
@@ -68,12 +68,12 @@ public partial class SettingsFlyout : UserControl {
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
-        Core.Settings.ShouldAnimate.ValueChanged -= ShouldAnimate_ValueChanged;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged -= ShouldExecuteOnTimer_ValueChanged;
-        Core.Settings.ShouldLog.ValueChanged -= ShouldLog_ValueChanged;
-        Core.Settings.ShouldPromptByDefault.ValueChanged -= ShouldPromptByDefault_ValueChanged;
-        Core.Settings.ShouldAutoNotificationsExpire.ValueChanged -= ShouldAutoNotificationsExpire_ValueChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged -= ShouldExpandColorBar_ValueChanged;
+        Settings.ShouldAnimate.ValueChanged -= ShouldAnimate_ValueChanged;
+        Settings.ShouldExecuteOnTimer.ValueChanged -= ShouldExecuteOnTimer_ValueChanged;
+        Settings.ShouldLog.ValueChanged -= ShouldLog_ValueChanged;
+        Settings.ShouldPromptByDefault.ValueChanged -= ShouldPromptByDefault_ValueChanged;
+        Settings.ShouldAutoNotificationsExpire.ValueChanged -= ShouldAutoNotificationsExpire_ValueChanged;
+        Settings.ShouldExpandColorBar.ValueChanged -= ShouldExpandColorBar_ValueChanged;
         if (DataContext is SettingsFlyoutViewModel viewModel) {
             viewModel.PropertyChanged -= ViewModel_PropertyChanged;
         }
@@ -174,7 +174,7 @@ public partial class SettingsFlyout : UserControl {
 
             bool? ask = await askPasswordDialog.Show(window.MainWindowLayout);
             if (ask is false) return;
-            
+
             var firstEntry = askPasswordDialog.PART_PasswordEntry.Text ?? string.Empty;
 
             /// Confirm the password
@@ -225,7 +225,7 @@ public partial class SettingsFlyout : UserControl {
             if (result is false) return;
 
             var serializer = ServiceProvider.Get<ISerializer>();
-            serializer.RestoreFile(DEFAULT_DATA_FILE);
+            serializer.RestoreFile(Settings.DEFAULT_DATA_FILE);
             LibraryManager.Libraries.ForEach(l => serializer.RestoreFile(l.LibraryName));
         }
         catch (OperationCanceledException) { }

@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
 
 public class ObservableProperty<T>(T _value) {
 

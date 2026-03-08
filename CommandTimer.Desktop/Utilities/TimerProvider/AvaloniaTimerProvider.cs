@@ -1,5 +1,4 @@
 using Avalonia.Threading;
-using CommandTimer.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ public class AvaloniaTimerProvider : ITimerProvider {
             _subscriberCounts[key] = 0;
             timer.Start();
         }
-        
+
         if (timer.Interval != TimeSpan.FromMilliseconds(milliseconds)) {
             throw new ArgumentOutOfRangeException($"TimerProvider: Key '{key}' already exists with interval {timer.Interval.TotalMilliseconds}ms, cannot subscribe with {milliseconds}ms.");
         }
@@ -45,7 +44,7 @@ public class AvaloniaTimerProvider : ITimerProvider {
 
     public void Unsubscribe(string key, int milliseconds, EventHandler eventHandler) {
         if (_timers.TryGetValue(key, out var timer) is false) return;
-        
+
         if (timer.Interval != TimeSpan.FromMilliseconds(milliseconds)) {
             throw new ArgumentOutOfRangeException($"TimerProvider: Key '{key}' exists with interval {timer.Interval.TotalMilliseconds}ms, cannot unsubscribe with {milliseconds}ms.");
         }

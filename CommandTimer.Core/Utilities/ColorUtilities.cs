@@ -1,5 +1,4 @@
 using Avalonia.Media;
-using System;
 
 namespace CommandTimer.Core.Utilities;
 

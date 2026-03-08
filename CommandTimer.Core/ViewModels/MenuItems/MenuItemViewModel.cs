@@ -1,6 +1,5 @@
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.Generic;
 
 namespace CommandTimer.Core.ViewModels.MenuItems;
 

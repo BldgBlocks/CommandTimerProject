@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 public interface IShowToolTip {
     public void OnPointerOver(Control control, string tooltip, IShowToolTipProperties properties);

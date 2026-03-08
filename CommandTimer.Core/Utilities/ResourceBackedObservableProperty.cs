@@ -1,6 +1,6 @@
 using Avalonia;
 using Avalonia.Media;
-using System;
+using CommandTimer.Core.Static.Exceptions;
 
 namespace CommandTimer.Core.Utilities;
 
@@ -36,12 +36,12 @@ public class ResourceBackedObservableProperty {
             var found = current.Resources.TryGetResource(_resourceKey, current.ActualThemeVariant, out var value);
 
             if (found is false) {
-                Core.MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' not found. Theme: {current.ActualThemeVariant}. Returning purple fallback.", Core.MessageRelay.MessageCategory.Exception, 100);
+                MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' not found. Theme: {current.ActualThemeVariant}. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
                 return new SolidColorBrush(Avalonia.Media.Colors.Purple);
             }
 
             if (value is not SolidColorBrush brush) {
-                Core.MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' found but is type '{value?.GetType().Name}', not SolidColorBrush. Returning purple fallback.", Core.MessageRelay.MessageCategory.Exception, 100);
+                MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' found but is type '{value?.GetType().Name}', not SolidColorBrush. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
                 return new SolidColorBrush(Avalonia.Media.Colors.Purple);
             }
 

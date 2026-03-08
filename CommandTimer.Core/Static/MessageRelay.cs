@@ -1,6 +1,4 @@
-using System;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
 
 public static class MessageRelay {
 

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Static;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,13 @@ public partial class ActivityDisplay : UserControl {
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
 
-        TimerProvider.Subscribe(Core.Settings.Keys.WillCall_Key_OnOneSecond, Core.Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
+        TimerProvider.Subscribe(Settings.Keys.WillCall_Key_OnOneSecond, Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
-        TimerProvider.Unsubscribe(Core.Settings.Keys.WillCall_Key_OnOneSecond, Core.Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
+        TimerProvider.Unsubscribe(Settings.Keys.WillCall_Key_OnOneSecond, Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
     }
 
     private void EventHandler_UpdateUI(object? sender, EventArgs e) {

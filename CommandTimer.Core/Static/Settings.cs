@@ -1,7 +1,4 @@
-using Avalonia.Media;
-using CommandTimer.Core.Utilities;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
 
 public static class Settings {
 

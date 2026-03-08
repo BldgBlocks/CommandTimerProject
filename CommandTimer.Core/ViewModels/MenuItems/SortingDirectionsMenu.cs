@@ -1,6 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 
 namespace CommandTimer.Core.ViewModels.MenuItems;
 

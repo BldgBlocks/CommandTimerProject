@@ -1,9 +1,5 @@
-using Avalonia;
 using Avalonia.Media;
-using CommandTimer.Core.Utilities;
-using System;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace CommandTimer.Core.ViewModels;
 
@@ -13,7 +9,7 @@ public partial class MessageControlViewModel : ViewModelBase {
     public int lifetimeRemaining;
 
     private event Func<Task> Remove = async delegate { await Task.Yield(); };
-    
+
     //...
 
 
@@ -32,7 +28,7 @@ public partial class MessageControlViewModel : ViewModelBase {
     private string _Message = "This is a test.";
     [JsonIgnore]
     public string Message {
-        get => _Message; 
+        get => _Message;
         set => SetProperty(ref _Message, value, Save.No, Notify.Yes);
     }
 

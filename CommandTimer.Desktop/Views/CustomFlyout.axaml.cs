@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Primitives.PopupPositioning;
-using CommandTimer.Core.Utilities;
 using CommandTimer.Desktop.Utilities;
 using System;
 using System.Collections.Generic;

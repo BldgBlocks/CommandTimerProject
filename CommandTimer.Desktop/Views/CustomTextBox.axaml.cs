@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 
 namespace CommandTimer.Desktop.Views;
+
 public partial class CustomTextBox : UserControl {
 
     private string _lastEntry = string.Empty;
@@ -279,32 +280,37 @@ public partial class CustomTextBox : UserControl {
     private void AcceptEntry() {
         if (TextBox == null) return;
 
-        Text = TextBox.Text?.Trim() ?? string.Empty;
-        _lastEntry = Text;
+        var trimmedText = TextBox.Text?.Trim() ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(Text)) {
-            Text = _initializedEntry;
-            _lastEntry = _initializedEntry;
+        if (string.IsNullOrWhiteSpace(trimmedText)) {
+            trimmedText = _initializedEntry;
+            TextBox.Text = trimmedText;  // Sync immediately if resetting to initial
+        }
+
+        /// Compare against last accepted value
+        bool changed = (trimmedText != _lastEntry);
+
+        _accepted = changed;
+
+        if (changed) {
+            _lastEntry = trimmedText;
+            /// Update both the styled property AND the internal TextBox synchronously
+            Text = trimmedText;
+            TextBox.Text = trimmedText;
+            OnAccept?.Invoke();
         }
 
         TextBox.CaretIndex = 0;
         TextBox.ScrollToLine(0);
-        _parentWindow?.FocusManager?.ClearFocus();
 
-        if (Text != _initializedEntry) {
-            _accepted = true;
-            OnAccept?.Invoke();
-        }
-        else {
-            CancelEntry();
-        }
-
+        /// Remove focus from TextBox
+        _parentWindow?.Focus();
     }
 
     private void CancelEntry() {
         Text = _lastEntry;
         if (TextBox is not null) {
-            TextBox.Text = _lastEntry; 
+            TextBox.Text = _lastEntry;
         }
         OnCancel?.Invoke();
     }
@@ -326,7 +332,7 @@ public partial class CustomTextBox : UserControl {
 
         if (AcceptWithDismiss) AcceptEntry(); else CancelEntry();
 
-        _parentWindow?.FocusManager?.ClearFocus();
+        _parentWindow?.Focus();
     }
 
     private bool IsPointerInsideControl(PointerPressedEventArgs e) {

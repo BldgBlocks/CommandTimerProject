@@ -1,7 +1,5 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -9,9 +7,9 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using CommandTimer.Core;
+using CommandTimer.Core.Static.Exceptions;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
 using CommandTimer.Desktop.Utilities;
 using CommunityToolkit.Mvvm.Input;
@@ -53,7 +51,7 @@ public partial class CommandTimerItem : UserControl {
         colorBarOnHover.Connect();
 
         /// Animation Presets - Avoid rendering issues by setting early in the constructor.
-        if (Core.Settings.ShouldAnimate.Value is Core.Settings.AnimationChoice.All) {
+        if (Settings.ShouldAnimate.Value is Settings.AnimationChoice.All) {
             this.Opacity = 0;
             this.Padding = new Thickness(1400, 0, 0, 0);
         }
@@ -66,11 +64,11 @@ public partial class CommandTimerItem : UserControl {
         viewModel.PaddingLeft = new Thickness(1400, 0, 0, 0);
 
         /// Get Controls
-        var secondsFlyout = FlyoutBase.GetAttachedFlyout(SecondsButton) ?? throw new Core.Exceptions.ControlNotFoundException($"A flyout child control of ${SecondsButton} was not found.");
+        var secondsFlyout = FlyoutBase.GetAttachedFlyout(SecondsButton) ?? throw new Exceptions.ControlNotFoundException($"A flyout child control of ${SecondsButton} was not found.");
         _secondsFlyoutBinding = SecondsSelectionView.Bind(secondsFlyout, SecondsButton);
         _secondsFlyoutBinding.Accept += Seconds_OnAccept;
 
-        var daysFlyout = FlyoutBase.GetAttachedFlyout(DaysButton) ?? throw new Core.Exceptions.ControlNotFoundException($"A flyout child control of ${DaysButton} was not found.");
+        var daysFlyout = FlyoutBase.GetAttachedFlyout(DaysButton) ?? throw new Exceptions.ControlNotFoundException($"A flyout child control of ${DaysButton} was not found.");
         _daysFlyoutBinding = DaysSelectionView.Bind(daysFlyout, DaysButton);
         _daysFlyoutBinding.Accept += Days_OnAccept;
 
@@ -112,19 +110,19 @@ public partial class CommandTimerItem : UserControl {
         CommandBlock.OnAccept += KeyHandler_AcceptCommand;
 
         /// Global Setting
-        Core.Settings.ShouldAnimate.ValueChanged += GlobalSetting_ShouldAnimate;
-        if (Core.Settings.ShouldAnimate.Value is Core.Settings.AnimationChoice.All) {
+        Settings.ShouldAnimate.ValueChanged += GlobalSetting_ShouldAnimate;
+        if (Settings.ShouldAnimate.Value is Settings.AnimationChoice.All) {
             BindAnimations();
         }
         Application.Current!.ActualThemeVariantChanged += EventHandler_ActualThemeVariantChanged;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged += GlobalSetting_ShouldExecuteOnTimer;
-        Core.Settings.MaxLines.ValueChanged += GlobalSetting_MaxLines;
-        Core.Settings.AccentColorSelection.ValueChanged += GlobalSetting_AccentColorSelectionChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged += GlobalSetting_ExpandColorBar;
+        Settings.ShouldExecuteOnTimer.ValueChanged += GlobalSetting_ShouldExecuteOnTimer;
+        Settings.MaxLines.ValueChanged += GlobalSetting_MaxLines;
+        Settings.AccentColorSelection.ValueChanged += GlobalSetting_AccentColorSelectionChanged;
+        Settings.ShouldExpandColorBar.ValueChanged += GlobalSetting_ExpandColorBar;
 
         /// Finish
-        GlobalSetting_MaxLines(Core.Settings.MaxLines.Value);
-        GlobalSetting_ExpandColorBar(Core.Settings.ShouldExpandColorBar.Value);
+        GlobalSetting_MaxLines(Settings.MaxLines.Value);
+        GlobalSetting_ExpandColorBar(Settings.ShouldExpandColorBar.Value);
         UpdateUI();
 
         base.OnLoaded(e);
@@ -201,11 +199,11 @@ public partial class CommandTimerItem : UserControl {
         if (Application.Current is not null) {
             Application.Current.ActualThemeVariantChanged -= EventHandler_ActualThemeVariantChanged;
         }
-        Core.Settings.ShouldAnimate.ValueChanged -= GlobalSetting_ShouldAnimate;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged -= GlobalSetting_ShouldExecuteOnTimer;
-        Core.Settings.MaxLines.ValueChanged -= GlobalSetting_MaxLines;
-        Core.Settings.AccentColorSelection.ValueChanged -= GlobalSetting_AccentColorSelectionChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged -= GlobalSetting_ExpandColorBar;
+        Settings.ShouldAnimate.ValueChanged -= GlobalSetting_ShouldAnimate;
+        Settings.ShouldExecuteOnTimer.ValueChanged -= GlobalSetting_ShouldExecuteOnTimer;
+        Settings.MaxLines.ValueChanged -= GlobalSetting_MaxLines;
+        Settings.AccentColorSelection.ValueChanged -= GlobalSetting_AccentColorSelectionChanged;
+        Settings.ShouldExpandColorBar.ValueChanged -= GlobalSetting_ExpandColorBar;
 
         UnbindAnimations();
 
@@ -235,7 +233,7 @@ public partial class CommandTimerItem : UserControl {
 
     private void GlobalSetting_AccentColorSelectionChanged(SolidColorBrush brush) {
         if (DataContext is not CommandTimerViewModel viewModel) return;
-        if (Core.Settings.ShouldExpandColorBar.Value) return;
+        if (Settings.ShouldExpandColorBar.Value) return;
 
         viewModel.Accent = brush;
         UpdateUI();
@@ -301,13 +299,13 @@ public partial class CommandTimerItem : UserControl {
     private void GlobalSetting_ShouldExecuteOnTimer(bool value)
         => UpdateControl_StartStop();
 
-    public void GlobalSetting_ShouldAnimate(Core.Settings.AnimationChoice choice) {
+    public void GlobalSetting_ShouldAnimate(Settings.AnimationChoice choice) {
         switch (choice) {
-            case Core.Settings.AnimationChoice.None:
+            case Settings.AnimationChoice.None:
                 UnbindAnimations();
                 UpdateUI();
                 break;
-            case Core.Settings.AnimationChoice.All:
+            case Settings.AnimationChoice.All:
                 BindAnimations();
                 UpdateUI();
                 break;
@@ -445,7 +443,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         /// Accent Theming
-        if (Core.Settings.ShouldExpandColorBar.Value) {
+        if (Settings.ShouldExpandColorBar.Value) {
             SetAccentToColorBar(viewModel);
         }
         else {
@@ -502,7 +500,7 @@ public partial class CommandTimerItem : UserControl {
             StartStopButton.IsHitTestVisible = true;
         }
         else {
-            if (Core.Settings.ShouldExecuteOnTimer.Value) {
+            if (Settings.ShouldExecuteOnTimer.Value) {
                 StartStopIcon.Height = 27;
                 StartStopIcon.Width = 27;
                 StartStopIcon.Kind = MaterialIconKind.Play;
@@ -681,16 +679,16 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         try {
-            if (viewModel.IsPromptForExecute || Core.Settings.ShouldPromptByDefault.Value) {
+            if (viewModel.IsPromptForExecute || Settings.ShouldPromptByDefault.Value) {
                 if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
                 bool? result = await ConfirmationDialog.Create()
                                                        .WithMessage($"Run command: {viewModel.Name}?")
-                                                       .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                       .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                        .Show(window.MainWindowLayout);
                 if (result is false) return;
             }
-            Core.MessageRelay.OnMessagePosted(this, $"Executing [{viewModel.Name}]", Core.MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(this, $"Executing [{viewModel.Name}]", MessageRelay.MessageCategory.User);
 
             viewModel.ExecuteCommand();
         }
@@ -710,7 +708,7 @@ public partial class CommandTimerItem : UserControl {
 
                 bool? result = await ConfirmationDialog.Create()
                                                        .WithTitle("Disable Confirmation Prompt?")
-                                                       .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                       .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                        .Show(window.MainWindowLayout);
                 if (result is false) return;
             }

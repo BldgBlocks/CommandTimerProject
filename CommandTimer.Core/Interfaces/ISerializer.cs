@@ -1,4 +1,4 @@
-namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 public interface ISerializer {
 

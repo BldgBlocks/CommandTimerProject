@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using System;
 
 namespace CommandTimer.Desktop.Views;
@@ -34,7 +34,7 @@ public partial class SecondsFlyout : UserControl {
         binding?.OnAccept();
     }
 
-    private void Click_Cancel(object? sender, RoutedEventArgs args) { 
+    private void Click_Cancel(object? sender, RoutedEventArgs args) {
         binding?.OnCancel();
     }
 

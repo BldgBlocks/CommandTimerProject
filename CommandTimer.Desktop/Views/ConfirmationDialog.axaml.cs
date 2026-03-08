@@ -3,8 +3,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
-using CommandTimer.Core.Utilities;
-using CommandTimer.Core.Utilities.DependencyInversion;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -108,7 +106,7 @@ public partial class ConfirmationDialog : UserControl {
             _tcs.TrySetResult(true);
             Hide();
         }
-        
+
         args.Handled = true;
     }
 

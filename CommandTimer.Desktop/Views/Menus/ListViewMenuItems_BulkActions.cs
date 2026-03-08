@@ -1,7 +1,7 @@
 using Avalonia;
-using CommandTimer.Core.Utilities;
 using Avalonia.Controls;
 using Avalonia.Media;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.ViewModels;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -10,7 +10,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 
-namespace CommandTimer.Desktop.Views;
+namespace CommandTimer.Desktop.Views.Menus;
 
 public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserPromptAreaWillCover) : IMenuItemsCollection {
 
@@ -25,7 +25,7 @@ public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserP
                 try {
                     bool? result = await ConfirmationDialog.Create()
                                                            .WithMessage($"Remove visible timers in this library?{Environment.NewLine}Are you sure?")
-                                                           .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                           .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                            .WithBorder(Brushes.Red, new Thickness(2))
                                                            .Show(UserPromptAreaWillCover);
                     if (result is true) {
@@ -46,7 +46,7 @@ public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserP
                  try {
                      bool? result = await ConfirmationDialog.Create()
                                                             .WithMessage($"Reset item colors?{Environment.NewLine}Are you sure?")
-                                                            .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                            .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                             .Show(UserPromptAreaWillCover);
                      if (result is true) {
                          var timers = ViewModel.RelevantCommandTimers.ToList();
@@ -66,7 +66,7 @@ public record ListViewMenuItems_BulkActions(ListViewModel ViewModel, Panel UserP
                 try {
                     bool? result = await ConfirmationDialog.Create()
                                                            .WithMessage($"Stop all timers?{Environment.NewLine}Are you sure?")
-                                                           .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                           .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                            .Show(UserPromptAreaWillCover);
                     if (result is true) {
                         var timers = ViewModel.RelevantCommandTimers.ToList();

@@ -1,6 +1,5 @@
-using System;
+namespace CommandTimer.Core.Static;
 
-namespace CommandTimer.Core;
 public static class ActionRelay {
 
     public static event EventHandler<ActionEventArgs>? ActionPosted;

@@ -1,9 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
-using System;
-using Avalonia.Controls.Primitives;
 
 namespace ControlsLibrary;
 

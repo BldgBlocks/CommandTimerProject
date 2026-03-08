@@ -1,6 +1,5 @@
 using Avalonia.Controls;
-using CommandTimer.Core;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Static;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -23,7 +22,7 @@ public partial class StartupDisclaimer : UserControl {
     /// </summary>
     [ModuleInitializer]
     public static void Initialize() {
-        Core.ActionRelay.ActionPosted += ActionRelay_Serialization;
+        ActionRelay.ActionPosted += ActionRelay_Serialization;
     }
 
     private static StartupDisclaimer? _instance;
@@ -38,11 +37,11 @@ public partial class StartupDisclaimer : UserControl {
     }
 
     private static void Serialize() {
-        ServiceProvider.Get<ISerializer>().Serialize<bool>("Application:HaveShownDisclaimer", _instance == null || _termsAccepted, Core.Settings.DEFAULT_DATA_FILE);
+        ServiceProvider.Get<ISerializer>().Serialize<bool>("Application:HaveShownDisclaimer", _instance == null || _termsAccepted, Settings.DEFAULT_DATA_FILE);
     }
 
     public static bool HaveShownTerms() {
-        return ServiceProvider.Get<ISerializer>().Deserialize<bool>("Application:HaveShownDisclaimer", Core.Settings.DEFAULT_DATA_FILE);
+        return ServiceProvider.Get<ISerializer>().Deserialize<bool>("Application:HaveShownDisclaimer", Settings.DEFAULT_DATA_FILE);
     }
 
     //... Public Methods
@@ -63,7 +62,7 @@ public partial class StartupDisclaimer : UserControl {
 
     //... Event Handlers
 
-    private static void ActionRelay_Serialization(object? sender, Core.ActionRelay.ActionEventArgs args)
+    private static void ActionRelay_Serialization(object? sender, ActionRelay.ActionEventArgs args)
         => Serialize();
 
     //... Actions

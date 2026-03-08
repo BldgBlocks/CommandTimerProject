@@ -1,13 +1,11 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using CommandTimer.Core.Utilities;
-using System;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
+
 public static class IOUtils {
 
     /// <summary>
@@ -126,14 +124,14 @@ public static class IOUtils {
                 Directory.GetFiles(folderPath).ForEach(File.Delete);
             }
             else {
-                Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"The directory '{folderPath}' was not found.", MessageRelay.MessageCategory.User);
+                MessageRelay.OnMessagePosted(nameof(IOUtils), $"The directory '{folderPath}' was not found.", MessageRelay.MessageCategory.User);
             }
         }
         catch (UnauthorizedAccessException ex) {
-            Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access to the path '{folderPath}' is denied. {ex.Message}", MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access to the path '{folderPath}' is denied. {ex.Message}", MessageRelay.MessageCategory.User);
         }
         catch (IOException ex) {
-            Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred while deleting files: {ex.Message}", MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred while deleting files: {ex.Message}", MessageRelay.MessageCategory.User);
         }
     }
 }

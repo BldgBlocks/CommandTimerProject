@@ -1,14 +1,9 @@
-using Avalonia;
 using Avalonia.Threading;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CommandTimer.Core.ViewModels;
 
@@ -40,8 +35,8 @@ public partial class ListViewModel : ViewModelBase {
         _libraryMenu = new LibrarySelectionsMenu(Command_LibrarySelection, Command_RemoveLibrary);
 
         /// Global Action
-        Core.ActionRelay.ActionPosted += (o, a) => {
-            if (a.ActionKey == Core.Settings.Keys.ActionRelay_Serialization) {
+        ActionRelay.ActionPosted += (o, a) => {
+            if (a.ActionKey == Settings.Keys.ActionRelay_Serialization) {
                 Serialize();
             }
         };
@@ -55,7 +50,7 @@ public partial class ListViewModel : ViewModelBase {
     //... Base Implementation
 
     public override void Serialize()
-        => ServiceProvider.Get<ISerializer>().Serialize(Core.Settings.Keys.ListView, this, Core.Settings.DEFAULT_DATA_FILE);
+        => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.ListView, this, Settings.DEFAULT_DATA_FILE);
 
     //... Event Handlers
 
@@ -79,7 +74,7 @@ public partial class ListViewModel : ViewModelBase {
     public static async void Command_RemoveLibrary(object? parameter) {
         var libraryName = (parameter as MenuItemViewModel)?.Header ?? string.Empty;
         bool? result = await ServiceProvider.Get<IAskTheUser>()
-                                            .Ask("Confirmation", 
+                                            .Ask("Confirmation",
                                                 $"Delete Library: '{libraryName}'{Environment.NewLine}{Environment.NewLine}Do you want to delete backups of this library?",
                                                 true, true);
         if (result is null) return;
@@ -113,7 +108,7 @@ public partial class ListViewModel : ViewModelBase {
     //...
 
     [JsonIgnore]
-    private CommandTimerLibrary _ActiveLibrary = new() { LibraryName = Core.Settings.Keys.DefaultLibrary };
+    private CommandTimerLibrary _ActiveLibrary = new() { LibraryName = Settings.Keys.DefaultLibrary };
     [JsonIgnore]
     public CommandTimerLibrary ActiveLibrary {
         get => _ActiveLibrary;
@@ -301,7 +296,7 @@ public partial class ListViewModel : ViewModelBase {
             if (!forceRefresh && e == maxCount) return;
             if (forceRefresh) e = 0;
 
-            var delay = Core.Settings.ShouldAnimate.Value is Core.Settings.AnimationChoice.All ? 100 : 50;
+            var delay = Settings.ShouldAnimate.Value is Settings.AnimationChoice.All ? 100 : 50;
             for (; e < list.Count; e++) {
                 if (i++ < FULL_ANIMATION_BEFORE_RAMP) {
                     await Task.Delay(delay, _cts.Token);
@@ -311,7 +306,7 @@ public partial class ListViewModel : ViewModelBase {
                     else {
                         RelevantCommandTimers[e] = list[e];
                     }
-                    if (Core.Settings.ShouldStripeList.Value) {
+                    if (Settings.ShouldStripeList.Value) {
                         list[e].IndexBackgroundStripe(e);
                     }
                 }
@@ -324,7 +319,7 @@ public partial class ListViewModel : ViewModelBase {
                         else {
                             RelevantCommandTimers[e] = list[e];
                         }
-                        if (Core.Settings.ShouldStripeList.Value) {
+                        if (Settings.ShouldStripeList.Value) {
                             list[e].IndexBackgroundStripe(e);
                         }
                     }, DispatcherPriority.Background, _cts.Token);

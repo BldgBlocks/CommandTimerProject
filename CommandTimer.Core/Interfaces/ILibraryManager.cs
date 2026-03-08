@@ -1,8 +1,6 @@
 using CommandTimer.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 
-namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 public interface ILibraryManager {
 

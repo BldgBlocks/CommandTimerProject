@@ -1,5 +1,4 @@
-using CommandTimer.Core;
-using CommandTimer.Core.Utilities.DependencyInversion;
+using CommandTimer.Core.Static;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -43,7 +42,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
         Deserialize();
         /// Global Action
         ActionRelay.ActionPosted += (o, a) => {
-            if (a.ActionKey == Core.Settings.Keys.ActionRelay_Serialization) {
+            if (a.ActionKey == Settings.Keys.ActionRelay_Serialization) {
                 Serialize();
             }
         };
@@ -100,7 +99,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
     }
 
     public bool IsSet() {
-        var value = _serializer.Deserialize<byte[]>(DATA_KEY, Core.Settings.DEFAULT_DATA_FILE);
+        var value = _serializer.Deserialize<byte[]>(DATA_KEY, Settings.DEFAULT_DATA_FILE);
         return value != null && value.Length != 0;
     }
 

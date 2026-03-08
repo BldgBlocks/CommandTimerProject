@@ -72,7 +72,7 @@ public partial class InteractionBlocker : UserControl {
 
     public InteractionBlocker WithBlurRadius(int strength) {
         PART_BorderBlocker.Effect = new BlurEffect() {
-            Radius = strength 
+            Radius = strength
         };
         return this;
     }

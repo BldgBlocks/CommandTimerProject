@@ -1,13 +1,9 @@
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
-using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
@@ -16,8 +12,8 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     public SettingsFlyoutViewModel() {
         /// Global Action
-        Core.ActionRelay.ActionPosted += (o, a) => {
-            if (a.ActionKey == Core.Settings.Keys.ActionRelay_Serialization) {
+        ActionRelay.ActionPosted += (o, a) => {
+            if (a.ActionKey == Settings.Keys.ActionRelay_Serialization) {
                 Serialize();
             }
         };
@@ -28,13 +24,13 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         _ThemeSelection = ThemeSelection.Header;
     }
 
-    public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Core.Settings.Keys.GlobalSettings, this, Core.Settings.DEFAULT_DATA_FILE);
+    public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.GlobalSettings, this, Settings.DEFAULT_DATA_FILE);
 
     //...
 
     [JsonInclude]
     [JsonPropertyName("ShouldAnimate")]
-    private Core.Settings.AnimationChoice _ShouldAnimate = Core.Settings.AnimationChoice.All;
+    private Settings.AnimationChoice _ShouldAnimate = Settings.AnimationChoice.All;
 
     /// <summary>
     /// Global Setting
@@ -42,11 +38,11 @@ public class SettingsFlyoutViewModel : ViewModelBase {
     /// <remarks>Choose if controls should animate.</remarks>
     [JsonIgnore]
     public bool ShouldAnimate {
-        get => _ShouldAnimate is Core.Settings.AnimationChoice.All;
+        get => _ShouldAnimate is Settings.AnimationChoice.All;
         set {
-            var _value = value ? Core.Settings.AnimationChoice.All : Core.Settings.AnimationChoice.None;
+            var _value = value ? Settings.AnimationChoice.All : Settings.AnimationChoice.None;
             if (SetProperty(ref _ShouldAnimate, _value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldAnimate.Value = _value;
+                Settings.ShouldAnimate.Value = _value;
             }
         }
     }
@@ -66,7 +62,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldExecuteOnTimer;
         set {
             if (SetProperty(ref _ShouldExecuteOnTimer, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldExecuteOnTimer.Value = value;
+                Settings.ShouldExecuteOnTimer.Value = value;
             }
         }
     }
@@ -86,7 +82,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldAutoNotificationsExpire;
         set {
             if (SetProperty(ref _ShouldAutoNotificationsExpire, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldAutoNotificationsExpire.Value = value;
+                Settings.ShouldAutoNotificationsExpire.Value = value;
             }
         }
     }
@@ -106,7 +102,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldLog;
         set {
             if (SetProperty(ref _ShouldLog, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldLog.Value = value;
+                Settings.ShouldLog.Value = value;
             }
         }
     }
@@ -126,7 +122,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldPromptByDefault;
         set {
             if (SetProperty(ref _ShouldPromptByDefault, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldPromptByDefault.Value = value;
+                Settings.ShouldPromptByDefault.Value = value;
             }
         }
     }
@@ -146,7 +142,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldUsePasswordConfirmation;
         set {
             if (SetProperty(ref _ShouldUsePasswordConfirmation, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldUsePasswordConfirmation.Value = value;
+                Settings.ShouldUsePasswordConfirmation.Value = value;
             }
         }
     }
@@ -166,7 +162,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldAutoStart;
         set {
             if (SetProperty(ref _ShouldAutoStart, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldAutoStart.Value = value;
+                Settings.ShouldAutoStart.Value = value;
             }
         }
     }
@@ -186,7 +182,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldExpandColorBar;
         set {
             if (SetProperty(ref _ShouldExpandColorBar, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldExpandColorBar.Value = value;
+                Settings.ShouldExpandColorBar.Value = value;
             }
         }
     }
@@ -206,7 +202,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldStripeList;
         set {
             if (SetProperty(ref _ShouldStripeList, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldStripeList.Value = value;
+                Settings.ShouldStripeList.Value = value;
             }
         }
     }
@@ -226,7 +222,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _ShouldCleanDatabase;
         set {
             if (SetProperty(ref _ShouldCleanDatabase, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.ShouldCleanDatabase.Value = value;
+                Settings.ShouldCleanDatabase.Value = value;
             }
         }
     }
@@ -248,7 +244,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _MaxLines;
         set {
             if (SetProperty(ref _MaxLines, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.MaxLines.Value = value;
+                Settings.MaxLines.Value = value;
             }
         }
     }
@@ -270,7 +266,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _BackupVersionsToKeep;
         set {
             if (SetProperty(ref _BackupVersionsToKeep, value, Save.Yes, Notify.Yes)) {
-                Core.Settings.BackupVersionsToKeep.Value = value;
+                Settings.BackupVersionsToKeep.Value = value;
             }
         }
     }
@@ -290,7 +286,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
             }
         }
     }
-    // Does not bind up to the Core.Settings. Use Application.Current.ActualThemeVariant for notification and value.
+    // Does not bind up to the Settings. Use Application.Current.ActualThemeVariant for notification and value.
     [JsonIgnore]
     public MenuItemViewModel ThemeSelection {
         get {
@@ -347,7 +343,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         get => _AccentColorSelection;
         set {
             if (value.Color != _AccentColorSelection.Color) {
-                Core.Settings.AccentColorSelection.Value = value;
+                Settings.AccentColorSelection.Value = value;
                 SetProperty(ref _AccentColorSelection, value, Save.Yes, Notify.Yes);
             }
         }

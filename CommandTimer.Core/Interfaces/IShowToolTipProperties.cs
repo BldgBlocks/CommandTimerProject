@@ -1,7 +1,7 @@
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 
-namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 public interface IShowToolTipProperties {
     public IBrush? Background { get; set; }

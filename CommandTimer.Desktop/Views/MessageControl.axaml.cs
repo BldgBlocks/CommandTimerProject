@@ -1,10 +1,10 @@
 using Avalonia;
-using CommandTimer.Core.Utilities;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.ViewModels;
 using System;
 using System.Threading.Tasks;
@@ -14,12 +14,12 @@ namespace CommandTimer.Desktop.Views;
 public partial class MessageControl : UserControl {
 
     //...
-    private readonly DoubleTransition? _fadeInTransition = new() {
+    private readonly DoubleTransition _fadeInTransition = new() {
         Duration = TimeSpan.FromMilliseconds(100),
         Easing = new LinearEasing(),
         Property = OpacityProperty,
     };
-    private readonly ThicknessTransition? _slideInTransition = new() {
+    private readonly ThicknessTransition _slideInTransition = new() {
         Duration = TimeSpan.FromMilliseconds(600),
         Easing = new CircularEaseInOut(),
         Property = PaddingProperty,
@@ -100,7 +100,7 @@ public partial class MessageControl : UserControl {
             await Task.Delay(_slideInTransition?.Duration.Milliseconds ?? 500);
         }
         catch (ArgumentOutOfRangeException ex) {
-            Core.MessageRelay.OnMessagePosted($"{nameof(MessageControl)}>{nameof(PlayRemoveAnimation)}", $"{ex.Message}");
+            MessageRelay.OnMessagePosted($"{nameof(MessageControl)}>{nameof(PlayRemoveAnimation)}", $"{ex.Message}");
             throw;
         }
     }

@@ -1,6 +1,5 @@
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
-using CommandTimer.Core;
 
 namespace CommandTimer.Desktop.Utilities;
 

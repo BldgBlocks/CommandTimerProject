@@ -1,4 +1,4 @@
-namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 /// <summary>
 /// Service contract for accessing application theme colors.

@@ -6,11 +6,12 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using CommandTimer.Core;
-using CommandTimer.Core.Utilities;
+using CommandTimer.Core.Static;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels;
 using CommandTimer.Core.ViewModels.MenuItems;
 using CommandTimer.Desktop.Utilities;
+using CommandTimer.Desktop.Views.Menus;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ public partial class ListView : UserControl {
     public ListView() {
         InitializeComponent();
 
-        if (ServiceProvider.Get<ISerializer>().Deserialize<ListViewModel>(Core.Settings.Keys.ListView, Core.Settings.DEFAULT_DATA_FILE) is not ListViewModel listViewModel) {
+        if (ServiceProvider.Get<ISerializer>().Deserialize<ListViewModel>(Settings.Keys.ListView, Settings.DEFAULT_DATA_FILE) is not ListViewModel listViewModel) {
             listViewModel = new ListViewModel();
         }
         DataContext = listViewModel;
@@ -64,8 +65,8 @@ public partial class ListView : UserControl {
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
         LibraryManager.CurrentLibraryChanging += LibraryManager_CurrentLibraryChanging;
         LibraryManager.CurrentLibraryChanged += LibraryManager_CurrentLibraryChanged;
-        Core.Settings.AccentColorSelection.ValueChanged += AccentColorSelection_ValueChanged;
-        Core.Settings.ShouldStripeList.ValueChanged += ShouldStripeList_ValueChanged;
+        Settings.AccentColorSelection.ValueChanged += AccentColorSelection_ValueChanged;
+        Settings.ShouldStripeList.ValueChanged += ShouldStripeList_ValueChanged;
         if (Application.Current is not null) {
             Application.Current.ActualThemeVariantChanged += EventHandler_ActualThemeVariantChanged;
         }
@@ -134,8 +135,8 @@ public partial class ListView : UserControl {
 
         LibraryManager.CurrentLibraryChanging -= LibraryManager_CurrentLibraryChanging;
         LibraryManager.CurrentLibraryChanged -= LibraryManager_CurrentLibraryChanged;
-        Core.Settings.AccentColorSelection.ValueChanged -= AccentColorSelection_ValueChanged;
-        Core.Settings.ShouldStripeList.ValueChanged -= ShouldStripeList_ValueChanged;
+        Settings.AccentColorSelection.ValueChanged -= AccentColorSelection_ValueChanged;
+        Settings.ShouldStripeList.ValueChanged -= ShouldStripeList_ValueChanged;
         LibraryManager.LibraryAdded -= LibraryManager_LibraryNamesChanged;
         LibraryManager.LibraryRemoved -= LibraryManager_LibraryNamesChanged;
         if (Application.Current is not null) {
@@ -147,13 +148,13 @@ public partial class ListView : UserControl {
         if (DataContext is not ListViewModel viewModel) return;
         if (MainWindow.Instance is not MainWindow window) return;
 
-        BulkActionButton.Flyout = new MenuFlyout() { 
+        BulkActionButton.Flyout = new MenuFlyout() {
             ItemsSource = new ListViewMenuItems_BulkActions(viewModel, window.MainWindowLayout).Items
         };
     }
 
     private void EventHandler_ActualThemeVariantChanged(object? sender, EventArgs e) {
-        RestripeList(Core.Settings.ShouldStripeList.Value);
+        RestripeList(Settings.ShouldStripeList.Value);
     }
 
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args) {
@@ -283,7 +284,7 @@ public partial class ListView : UserControl {
         if (DataContext is not ListViewModel viewModel) return;
 
         viewModel.AddNewTimer();
-        if (Core.Settings.ShouldStripeList.Value) {
+        if (Settings.ShouldStripeList.Value) {
             RestripeList(true);
         }
     }

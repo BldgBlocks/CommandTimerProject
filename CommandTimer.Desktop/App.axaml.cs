@@ -1,5 +1,4 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
@@ -9,11 +8,12 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
-using CommandTimer.Core;
 using CommandTimer.Core.Converters;
+using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels;
 using CommandTimer.Desktop.Utilities.ColorProvider;
+using CommandTimer.Desktop.Utilities.TimerProvider;
 using CommandTimer.Desktop.Views;
 using System;
 using System.Linq;
@@ -66,7 +66,7 @@ public partial class App : Application {
         BindingPlugins.DataValidators.RemoveAt(0);
 
         /// Services
-        ServiceProvider.Set<ITimerProvider>(new CommandTimer.Desktop.Utilities.TimerProvider.AvaloniaTimerProvider());
+        ServiceProvider.Set<ITimerProvider>(new AvaloniaTimerProvider());
         ServiceProvider.Set<IColorProvider>(new AvaloniaColorProvider());
         SetupSerialization();
         ServiceProvider.Set<ILibraryManager>(new LibraryManager());
@@ -91,7 +91,7 @@ public partial class App : Application {
         }
 
         /// Fluent Theme Accent Color
-        var observable = Core.Settings.AccentColorSelection;
+        var observable = Settings.AccentColorSelection;
         FluentTheme_UpdateAccentColor(ThemeVariant.Dark, observable.Value.Color);
         FluentTheme_UpdateAccentColor(ThemeVariant.Light, observable.Value.Color);
         observable.ValueChanged += (brush) => {
@@ -146,7 +146,7 @@ public partial class App : Application {
         var message = FlattenException(exception);
 
         /// Avalonia Dbus nuisance
-        if ((exception is AggregateException 
+        if ((exception is AggregateException
             && message.Contains("com.canonical.AppMenu.Registrar"))
             || message.Contains("The name is not activatable")) {
             /// Avalonia Dbus integration is causing exceptions.
@@ -161,7 +161,7 @@ public partial class App : Application {
     }
 
     private void LogException(string context, Exception ex) {
-        Core.MessageRelay.OnMessagePosted(nameof(App), $"[{context}] {ex.GetType().Name}: {ex.Message}", Core.MessageRelay.MessageCategory.Exception);
+        MessageRelay.OnMessagePosted(nameof(App), $"[{context}] {ex.GetType().Name}: {ex.Message}", MessageRelay.MessageCategory.Exception);
     }
 
     private static string FlattenException(Exception exception) {
@@ -185,7 +185,7 @@ public partial class App : Application {
 
     private void ShowUserError(string message) {
         int limit = 3000;
-        Core.MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, Core.MessageRelay.MessageCategory.Exception, 100);
+        MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, MessageRelay.MessageCategory.Exception, 100);
     }
 
     private static void SetupSerialization() {
@@ -198,9 +198,9 @@ public partial class App : Application {
         };
 
         CacheSerializer serializer = new(jsonOptions,
-                                         Core.Settings.BackupVersionsToKeep.GetValue,
+                                         Settings.BackupVersionsToKeep.GetValue,
                                          SystemInteraction.Files.GetUserConfigPath,
-                                         (message) => Core.MessageRelay.OnMessagePosted(nameof(CacheSerializer), message, Core.MessageRelay.MessageCategory.Exception),
+                                         (message) => MessageRelay.OnMessagePosted(nameof(CacheSerializer), message, MessageRelay.MessageCategory.Exception),
                                          onCommit);
 
         ServiceProvider.Set<ISerializer>(serializer);
