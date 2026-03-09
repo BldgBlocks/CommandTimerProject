@@ -3,14 +3,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
 
-public class ViewModelBase : ObservableObject {
+public class ViewModelBase : ObservableObject, IJsonOnSerializing, IJsonOnSerialized, IJsonOnDeserializing, IJsonOnDeserialized {
 
 
-    // TODO: Should this really be static or per class?
-    protected static bool ShouldSerialize { get; set; } = true;
+    protected bool ShouldSerialize { get; set; } = true;
     protected enum Notify { Yes, No }
     protected enum Save { Yes, No }
 
@@ -34,6 +34,28 @@ public class ViewModelBase : ObservableObject {
     }
 
     //... Callbacks
+
+    protected virtual void PreSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreSerialize);
+
+    protected virtual void PostSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostSerialize);
+
+    protected virtual void PreDeserialize() {
+        ShouldSerialize = false;
+        ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreDeserialize);
+    }
+
+    protected virtual void PostDeserialize() {
+        ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostDeserialize);
+        ShouldSerialize = true;
+    }
+
+    void IJsonOnSerializing.OnSerializing() => PreSerialize();
+
+    void IJsonOnSerialized.OnSerialized() => PostSerialize();
+
+    void IJsonOnDeserializing.OnDeserializing() => PreDeserialize();
+
+    void IJsonOnDeserialized.OnDeserialized() => PostDeserialize();
 
     /// <summary>
     /// No default implementation. No need to call base.

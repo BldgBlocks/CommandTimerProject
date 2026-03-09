@@ -28,6 +28,14 @@ public static class Settings {
 
         public static readonly string ActionRelay_Serialization = "Serialize";
 
+        public static readonly string ActionRelay_PreSerialize = "PreSerialize";
+
+        public static readonly string ActionRelay_PostSerialize = "PostSerialize";
+
+        public static readonly string ActionRelay_PreDeserialize = "PreDeserialize";
+
+        public static readonly string ActionRelay_PostDeserialize = "PostDeserialize";
+
         public static readonly string WillCall_Key_OnOneSecond = "WillCall_Key_OnOneSecond";
 
         public static readonly int WillCall_Interval_OnOneSecond = 1000;
