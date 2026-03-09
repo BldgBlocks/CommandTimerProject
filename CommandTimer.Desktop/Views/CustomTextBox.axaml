@@ -36,11 +36,11 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="views:CustomTextBox">
-                        <Border BorderBrush="Transparent"
+                        <Border Background="Transparent"
+                                BorderBrush="Transparent"
                                 BorderThickness="0"
-                                CornerRadius="0"
-                                PointerPressed="OnControlPointerPressed">
-                            <Grid>
+                                CornerRadius="0">
+                            <Grid Background="Transparent">
 
                                 <TextBlock Name="PART_DisplayTextBlock"
                                            Margin="5"

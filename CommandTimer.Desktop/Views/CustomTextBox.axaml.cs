@@ -13,13 +13,13 @@ namespace CommandTimer.Desktop.Views;
 public partial class CustomTextBox : UserControl {
 
     private string _lastEntry = string.Empty;
-    private string _initializedEntry = string.Empty;
     private IBrush? _initializedBrush;
     public TextBox? TextBox;
     public TextBlock? DisplayTextBlock;
     public Border? BackgroundBorder;
     private bool _accepted;
     private bool _isEditing;
+    private bool _selectAllOnNextFocus = true;
     private Window? ParentWindow => TopLevel.GetTopLevel(this) as Window;
     private bool HasFocus => TextBox is not null && TextBox.IsFocused;
     private bool PointerOver => TextBox is not null && TextBox.IsPointerOver;
@@ -211,6 +211,7 @@ public partial class CustomTextBox : UserControl {
         _accepted = false;
         _lastEntry = TextBox?.Text ?? string.Empty;
 
+        AddHandler(PointerPressedEvent, OnControlPointerPressed, RoutingStrategies.Tunnel);
         TextBox?.AddHandler(KeyDownEvent, OnKeyDown_CaptureSelection, RoutingStrategies.Tunnel);
         TextBox?.AddHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition, RoutingStrategies.Bubble, true);
     }
@@ -219,6 +220,7 @@ public partial class CustomTextBox : UserControl {
         base.OnUnloaded(e);
 
         /// Global Setting
+        RemoveHandler(PointerPressedEvent, OnControlPointerPressed);
         TextBox?.RemoveHandler(KeyDownEvent, OnKeyDown_CaptureSelection);
         TextBox?.RemoveHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition);
     }
@@ -232,7 +234,6 @@ public partial class CustomTextBox : UserControl {
         DisplayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayTextBlock");
         BackgroundBorder = e.NameScope.Find<Border>("PART_BorderElement");
         _lastEntry = Text;
-        _initializedEntry = Text;
 
         if (TextBox is not null) {
             TextBox.Text = Text;
@@ -245,10 +246,10 @@ public partial class CustomTextBox : UserControl {
         if (TextBox is null) return;
 
         _lastEntry = Text;
-        _initializedEntry = Text;
+        _selectAllOnNextFocus = selectAll;
         TextBox.Text = Text;
         SetEditingState(true);
-        _ = FocusEditorAsync(selectAll);
+        _ = FocusEditorAsync();
     }
 
     /// <summary>
@@ -282,10 +283,11 @@ public partial class CustomTextBox : UserControl {
 
     public void OnKeyDown(object? sender, KeyEventArgs e) {
         if (TextBox is null) return;
+        if (HasFocus is false) return;
 
         switch (e.Key) {
             case Key.Enter:
-                if (sender != TextBox) return;
+                if (AcceptsReturn && e.KeyModifiers.HasFlag(KeyModifiers.Shift)) return;
                 AcceptEntry();
                 break;
             case Key.Escape:
@@ -303,8 +305,8 @@ public partial class CustomTextBox : UserControl {
         var trimmedText = TextBox.Text?.Trim() ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(trimmedText)) {
-            trimmedText = _initializedEntry;
-            TextBox.Text = trimmedText;  // Sync immediately if resetting to initial
+            trimmedText = _lastEntry;
+            TextBox.Text = trimmedText;
         }
 
         /// Compare against last accepted value
@@ -312,7 +314,6 @@ public partial class CustomTextBox : UserControl {
 
         _accepted = true;
         _lastEntry = trimmedText;
-        _initializedEntry = trimmedText;
         Text = trimmedText;
         TextBox.Text = trimmedText;
 
@@ -332,7 +333,6 @@ public partial class CustomTextBox : UserControl {
             TextBox.Text = _lastEntry;
         }
 
-        _initializedEntry = _lastEntry;
         _accepted = true;
         OnCancel?.Invoke();
 
@@ -390,7 +390,7 @@ public partial class CustomTextBox : UserControl {
     /// <remarks>
     /// - Monitors window for clicks off the control.
     /// </remarks>
-    private async void OnGotFocus(object? sender, GotFocusEventArgs args) {
+    private void OnGotFocus(object? sender, GotFocusEventArgs args) {
         SetEditingState(true);
         _accepted = false;
         ParentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
@@ -400,21 +400,6 @@ public partial class CustomTextBox : UserControl {
             ?? (PointerOverColor as IImmutableSolidColorBrush)?.Color
             ?? Colors.White;
         Background = new SolidColorBrush(new Color(10, color.R, color.G, color.B));
-
-        try {
-            /// Wait till click is finished, then select all for the user.
-            await Dispatcher.UIThread.Invoke(async () => {
-                await Task.Delay(50);
-                TextBox?.SelectAll();
-                /// For some reason focus is sometimes stolen to keyboard navigation 
-                /// when pressing left arrow calling focus seems to handle this.
-                TextBox?.Focus();
-            }, DispatcherPriority.Background);
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) {
-            throw new Exception($"Method: {nameof(OnGotFocus)} has thrown the following.", ex);
-        }
     }
 
     /// <summary>
@@ -460,7 +445,7 @@ public partial class CustomTextBox : UserControl {
         }
     }
 
-    private async Task FocusEditorAsync(bool selectAll) {
+    private async Task FocusEditorAsync() {
         if (TextBox is null) return;
 
         try {
@@ -469,14 +454,14 @@ public partial class CustomTextBox : UserControl {
 
                 if (TextBox is null) return;
 
-                if (selectAll) {
+                TextBox.Focus();
+
+                if (_selectAllOnNextFocus) {
                     TextBox.SelectAll();
                 }
                 else {
                     TextBox.CaretIndex = TextBox.Text?.Length ?? 0;
                 }
-
-                TextBox.Focus();
             }, DispatcherPriority.Background);
         }
         catch (OperationCanceledException) { }

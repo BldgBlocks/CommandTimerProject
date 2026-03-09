@@ -193,10 +193,14 @@ public partial class CommandTimerLibrary {
     }
 
     public void ChangeTimerNameTo(CommandTimerViewModel timer, string newName) {
+        newName = string.IsNullOrWhiteSpace(newName)
+            ? CommandTimerViewModel.PLACEHOLDER_NAME
+            : newName.Trim();
+
         timer.Unserialize();
         UntrackInstance(timer);
 
-        timer.Name = newName;
+        timer.Name = MakeUniqueTimerName(newName);
 
         TrackInstance(timer);
         Serialize();
