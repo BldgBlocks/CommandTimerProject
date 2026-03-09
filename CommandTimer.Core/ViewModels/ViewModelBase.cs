@@ -10,12 +10,10 @@ namespace CommandTimer.Core.ViewModels;
 public class ViewModelBase : ObservableObject, IJsonOnSerializing, IJsonOnSerialized, IJsonOnDeserializing, IJsonOnDeserialized {
 
 
-    /// <summary>
     /// NOTE: This suppression flag and the JSON lifecycle hook surface are intentionally kept on the base class even
     /// though the current project now deserializes more Data objects than ViewModels directly. The base class is meant
     /// to remain a reusable foundation for future ViewModels, batch updates, initialization paths, or external projects
     /// that may still need a built-in "notify but do not persist" mechanism.
-    /// </summary>
     protected bool ShouldSerialize { get; set; } = true;
     protected enum Notify { Yes, No }
     protected enum Save { Yes, No }
