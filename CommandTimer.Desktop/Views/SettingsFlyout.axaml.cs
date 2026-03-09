@@ -8,9 +8,7 @@ using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using static CommandTimer.Core.Static.Settings;
 
 namespace CommandTimer.Desktop.Views;
 
@@ -36,17 +34,6 @@ public partial class SettingsFlyout : UserControl {
             SetupCustomToolTips();
         }
 
-        /// Bind changes from the static settings class even though the view model will likely be authoritative and serialized.
-        Settings.ShouldAnimate.ValueChanged += ShouldAnimate_ValueChanged;
-        Settings.ShouldExecuteOnTimer.ValueChanged += ShouldExecuteOnTimer_ValueChanged;
-        Settings.ShouldLog.ValueChanged += ShouldLog_ValueChanged;
-        Settings.ShouldPromptByDefault.ValueChanged += ShouldPromptByDefault_ValueChanged;
-        Settings.ShouldAutoNotificationsExpire.ValueChanged += ShouldAutoNotificationsExpire_ValueChanged;
-        Settings.ShouldExpandColorBar.ValueChanged += ShouldExpandColorBar_ValueChanged;
-        if (DataContext is SettingsFlyoutViewModel viewModel) {
-            viewModel.PropertyChanged += ViewModel_PropertyChanged;
-        }
-
         _colorBarFlyout = FlyoutBase.GetAttachedFlyout(ColorBar);
         if (_colorBarFlyout is not null) {
             _colorBarFlyout.Opened += (s, e) => {
@@ -63,51 +50,7 @@ public partial class SettingsFlyout : UserControl {
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
-        Settings.ShouldAnimate.ValueChanged -= ShouldAnimate_ValueChanged;
-        Settings.ShouldExecuteOnTimer.ValueChanged -= ShouldExecuteOnTimer_ValueChanged;
-        Settings.ShouldLog.ValueChanged -= ShouldLog_ValueChanged;
-        Settings.ShouldPromptByDefault.ValueChanged -= ShouldPromptByDefault_ValueChanged;
-        Settings.ShouldAutoNotificationsExpire.ValueChanged -= ShouldAutoNotificationsExpire_ValueChanged;
-        Settings.ShouldExpandColorBar.ValueChanged -= ShouldExpandColorBar_ValueChanged;
-        if (DataContext is SettingsFlyoutViewModel viewModel) {
-            viewModel.PropertyChanged -= ViewModel_PropertyChanged;
-        }
-
         ColorPickerControl.KeyDown -= ColorBar_KeyDown;
-    }
-
-    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs args) {
-
-    }
-
-    private void ShouldPromptByDefault_ValueChanged(bool value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldPromptByDefault = value;
-    }
-
-    private void ShouldLog_ValueChanged(bool value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldLog = value;
-    }
-
-    private void ShouldExecuteOnTimer_ValueChanged(bool value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldExecuteOnTimer = value;
-    }
-
-    private void ShouldAutoNotificationsExpire_ValueChanged(bool value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldAutoNotificationsExpire = value;
-    }
-
-    private void ShouldAnimate_ValueChanged(AnimationChoice value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldAnimate = value is AnimationChoice.All;
     }
 
     private async void Tapped_StartAutoStartsButton(object? sender, TappedEventArgs args) {
@@ -129,12 +72,6 @@ public partial class SettingsFlyout : UserControl {
         catch (Exception ex) {
             throw new Exception($"Method: {nameof(Tapped_StartAutoStartsButton)} has thrown the following.", ex);
         }
-    }
-
-    private void ShouldExpandColorBar_ValueChanged(bool value) {
-        if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-
-        viewModel.ShouldExpandColorBar = value;
     }
 
     private async void Tapped_PromptPasswordButton(object? sender, TappedEventArgs args) {

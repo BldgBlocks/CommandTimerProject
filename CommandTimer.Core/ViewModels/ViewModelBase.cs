@@ -35,15 +35,27 @@ public class ViewModelBase : ObservableObject, IJsonOnSerializing, IJsonOnSerial
 
     //... Callbacks
 
+    /// <summary>
+    /// Called by the JSON serialization pipeline before writing. Overrides should call base to preserve lifecycle broadcasts.
+    /// </summary>
     protected virtual void PreSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreSerialize);
 
+    /// <summary>
+    /// Called by the JSON serialization pipeline after writing. Overrides should call base to preserve lifecycle broadcasts.
+    /// </summary>
     protected virtual void PostSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostSerialize);
 
+    /// <summary>
+    /// Called by the JSON serialization pipeline before reading. Overrides should call base to preserve serialization suppression and lifecycle broadcasts.
+    /// </summary>
     protected virtual void PreDeserialize() {
         ShouldSerialize = false;
         ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreDeserialize);
     }
 
+    /// <summary>
+    /// Called by the JSON serialization pipeline after reading. Overrides should call base to restore serialization and preserve lifecycle broadcasts.
+    /// </summary>
     protected virtual void PostDeserialize() {
         ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostDeserialize);
         ShouldSerialize = true;

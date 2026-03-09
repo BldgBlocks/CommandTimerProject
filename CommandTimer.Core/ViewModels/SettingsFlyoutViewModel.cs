@@ -26,6 +26,31 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.GlobalSettings, this, Settings.DEFAULT_DATA_FILE);
 
+    /// <summary>
+    /// Restore the static runtime Settings state from the deserialized backing fields once loading is complete.
+    /// This is done here because deserialization populates the private fields directly, bypassing the public property setters
+    /// that normally push changes into Settings and apply other runtime side effects such as the theme selection.
+    /// </summary>
+    protected override void PostDeserialize() {
+        Settings.ShouldAnimate.Value = _ShouldAnimate;
+        Settings.ShouldExecuteOnTimer.Value = _ShouldExecuteOnTimer;
+        Settings.ShouldAutoNotificationsExpire.Value = _ShouldAutoNotificationsExpire;
+        Settings.ShouldLog.Value = _ShouldLog;
+        Settings.ShouldPromptByDefault.Value = _ShouldPromptByDefault;
+        Settings.ShouldUsePasswordConfirmation.Value = _ShouldUsePasswordConfirmation;
+        Settings.ShouldAutoStart.Value = _ShouldAutoStart;
+        Settings.ShouldExpandColorBar.Value = _ShouldExpandColorBar;
+        Settings.ShouldStripeList.Value = _ShouldStripeList;
+        Settings.ShouldCleanDatabase.Value = _ShouldCleanDatabase;
+        Settings.MaxLines.Value = _MaxLines;
+        Settings.BackupVersionsToKeep.Value = _BackupVersionsToKeep;
+        Settings.AccentColorSelection.Value = _AccentColorSelection;
+
+        Application_ThemeSelectionChanged();
+
+        base.PostDeserialize();
+    }
+
     //...
 
     [JsonInclude]
