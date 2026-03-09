@@ -156,7 +156,10 @@ public partial class LibraryManager : ILibraryManager {
     }
 
     private CommandTimerLibrary? GetFromLoaded(string libraryName) => _libraries.FirstOrDefault((o) => o.LibraryName == libraryName);
-    private CommandTimerLibrary? GetFromSaveData(string libraryName) => ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerLibrary>($"{Settings.Keys.LibraryPrefix}{libraryName}", libraryName);
+    private CommandTimerLibrary? GetFromSaveData(string libraryName) {
+        var data = ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerLibraryData>($"{Settings.Keys.LibraryPrefix}{libraryName}", libraryName);
+        return data is not null ? new CommandTimerLibrary(data) : null;
+    }
     private CommandTimerLibrary CreateNewLibrary(string libraryName) => new() { LibraryName = libraryName.Trim() };
 
     private void DeserializeState() {

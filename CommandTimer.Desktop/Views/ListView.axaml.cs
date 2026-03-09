@@ -21,10 +21,9 @@ public partial class ListView : UserControl {
     public ListView() {
         InitializeComponent();
 
-        if (ServiceProvider.Get<ISerializer>().Deserialize<ListViewModel>(Settings.Keys.ListView, Settings.DEFAULT_DATA_FILE) is not ListViewModel listViewModel) {
-            listViewModel = new ListViewModel();
-        }
-        DataContext = listViewModel;
+        var listViewData = ServiceProvider.Get<ISerializer>().Deserialize<ListViewData>(Settings.Keys.ListView, Settings.DEFAULT_DATA_FILE)
+            ?? new ListViewData();
+        DataContext = new ListViewModel(listViewData);
     }
 
     private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();

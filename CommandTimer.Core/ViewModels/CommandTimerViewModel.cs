@@ -311,16 +311,5 @@ public partial class CommandTimerViewModel : ViewModelBase {
         }
     }
 
-    /// <summary>
-    /// Save + Notify: value already written to Data. Fires PropertyChanged and serializes if changed.
-    /// </summary>
-    private void SetPropertySaveNotify<T>(T oldValue, T newValue, [System.Runtime.CompilerServices.CallerMemberName] string? propertyName = null) {
-        if (!EqualityComparer<T>.Default.Equals(oldValue, newValue)) {
-            OnPropertyChanged(propertyName);
-            if (ShouldSerialize) {
-                Serialize();
-            }
-        }
-    }
 }
 

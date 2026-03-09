@@ -22,10 +22,9 @@ public partial class SettingsFlyout : UserControl {
         InitializeComponent();
 
         /// Settings Flyout
-        if (ServiceProvider.Get<ISerializer>().Deserialize<SettingsFlyoutViewModel>(Settings.Keys.GlobalSettings, Settings.DEFAULT_DATA_FILE) is not SettingsFlyoutViewModel settingsViewModel) {
-            settingsViewModel = new SettingsFlyoutViewModel();
-        }
-        DataContext = settingsViewModel;
+        var settingsData = ServiceProvider.Get<ISerializer>().Deserialize<SettingsFlyoutData>(Settings.Keys.GlobalSettings, Settings.DEFAULT_DATA_FILE)
+            ?? new SettingsFlyoutData();
+        DataContext = new SettingsFlyoutViewModel(settingsData);
     }
 
     protected override void OnLoaded(RoutedEventArgs e) {

@@ -1,5 +1,4 @@
-﻿using Avalonia.Media;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 
 namespace CommandTimer.Core.ViewModels;
@@ -21,95 +20,50 @@ public class CommandTimerData {
     public enum TimeModeChoice { Duration, Time, Date }
 
 
-    //... Serialized Fields & Properties
+    //... Serialized Properties
 
-    [JsonInclude]
     [JsonPropertyName("Name")]
-    private string _Name = PLACEHOLDER_NAME;
-    [JsonIgnore]
-    public string Name { get => _Name; set => _Name = value; }
+    public string Name { get; set; } = PLACEHOLDER_NAME;
 
-    [JsonInclude]
     [JsonPropertyName("LibraryName")]
-    private string _Library = Settings.Keys.DefaultLibrary;
-    [JsonIgnore]
-    public string LibraryName { get => _Library; set => _Library = value; }
+    public string LibraryName { get; set; } = Settings.Keys.DefaultLibrary;
 
-    [JsonInclude]
     [JsonPropertyName("Description")]
-    private string _Description = PLACEHOLDER_DESCRIPTION;
-    [JsonIgnore]
-    public string Description { get => _Description; set => _Description = value; }
+    public string Description { get; set; } = PLACEHOLDER_DESCRIPTION;
 
-    [JsonInclude]
     [JsonPropertyName("Command")]
-    private string _Command = PLACEHOLDER_COMMAND;
-    [JsonIgnore]
-    public string Command { get => _Command; set => _Command = value; }
+    public string Command { get; set; } = PLACEHOLDER_COMMAND;
 
-    [JsonInclude]
     [JsonPropertyName("IsLog")]
-    private bool _IsLog = true;
-    [JsonIgnore]
-    public bool IsLog { get => _IsLog; set => _IsLog = value; }
+    public bool IsLog { get; set; } = true;
 
-    [JsonInclude]
     [JsonPropertyName("IsShowTerminal")]
-    private bool _IsShowTerminal;
-    [JsonIgnore]
-    public bool IsShowTerminal { get => _IsShowTerminal; set => _IsShowTerminal = value; }
+    public bool IsShowTerminal { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("IsTimeMode")]
-    private TimeModeChoice _IsTimeMode;
-    [JsonIgnore]
-    public TimeModeChoice TimeMode { get => _IsTimeMode; set => _IsTimeMode = value; }
+    public TimeModeChoice TimeMode { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("IsLoop")]
-    private bool _IsLoop;
-    [JsonIgnore]
-    public bool IsLoop { get => _IsLoop; set => _IsLoop = value; }
+    public bool IsLoop { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("IsAutoStart")]
-    private bool _IsAutoStart;
-    [JsonIgnore]
-    public bool IsAutoStart { get => _IsAutoStart; set => _IsAutoStart = value; }
+    public bool IsAutoStart { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("IsPromptForExecute")]
-    private bool _IsPromptForExecute;
-    [JsonIgnore]
-    public bool IsPromptForExecute { get => _IsPromptForExecute; set => _IsPromptForExecute = value; }
+    public bool IsPromptForExecute { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("IsFavorite")]
-    private bool _IsFavorite;
-    [JsonIgnore]
-    public bool IsFavorite { get => _IsFavorite; set => _IsFavorite = value; }
+    public bool IsFavorite { get; set; }
 
-    [JsonInclude]
     [JsonPropertyName("ColorBarColor")]
-    private AppColor _ColorBarColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
-    [JsonIgnore]
-    public AppColor ColorBarColor { get => _ColorBarColor; set => _ColorBarColor = value; }
+    public AppColor ColorBarColor { get; set; } = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
 
-    [JsonInclude]
     [JsonPropertyName("TargetTimeSpan")]
-    private TimeSpan _TargetTimeSpanTillExecution = MinimumTimer;
-    [JsonIgnore]
-    public TimeSpan TargetTimeSpanTillExecution { get => _TargetTimeSpanTillExecution; set => _TargetTimeSpanTillExecution = value; }
+    public TimeSpan TargetTimeSpanTillExecution { get; set; } = MinimumTimer;
 
-    [JsonInclude]
     [JsonPropertyName("TargetDate")]
-    private DateTime _TargetDateTillExecution = DateTime.Today.AddDays(1);
-    [JsonIgnore]
-    public DateTime TargetDateTillExecution { get => _TargetDateTillExecution; set => _TargetDateTillExecution = value; }
+    public DateTime TargetDateTillExecution { get; set; } = DateTime.Today.AddDays(1);
 
-    [JsonInclude]
     [JsonPropertyName("StartTime")]
-    private DateTime _StartTime;
-    [JsonIgnore]
-    public DateTime StartTime { get => _StartTime; set => _StartTime = value; }
+    public DateTime StartTime { get; set; }
 }

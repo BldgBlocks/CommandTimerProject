@@ -4,13 +4,16 @@ using Avalonia.Styling;
 using CommandTimer.Core.ViewModels.MenuItems;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
 
 public class SettingsFlyoutViewModel : ViewModelBase {
 
-    public SettingsFlyoutViewModel() {
+    public SettingsFlyoutViewModel() : this(new SettingsFlyoutData()) { }
+
+    public SettingsFlyoutViewModel(SettingsFlyoutData data) {
+        Data = data;
+
         /// Global Action
         ActionRelay.ActionPosted += (o, a) => {
             if (a.ActionKey == Settings.Keys.ActionRelay_Serialization) {
@@ -21,72 +24,69 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         /// Theme Selection Menu
         var themeSelectionMenu = new ThemeSelectionsMenu(Command_ThemeSelection);
         ThemeSelections = new ObservableCollection<MenuItemViewModel>(themeSelectionMenu.Items);
-        _ThemeSelection = ThemeSelection.Header;
+        /// Force the getter to run to set a valid default if the data value is invalid, and apply the theme selection to the application.
+        /// Comeback and create a NormalizeThemeSelection() call
+        _ = ThemeSelection;
+
+        ApplyRuntimeStateFromData();
     }
 
-    public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.GlobalSettings, this, Settings.DEFAULT_DATA_FILE);
+    internal SettingsFlyoutData Data { get; }
+
+    public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.GlobalSettings, Data, Settings.DEFAULT_DATA_FILE);
 
     /// <summary>
-    /// Restore the static runtime Settings state from the deserialized backing fields once loading is complete.
-    /// This is done here because deserialization populates the private fields directly, bypassing the public property setters
-    /// that normally push changes into Settings and apply other runtime side effects such as the theme selection.
+    /// Restore the static runtime Settings state from the data object after construction.
+    /// The data is the persistence authority, while Settings remains the runtime authority read throughout the app.
     /// </summary>
-    protected override void PostDeserialize() {
-        Settings.ShouldAnimate.Value = _ShouldAnimate;
-        Settings.ShouldExecuteOnTimer.Value = _ShouldExecuteOnTimer;
-        Settings.ShouldAutoNotificationsExpire.Value = _ShouldAutoNotificationsExpire;
-        Settings.ShouldLog.Value = _ShouldLog;
-        Settings.ShouldPromptByDefault.Value = _ShouldPromptByDefault;
-        Settings.ShouldUsePasswordConfirmation.Value = _ShouldUsePasswordConfirmation;
-        Settings.ShouldAutoStart.Value = _ShouldAutoStart;
-        Settings.ShouldExpandColorBar.Value = _ShouldExpandColorBar;
-        Settings.ShouldStripeList.Value = _ShouldStripeList;
-        Settings.ShouldCleanDatabase.Value = _ShouldCleanDatabase;
-        Settings.MaxLines.Value = _MaxLines;
-        Settings.BackupVersionsToKeep.Value = _BackupVersionsToKeep;
-        Settings.AccentColorSelection.Value = _AccentColorSelection;
+    private void ApplyRuntimeStateFromData() {
+        Settings.ShouldAnimate.Value = Data.ShouldAnimate;
+        Settings.ShouldExecuteOnTimer.Value = Data.ShouldExecuteOnTimer;
+        Settings.ShouldAutoNotificationsExpire.Value = Data.ShouldAutoNotificationsExpire;
+        Settings.ShouldLog.Value = Data.ShouldLog;
+        Settings.ShouldPromptByDefault.Value = Data.ShouldPromptByDefault;
+        Settings.ShouldUsePasswordConfirmation.Value = Data.ShouldUsePasswordConfirmation;
+        Settings.ShouldAutoStart.Value = Data.ShouldAutoStart;
+        Settings.ShouldExpandColorBar.Value = Data.ShouldExpandColorBar;
+        Settings.ShouldStripeList.Value = Data.ShouldStripeList;
+        Settings.ShouldCleanDatabase.Value = Data.ShouldCleanDatabase;
+        Settings.MaxLines.Value = Data.MaxLines;
+        Settings.BackupVersionsToKeep.Value = Data.BackupVersionsToKeep;
+        Settings.AccentColorSelection.Value = Data.AccentColorSelection;
 
         Application_ThemeSelectionChanged();
-
-        base.PostDeserialize();
     }
 
     //...
-
-    [JsonInclude]
-    [JsonPropertyName("ShouldAnimate")]
-    private Settings.AnimationChoice _ShouldAnimate = Settings.AnimationChoice.All;
 
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if controls should animate.</remarks>
-    [JsonIgnore]
     public bool ShouldAnimate {
-        get => _ShouldAnimate is Settings.AnimationChoice.All;
+        get => Data.ShouldAnimate is Settings.AnimationChoice.All;
         set {
-            var _value = value ? Settings.AnimationChoice.All : Settings.AnimationChoice.None;
-            if (SetProperty(ref _ShouldAnimate, _value, Save.Yes, Notify.Yes)) {
-                Settings.ShouldAnimate.Value = _value;
+            var newValue = value ? Settings.AnimationChoice.All : Settings.AnimationChoice.None;
+            var oldValue = Data.ShouldAnimate;
+            Data.ShouldAnimate = newValue;
+            if (SetPropertySaveNotify(oldValue, newValue)) {
+                Settings.ShouldAnimate.Value = newValue;
             }
         }
     }
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldExecuteOnTimer")]
-    private bool _ShouldExecuteOnTimer = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if commands should execute on timers (manual only).</remarks>
-    [JsonIgnore]
     public bool ShouldExecuteOnTimer {
-        get => _ShouldExecuteOnTimer;
+        get => Data.ShouldExecuteOnTimer;
         set {
-            if (SetProperty(ref _ShouldExecuteOnTimer, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldExecuteOnTimer;
+            Data.ShouldExecuteOnTimer = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldExecuteOnTimer.Value = value;
             }
         }
@@ -94,19 +94,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldAutoNotificationsExpire")]
-    private bool _ShouldAutoNotificationsExpire = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if notifications from timer expiration should expire.</remarks>
-    [JsonIgnore]
     public bool ShouldAutoNotificationsExpire {
-        get => _ShouldAutoNotificationsExpire;
+        get => Data.ShouldAutoNotificationsExpire;
         set {
-            if (SetProperty(ref _ShouldAutoNotificationsExpire, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldAutoNotificationsExpire;
+            Data.ShouldAutoNotificationsExpire = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldAutoNotificationsExpire.Value = value;
             }
         }
@@ -114,19 +111,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldLog")]
-    private bool _ShouldLog = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if commands should be logged.</remarks>
-    [JsonIgnore]
     public bool ShouldLog {
-        get => _ShouldLog;
+        get => Data.ShouldLog;
         set {
-            if (SetProperty(ref _ShouldLog, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldLog;
+            Data.ShouldLog = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldLog.Value = value;
             }
         }
@@ -134,19 +128,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldPromptByDefault")]
-    private bool _ShouldPromptByDefault = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if 'Execute' button should prompt for confirmation.</remarks>
-    [JsonIgnore]
     public bool ShouldPromptByDefault {
-        get => _ShouldPromptByDefault;
+        get => Data.ShouldPromptByDefault;
         set {
-            if (SetProperty(ref _ShouldPromptByDefault, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldPromptByDefault;
+            Data.ShouldPromptByDefault = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldPromptByDefault.Value = value;
             }
         }
@@ -154,19 +145,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldUsePasswordConfirmation")]
-    private bool _ShouldUsePasswordConfirmation = false;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Require password for confirmation windows.</remarks>
-    [JsonIgnore]
     public bool ShouldUsePasswordConfirmation {
-        get => _ShouldUsePasswordConfirmation;
+        get => Data.ShouldUsePasswordConfirmation;
         set {
-            if (SetProperty(ref _ShouldUsePasswordConfirmation, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldUsePasswordConfirmation;
+            Data.ShouldUsePasswordConfirmation = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldUsePasswordConfirmation.Value = value;
             }
         }
@@ -174,19 +162,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldAutoStart")]
-    private bool _ShouldAutoStart = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if AutoStart should trigger upon start up.</remarks>
-    [JsonIgnore]
     public bool ShouldAutoStart {
-        get => _ShouldAutoStart;
+        get => Data.ShouldAutoStart;
         set {
-            if (SetProperty(ref _ShouldAutoStart, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldAutoStart;
+            Data.ShouldAutoStart = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldAutoStart.Value = value;
             }
         }
@@ -194,19 +179,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldExpandColorBar")]
-    private bool _ShouldExpandColorBar = false;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if color should expand to timer item accents.</remarks>
-    [JsonIgnore]
     public bool ShouldExpandColorBar {
-        get => _ShouldExpandColorBar;
+        get => Data.ShouldExpandColorBar;
         set {
-            if (SetProperty(ref _ShouldExpandColorBar, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldExpandColorBar;
+            Data.ShouldExpandColorBar = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldExpandColorBar.Value = value;
             }
         }
@@ -214,19 +196,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldStripeList")]
-    private bool _ShouldStripeList = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if list items should have alternating background colors.</remarks>
-    [JsonIgnore]
     public bool ShouldStripeList {
-        get => _ShouldStripeList;
+        get => Data.ShouldStripeList;
         set {
-            if (SetProperty(ref _ShouldStripeList, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldStripeList;
+            Data.ShouldStripeList = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldStripeList.Value = value;
             }
         }
@@ -234,19 +213,16 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("ShouldCleanDatabase")]
-    private bool _ShouldCleanDatabase = true;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose if database should be cleaned on backup.</remarks>
-    [JsonIgnore]
     public bool ShouldCleanDatabase {
-        get => _ShouldCleanDatabase;
+        get => Data.ShouldCleanDatabase;
         set {
-            if (SetProperty(ref _ShouldCleanDatabase, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ShouldCleanDatabase;
+            Data.ShouldCleanDatabase = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.ShouldCleanDatabase.Value = value;
             }
         }
@@ -254,21 +230,17 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("MaxLines")]
-    [Range(1, 5)]
-    private int _MaxLines = 1;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose how many lines should expand for description.</remarks>
-    [JsonIgnore]
     [Range(1, 5)]
     public int MaxLines {
-        get => _MaxLines;
+        get => Data.MaxLines;
         set {
-            if (SetProperty(ref _MaxLines, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.MaxLines;
+            Data.MaxLines = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.MaxLines.Value = value;
             }
         }
@@ -276,21 +248,17 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("BackupVersions")]
-    [Range(0, 10)]
-    private int _BackupVersionsToKeep = 0;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose how many backup versions to keep.</remarks>
-    [JsonIgnore]
     [Range(0, 10)]
     public int BackupVersionsToKeep {
-        get => _BackupVersionsToKeep;
+        get => Data.BackupVersionsToKeep;
         set {
-            if (SetProperty(ref _BackupVersionsToKeep, value, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.BackupVersionsToKeep;
+            Data.BackupVersionsToKeep = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.BackupVersionsToKeep.Value = value;
             }
         }
@@ -299,38 +267,26 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonIgnore]
-    private string _ThemeSelection = "Dark";
-    [JsonInclude]
-    [JsonPropertyName("ThemeSelection")]
-    private string Serialized_ThemeSelection {
-        get => _ThemeSelection;
-        set {
-            if (SetProperty(ref _ThemeSelection, value, Save.No, Notify.Yes, nameof(ThemeSelection))) {
-                Application_ThemeSelectionChanged();
-            }
-        }
-    }
     // Does not bind up to the Settings. Use Application.Current.ActualThemeVariant for notification and value.
-    [JsonIgnore]
     public MenuItemViewModel ThemeSelection {
         get {
-            if (GetMenuItem(ThemeSelections, _ThemeSelection) is not MenuItemViewModel menuItem) {
+            if (GetMenuItem(ThemeSelections, Data.ThemeSelection) is not MenuItemViewModel menuItem) {
                 menuItem = ThemeSelections[0];
-                Serialized_ThemeSelection = menuItem.Header;
+                Data.ThemeSelection = menuItem.Header;
             }
 
             return menuItem;
         }
 
         private set {
-            if (SetProperty(ref _ThemeSelection, value.Header, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.ThemeSelection;
+            Data.ThemeSelection = value.Header;
+            if (SetPropertySaveNotify(oldValue, value.Header)) {
                 Application_ThemeSelectionChanged();
             }
         }
     }
 
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel> ThemeSelections { get; }
 
     private void Command_ThemeSelection(object? parameter) => ThemeSelection = parameter as MenuItemViewModel ?? ThemeSelection;
@@ -355,25 +311,20 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     //...
 
-    [JsonInclude]
-    [JsonPropertyName("AccentColorSelection")]
-    private AppColor _AccentColorSelection = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
-
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose the accent color of the application.</remarks>
-    [JsonIgnore]
     public AppColor AccentColorSelection {
-        get => _AccentColorSelection;
+        get => Data.AccentColorSelection;
         set {
-            if (value != _AccentColorSelection) {
+            var oldValue = Data.AccentColorSelection;
+            Data.AccentColorSelection = value;
+            if (SetPropertySaveNotify(oldValue, value)) {
                 Settings.AccentColorSelection.Value = value;
-                SetProperty(ref _AccentColorSelection, value, Save.Yes, Notify.Yes);
             }
         }
     }
-
 
 }
 

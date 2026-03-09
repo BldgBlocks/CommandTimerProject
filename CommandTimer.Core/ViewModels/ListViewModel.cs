@@ -2,7 +2,6 @@ using Avalonia.Threading;
 using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
 using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
 using System.Threading;
 
 namespace CommandTimer.Core.ViewModels;
@@ -18,7 +17,10 @@ public partial class ListViewModel : ViewModelBase {
 
     //... Constructor
 
-    public ListViewModel() {
+    public ListViewModel() : this(new ListViewData()) { }
+
+    public ListViewModel(ListViewData data) {
+        Data = data;
 
         /// Quick Filters Menu List
         var quickFilterMenu = new QuickFilterMenu(Command_QuickFilterSelection);
@@ -42,15 +44,21 @@ public partial class ListViewModel : ViewModelBase {
         };
 
         /// Finish
-        _QuickFilter = QuickFilter.Header;
-        _SortStrategy = SortStrategy.Header;
-        _SortDirection = SortDirection.Header;
+        if (string.IsNullOrWhiteSpace(Data.LibrarySelection)) {
+            Data.LibrarySelection = Settings.Keys.DefaultLibrary;
+        }
+        _ = QuickFilter;
+        _ = SortStrategy;
+        _ = SortDirection;
+        LibraryManager.SetCurrent(Data.LibrarySelection);
     }
+
+    internal ListViewData Data { get; }
 
     //... Base Implementation
 
     public override void Serialize()
-        => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.ListView, this, Settings.DEFAULT_DATA_FILE);
+        => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.ListView, Data, Settings.DEFAULT_DATA_FILE);
 
     //... Event Handlers
 
@@ -84,32 +92,21 @@ public partial class ListViewModel : ViewModelBase {
 
     //... Binding Properties
 
-    [JsonIgnore]
     public ObservableCollection<CommandTimerViewModel> RelevantCommandTimers { get; } = [];
-    [JsonIgnore]
     private string _UserSearchEntry = string.Empty;
-    [JsonIgnore]
     public string UserSearchEntry { get => _UserSearchEntry; set => SetProperty(ref _UserSearchEntry, value); }
 
 
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel_CommandTimers> QuickFilters { get; }
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel_CommandTimers> SortStrategies { get; }
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel_CommandTimers> SortDirections { get; }
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel_CommandTimers> SortOptions { get; } = [];
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel> ThemeSelections { get; } = [];
-    [JsonIgnore]
     public ObservableCollection<MenuItemViewModel> LibrarySelections { get; } = [];
 
     //...
 
-    [JsonIgnore]
     private CommandTimerLibrary _ActiveLibrary = new() { LibraryName = Settings.Keys.DefaultLibrary };
-    [JsonIgnore]
     public CommandTimerLibrary ActiveLibrary {
         get => _ActiveLibrary;
         set {
@@ -129,31 +126,21 @@ public partial class ListViewModel : ViewModelBase {
         }
     }
 
-    [JsonIgnore]
-    private string _LibrarySelection = string.Empty;
-    [JsonInclude]
-    [JsonPropertyName("LibrarySelection")]
-    public string Serialized_LibrarySelection {
-        get => _LibrarySelection;
-        set {
-            if (SetProperty(ref _LibrarySelection, value, Save.No, Notify.Yes, nameof(LibrarySelection))) {
-                LibraryManager.SetCurrent(value);
-            }
-        }
-    }
-
-    [JsonIgnore]
     public MenuItemViewModel LibrarySelection {
         get {
-            var menuItem = _libraryMenu.GetMenuItem(_LibrarySelection) ?? LibrarySelections[0];
-            Serialized_LibrarySelection = menuItem.Header;
+            var menuItem = _libraryMenu.GetMenuItem(Data.LibrarySelection)
+                ?? _libraryMenu.GetMenuItem(Settings.Keys.DefaultLibrary)
+                ?? LibrarySelections.FirstOrDefault()
+                ?? throw new InvalidOperationException("No library selections are available.");
+            Data.LibrarySelection = menuItem.Header;
             return menuItem;
         }
 
         set {
             if (value is null) return;
-            if (SetProperty(ref _LibrarySelection, value.Header, Save.Yes, Notify.Yes)) {
-                Serialized_LibrarySelection = value.Header;
+            var oldValue = Data.LibrarySelection;
+            Data.LibrarySelection = value.Header;
+            if (SetPropertySaveNotify(oldValue, value.Header)) {
                 LibraryManager.SetCurrent(value.Header);
             }
         }
@@ -161,32 +148,20 @@ public partial class ListViewModel : ViewModelBase {
 
     //...
 
-    [JsonIgnore]
-    private string _QuickFilter;
-    [JsonInclude]
-    [JsonPropertyName("QuickFilter")]
-    private string Serialized_QuickFilter {
-        get => _QuickFilter;
-        set {
-            if (SetProperty(ref _QuickFilter, value, Save.No, Notify.Yes, nameof(QuickFilter))) {
-                SortRelevantTimers();
-            }
-        }
-    }
-
-    [JsonIgnore]
     public MenuItemViewModel_CommandTimers QuickFilter {
         get {
-            if (GetMenuItem(QuickFilters, _QuickFilter) is not MenuItemViewModel_CommandTimers menuItem) {
+            if (GetMenuItem(QuickFilters, Data.QuickFilter) is not MenuItemViewModel_CommandTimers menuItem) {
                 menuItem = QuickFilters[0];
-                Serialized_QuickFilter = menuItem.Header;
+                Data.QuickFilter = menuItem.Header;
             }
 
             return menuItem;
         }
 
         private set {
-            if (SetProperty(ref _QuickFilter, value.Header, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.QuickFilter;
+            Data.QuickFilter = value.Header;
+            if (SetPropertySaveNotify(oldValue, value.Header)) {
                 SortRelevantTimers();
             }
         }
@@ -194,32 +169,20 @@ public partial class ListViewModel : ViewModelBase {
 
     //...
 
-    [JsonIgnore]
-    private string _SortStrategy;
-    [JsonInclude]
-    [JsonPropertyName("SortStrategy")]
-    private string Serialized_SortStrategy {
-        get => _SortStrategy;
-        set {
-            if (SetProperty(ref _SortStrategy, value, Save.No, Notify.Yes, nameof(SortStrategy))) {
-                SortRelevantTimers();
-            }
-        }
-    }
-
-    [JsonIgnore]
     public MenuItemViewModel_CommandTimers SortStrategy {
         get {
-            if (GetMenuItem(SortStrategies, _SortStrategy) is not MenuItemViewModel_CommandTimers menuItem) {
+            if (GetMenuItem(SortStrategies, Data.SortStrategy) is not MenuItemViewModel_CommandTimers menuItem) {
                 menuItem = SortStrategies[0];
-                Serialized_SortStrategy = menuItem.Header;
+                Data.SortStrategy = menuItem.Header;
             }
 
             return menuItem;
         }
 
         private set {
-            if (SetProperty(ref _SortStrategy, value.Header, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.SortStrategy;
+            Data.SortStrategy = value.Header;
+            if (SetPropertySaveNotify(oldValue, value.Header)) {
                 SortRelevantTimers();
             }
         }
@@ -227,32 +190,20 @@ public partial class ListViewModel : ViewModelBase {
 
     //...
 
-    [JsonIgnore]
-    private string _SortDirection;
-    [JsonInclude]
-    [JsonPropertyName("SortDirection")]
-    private string Serialized_SortDirection {
-        get => _SortDirection;
-        set {
-            if (SetProperty(ref _SortDirection, value, Save.No, Notify.Yes, nameof(SortDirection))) {
-                SortRelevantTimers();
-            }
-        }
-    }
-
-    [JsonIgnore]
     public MenuItemViewModel_CommandTimers SortDirection {
         get {
-            if (GetMenuItem(SortDirections, _SortDirection) is not MenuItemViewModel_CommandTimers menuItem) {
+            if (GetMenuItem(SortDirections, Data.SortDirection) is not MenuItemViewModel_CommandTimers menuItem) {
                 menuItem = SortDirections[0];
-                Serialized_SortDirection = menuItem.Header;
+                Data.SortDirection = menuItem.Header;
             }
 
             return menuItem;
         }
 
         private set {
-            if (SetProperty(ref _SortDirection, value.Header, Save.Yes, Notify.Yes)) {
+            var oldValue = Data.SortDirection;
+            Data.SortDirection = value.Header;
+            if (SetPropertySaveNotify(oldValue, value.Header)) {
                 SortRelevantTimers();
             }
         }
@@ -342,5 +293,6 @@ public partial class ListViewModel : ViewModelBase {
             LibraryManager.SetCurrent(LibrarySelection.Header);
         }
     }
+
 }
 

@@ -6,33 +6,33 @@ public partial class CommandTimerLibrary {
 
     // TODO: I would like to clean up this class. The adding, tracking, removing... Encapsulate the timer name with the associated names methods.
 
+    public CommandTimerLibrary() : this(new CommandTimerLibraryData()) { }
+
+    public CommandTimerLibrary(CommandTimerLibraryData data) {
+        Data = data;
+    }
+
+    internal CommandTimerLibraryData Data { get; }
+
     /// <summary>
     /// Serialized value unique to this library.
     /// </summary>
-    [JsonInclude]
-    [JsonPropertyName("LibraryName")]
-    public required string LibraryName { get; init; }
+    public string LibraryName {
+        get => Data.LibraryName;
+        init => Data.LibraryName = value;
+    }
 
     /// <summary>
     /// The library manages a list of names. Upon load, those names access saved data to create instances of CommandTimers held in a collection.
     /// </summary>
-    [JsonInclude]
-    [JsonPropertyName("TimersByName")]
-    private HashSet<string> TimerNames = [];
+    public IEnumerable<string> Names => Data.TimerNames;
 
-    [JsonIgnore]
     public bool IsLoaded { get; private set; }
-    [JsonIgnore]
     public bool IsLoading { get; private set; }
 
-    [JsonIgnore]
     public IEnumerable<CommandTimerViewModel> CommandTimers => _timerInstances;
-    [JsonIgnore]
     private readonly List<CommandTimerViewModel> _timerInstances = [];
 
-    [JsonIgnore]
-    public IEnumerable<string> Names => TimerNames;
-    [JsonIgnore]
     private bool _shouldNotifyChange = true;
 
     //...
@@ -48,7 +48,7 @@ public partial class CommandTimerLibrary {
         IsLoading = true;
         _shouldNotifyChange = false;
 
-        var copyOfNames = TimerNames.ToList();
+        var copyOfNames = Data.TimerNames.ToList();
         foreach (var name in copyOfNames) {
             if (_timerInstances.Any((o) => o.Name == name)) continue;
             if (Deserialize(name) is CommandTimerViewModel fromSavedData) {
@@ -81,7 +81,7 @@ public partial class CommandTimerLibrary {
     }
 
     public void Serialize()
-        => ServiceProvider.Get<ISerializer>().Serialize($"{Settings.Keys.LibraryPrefix}{LibraryName}", this, LibraryName);
+        => ServiceProvider.Get<ISerializer>().Serialize($"{Settings.Keys.LibraryPrefix}{LibraryName}", Data, LibraryName);
 
     private CommandTimerViewModel? Deserialize(string name) {
         var data = ServiceProvider.Get<ISerializer>().Deserialize<CommandTimerData>($"{Settings.Keys.CommandTimerPrefix}{name}", LibraryName);
@@ -91,13 +91,13 @@ public partial class CommandTimerLibrary {
     //... Names
 
     private bool TryAddName(string name)
-        => TimerNames.Add(name);
+        => Data.TimerNames.Add(name);
 
     private bool TryRemoveName(string name)
-        => TimerNames.Remove(name);
+        => Data.TimerNames.Remove(name);
 
     public bool ContainsName(string name)
-        => TimerNames.Contains(name);
+        => Data.TimerNames.Contains(name);
 
     public CommandTimerViewModel? GetSingleTimerInstance(string name) {
         var wasNotLoaded = !IsLoaded;
@@ -112,7 +112,7 @@ public partial class CommandTimerLibrary {
         string baseName = GetBaseName(name);
         string uniqueName = name;
 
-        while (TimerNames.Contains(uniqueName)) {
+        while (Data.TimerNames.Contains(uniqueName)) {
             uniqueName = $"{baseName} ({counter++})";
         }
         return uniqueName;
