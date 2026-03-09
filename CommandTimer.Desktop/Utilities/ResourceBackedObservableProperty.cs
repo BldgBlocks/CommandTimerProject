@@ -35,31 +35,29 @@ public class ResourceBackedObservableProperty : ObservableProperty<AppColor> {
 
         if (found is false) {
             MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' not found. Theme: {current.ActualThemeVariant}. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
-            return new AppColor(128, 0, 128, 255); // Purple fallback
+            return AppColor.Fallback;
         }
 
         if (value is not SolidColorBrush brush) {
             MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' found but is type '{value?.GetType().Name}', not SolidColorBrush. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
-            return new AppColor(128, 0, 128, 255); // Purple fallback
+            return AppColor.Fallback;
         }
 
         return new AppColor(brush.Color.A, brush.Color.R, brush.Color.G, brush.Color.B);
     }
 
-    public override AppColor Value {
-        set {
-            if (_constantValue is not null) return;
-            if (_resourceKey is null) throw new InvalidOperationException("Cannot set value on constant ResourceBackedObservableProperty.");
+    protected override void SetValue(AppColor value) {
+        if (_constantValue is not null) return;
+        if (_resourceKey is null) throw new InvalidOperationException("Cannot set value on constant ResourceBackedObservableProperty.");
 
-            if (Application.Current is not Application current)
-                throw new Exceptions.ApplicationException($"Application not found.");
+        if (Application.Current is not Application current)
+            throw new Exceptions.ApplicationException($"Application not found.");
 
-            var currentColor = GetValue();
-            if (currentColor == value) return;
+        var currentColor = GetValue();
+        if (currentColor == value) return;
 
-            var brush = new SolidColorBrush(new Avalonia.Media.Color(value.A, value.R, value.G, value.B));
-            current.Resources[_resourceKey] = brush;
-            OnValueChanged(value);
-        }
+        var brush = new SolidColorBrush(new Avalonia.Media.Color(value.A, value.R, value.G, value.B));
+        current.Resources[_resourceKey] = brush;
+        OnValueChanged(value);
     }
 }

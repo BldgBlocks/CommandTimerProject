@@ -1,3 +1,5 @@
+namespace CommandTimer.Core.Interfaces;
+
 /// <summary>
 /// Service contract for accessing application theme colors.
 /// All colors are resource-backed observables — subscribers can attach to ValueChanged events.

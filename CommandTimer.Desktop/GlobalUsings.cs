@@ -10,3 +10,4 @@ global using Avalonia.Controls;
 global using CommandTimer.Core.Interfaces;
 global using CommandTimer.Core.Static;
 global using CommandTimer.Core.ViewModels;
+global using CommandTimer.Desktop.Utilities;

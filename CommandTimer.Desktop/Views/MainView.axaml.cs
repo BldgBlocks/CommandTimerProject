@@ -1,5 +1,3 @@
-using Avalonia.Controls;
-
 namespace CommandTimer.Desktop.Views;
 
 public partial class MainView : UserControl {

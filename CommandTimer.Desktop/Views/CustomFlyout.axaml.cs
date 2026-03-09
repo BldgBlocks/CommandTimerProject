@@ -1,8 +1,6 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Primitives.PopupPositioning;
-using CommandTimer.Desktop.Utilities;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +16,7 @@ public partial class CustomToolTip : Popup {
         PlacementAnchor = PopupAnchor.Bottom;
 
         /// Popups can not access Resources.
-        PART_BorderBackground.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
+        PART_BorderBackground.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value.AsBrush();
         PART_TextPresenter.FontSize = ResourceHelper.GetResourceOrThrow<double>("ApplicationFontSize_Text");
     }
 
@@ -35,6 +33,12 @@ public partial class CustomToolTip : Popup {
         return typedValue;
     }
 }
+
+
+
+
+
+
 
 
 

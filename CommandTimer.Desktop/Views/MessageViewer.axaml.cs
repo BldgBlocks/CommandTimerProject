@@ -1,9 +1,6 @@
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using CommandTimer.Core.Static;
-using CommandTimer.Core.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;

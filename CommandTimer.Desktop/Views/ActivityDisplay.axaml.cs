@@ -1,8 +1,5 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities.ExtensionMethods;
-using CommandTimer.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

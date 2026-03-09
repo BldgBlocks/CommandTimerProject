@@ -1,4 +1,3 @@
-using CommandTimer.Core.ViewModels;
 using System.Collections.Generic;
 
 namespace CommandTimer.Desktop.Utilities;

@@ -91,9 +91,9 @@ public class CommandTimerData {
 
     [JsonInclude]
     [JsonPropertyName("ColorBarColor")]
-    private SolidColorBrush _ColorBarColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
+    private AppColor _ColorBarColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
     [JsonIgnore]
-    public SolidColorBrush ColorBarColor { get => _ColorBarColor; set => _ColorBarColor = value; }
+    public AppColor ColorBarColor { get => _ColorBarColor; set => _ColorBarColor = value; }
 
     [JsonInclude]
     [JsonPropertyName("TargetTimeSpan")]

@@ -1,5 +1,3 @@
-using Avalonia.Controls;
-using CommandTimer.Core.Static;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 

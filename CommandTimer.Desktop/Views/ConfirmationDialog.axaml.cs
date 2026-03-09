@@ -1,8 +1,7 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using CommandTimer.Core.Utilities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -113,13 +112,13 @@ public partial class ConfirmationDialog : UserControl {
     private void ValidatePassword() {
         var passwordValidation = ServiceProvider.Get<IPasswordValidation>();
         if (passwordValidation.Validate(PART_PasswordEntry.Text ?? string.Empty) || (_overrideValidation?.Invoke(PART_PasswordEntry.Text ?? string.Empty)).GetValueOrDefault()) {
-            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value;
+            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value.AsBrush();
             PART_PasswordEntryTip.Text = "Granted";
             _tcs.TrySetResult(true);
             Hide();
         }
         else {
-            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value;
+            PART_PasswordEntryTip.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value.AsBrush();
             PART_PasswordEntryTip.Text = "The password is incorrect.";
         }
     }

@@ -1,16 +1,11 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Themes.Fluent;
-using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities;
 using CommandTimer.Core.Utilities.ExtensionMethods;
-using CommandTimer.Core.ViewModels;
 using CommandTimer.Core.ViewModels.MenuItems;
-using CommandTimer.Desktop.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -285,7 +280,7 @@ public partial class SettingsFlyout : UserControl {
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
+            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush() : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value.AsBrush();
         }
     }
 
@@ -295,7 +290,7 @@ public partial class SettingsFlyout : UserControl {
     public void Changed_ColorPick(object sender, ColorChangedEventArgs args) => Sync_ColorPick();
     private void Sync_ColorPick() {
         ColorApplyButton.Background = new SolidColorBrush(ColorPickerControl.Color);
-        ColorApplyButton.Foreground = new SolidColorBrush(ColorUtilities.GetSlidingContrastColor(ColorPickerControl.Color));
+        ColorApplyButton.Foreground = new SolidColorBrush(ColorUtilities.GetSlidingContrastColor(new AppColor(ColorPickerControl.Color.A, ColorPickerControl.Color.R, ColorPickerControl.Color.G, ColorPickerControl.Color.B)).AsBrush().Color);
     }
 
     private void ColorPick_KeyDown(object sender, KeyEventArgs args) {
@@ -330,7 +325,7 @@ public partial class SettingsFlyout : UserControl {
     private void ColorPick_ApplyColor() {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
 
-        viewModel.AccentColorSelection = new SolidColorBrush(ColorPickerControl.Color);
+        viewModel.AccentColorSelection = new AppColor(ColorPickerControl.Color.A, ColorPickerControl.Color.R, ColorPickerControl.Color.G, ColorPickerControl.Color.B);
         var colorBarFlyout = FlyoutBase.GetAttachedFlyout(ColorBar);
         colorBarFlyout?.Hide();
     }
@@ -339,17 +334,17 @@ public partial class SettingsFlyout : UserControl {
     private void ColorPick_CancelColor() {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
 
-        ColorPickerControl.Color = viewModel.AccentColorSelection.Color;
+        ColorPickerControl.Color = viewModel.AccentColorSelection.AsBrush().Color;
         FlyoutBase.GetAttachedFlyout(ColorBar)?.Hide();
     }
 
     private void Tapped_ResetAccentColor(object sender, TappedEventArgs args) {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
 
-        var accentBrush = nameof(IColorProvider.ApplicationBrush_Accent);
+        var accentKey = nameof(IColorProvider.ApplicationBrush_Accent);
         if (ServiceProvider.Get<IColorProvider>() is CommandTimer.Desktop.Utilities.ColorProvider.AvaloniaColorProvider provider
-            && provider.TryGetDefaultBrush(accentBrush, out var defaultBrush)) {
-            viewModel.AccentColorSelection = defaultBrush;
+            && provider.TryGetDefaultBrush(accentKey, out var defaultBrush)) {
+            viewModel.AccentColorSelection = new AppColor(defaultBrush.Color.A, defaultBrush.Color.R, defaultBrush.Color.G, defaultBrush.Color.B);
         }
     }
 
@@ -357,8 +352,8 @@ public partial class SettingsFlyout : UserControl {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
 
         if (Application.Current?.Styles.FirstOrDefault(s => s is FluentTheme) is FluentTheme theme) {
-            if (Application.Current.TryGetResource("SystemAccentColor", out object? accentColorObject) && accentColorObject is Color systemAccentColor) {
-                viewModel.AccentColorSelection = new SolidColorBrush(systemAccentColor);
+            if (Application.Current.TryGetResource("SystemAccentColor", out object? accentColorObject) && accentColorObject is Avalonia.Media.Color systemAccentColor) {
+                viewModel.AccentColorSelection = new AppColor(systemAccentColor.A, systemAccentColor.R, systemAccentColor.G, systemAccentColor.B);
             }
         }
     }

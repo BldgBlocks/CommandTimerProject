@@ -1,8 +1,5 @@
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using CommandTimer.Core.Static;
-using CommandTimer.Desktop.Utilities;
 using System;
 
 namespace CommandTimer.Desktop.Views;

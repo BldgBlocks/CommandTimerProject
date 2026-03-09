@@ -1,7 +1,6 @@
 using Avalonia.Media;
 using Avalonia.Styling;
 using CommandTimer.Core.Static.Exceptions;
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,17 +41,17 @@ public class AvaloniaColorProvider : IColorProvider {
     }
 
     private void InitializeObservables() {
-        ApplicationBrush_Background = new(nameof(ApplicationBrush_Background));
-        ApplicationBrush_Contrast = new(nameof(ApplicationBrush_Contrast));
-        ApplicationBrush_Overlay = new(nameof(ApplicationBrush_Overlay));
-        ApplicationBrush_Accent = new(nameof(ApplicationBrush_Accent));
-        ApplicationBrush_Inconspicuous = new(nameof(ApplicationBrush_Inconspicuous));
-        ApplicationBrush_Stripe = new(nameof(ApplicationBrush_Stripe));
-        ApplicationBrush_Transparent = new(AppColor.Transparent);
-        ApplicationBrush_DoThingIntended = new(nameof(ApplicationBrush_DoThingIntended));
-        ApplicationBrush_Bad = new(nameof(ApplicationBrush_Bad));
-        ApplicationBrush_Text = new(nameof(ApplicationBrush_Text));
-        ApplicationBrush_Highlight = new(nameof(ApplicationBrush_Highlight));
+        ApplicationBrush_Background = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Background));
+        ApplicationBrush_Contrast = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Contrast));
+        ApplicationBrush_Overlay = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Overlay));
+        ApplicationBrush_Accent = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Accent));
+        ApplicationBrush_Inconspicuous = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Inconspicuous));
+        ApplicationBrush_Stripe = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Stripe));
+        ApplicationBrush_Transparent = new ResourceBackedObservableProperty(AppColor.Transparent);
+        ApplicationBrush_DoThingIntended = new ResourceBackedObservableProperty(nameof(ApplicationBrush_DoThingIntended));
+        ApplicationBrush_Bad = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Bad));
+        ApplicationBrush_Text = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Text));
+        ApplicationBrush_Highlight = new ResourceBackedObservableProperty(nameof(ApplicationBrush_Highlight));
     }
 
     public SolidColorBrush GetCachedBrush(AppColor color) {

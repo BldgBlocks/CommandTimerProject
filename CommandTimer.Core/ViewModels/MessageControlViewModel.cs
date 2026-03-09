@@ -1,4 +1,5 @@
 using Avalonia.Media;
+using CommandTimer.Core.Utilities;
 using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
@@ -55,14 +56,13 @@ public partial class MessageControlViewModel : ViewModelBase {
 
 
     [JsonInclude]
-    private IBrush _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
+    private AppColor _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
     [JsonIgnore]
-    public IBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
+    public AppColor Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
     [JsonInclude]
-    private IBrush _Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
+    private AppColor _Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
     [JsonIgnore]
-    public IBrush Foreground { get => _Foreground; set => SetProperty(ref _Foreground, value, Save.No, Notify.Yes); }
-
+    public AppColor Foreground { get => _Foreground; set => SetProperty(ref _Foreground, value, Save.No, Notify.Yes); }
 }
 

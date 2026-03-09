@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Input.Platform;
@@ -9,9 +8,7 @@ using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using CommandTimer.Core.Converters;
-using CommandTimer.Core.Static;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
 using CommandTimer.Desktop.Utilities.ColorProvider;
 using CommandTimer.Desktop.Utilities.TimerProvider;
 using CommandTimer.Desktop.Views;
@@ -92,11 +89,11 @@ public partial class App : Application {
 
         /// Fluent Theme Accent Color
         var observable = Settings.AccentColorSelection;
-        FluentTheme_UpdateAccentColor(ThemeVariant.Dark, observable.Value.Color);
-        FluentTheme_UpdateAccentColor(ThemeVariant.Light, observable.Value.Color);
-        observable.ValueChanged += (brush) => {
-            FluentTheme_UpdateAccentColor(ThemeVariant.Dark, brush.Color);
-            FluentTheme_UpdateAccentColor(ThemeVariant.Light, brush.Color);
+        FluentTheme_UpdateAccentColor(ThemeVariant.Dark, observable.Value.AsBrush().Color);
+        FluentTheme_UpdateAccentColor(ThemeVariant.Light, observable.Value.AsBrush().Color);
+        observable.ValueChanged += (color) => {
+            FluentTheme_UpdateAccentColor(ThemeVariant.Dark, color.AsBrush().Color);
+            FluentTheme_UpdateAccentColor(ThemeVariant.Light, color.AsBrush().Color);
         };
 
         /// Loading
@@ -193,12 +190,12 @@ public partial class App : Application {
             WriteIndented = true,
             IncludeFields = true,
             Converters = {
-                new JsonConverter_SolidColorBrush(),
+                new JsonConverter_AppColor(),
             }
         };
 
         CacheSerializer serializer = new(jsonOptions,
-                                         Settings.BackupVersionsToKeep.GetValue,
+                                         () => Settings.BackupVersionsToKeep.Value,
                                          SystemInteraction.Files.GetUserConfigPath,
                                          (message) => MessageRelay.OnMessagePosted(nameof(CacheSerializer), message, MessageRelay.MessageCategory.Exception),
                                          onCommit);
@@ -228,5 +225,36 @@ public partial class App : Application {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

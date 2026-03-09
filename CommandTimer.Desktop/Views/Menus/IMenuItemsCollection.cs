@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using System.Collections.Generic;
 
 namespace CommandTimer.Desktop.Views.Menus;

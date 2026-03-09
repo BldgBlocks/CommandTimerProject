@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Media;
+using CommandTimer.Core.Utilities;
 using CommandTimer.Core.ViewModels.MenuItems;
 using System.Collections.ObjectModel;
 using System.Reflection;
@@ -94,12 +95,12 @@ public partial class CommandTimerViewModel : ViewModelBase {
 
     //... Bindings — UI-only properties (not serialized)
 
-    private SolidColorBrush _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
-    public SolidColorBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
+    private AppColor _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
+    public AppColor Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
 
-    private SolidColorBrush _Accent = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
-    public SolidColorBrush Accent { get => _Accent; set => SetProperty(ref _Accent, value, Save.No, Notify.Yes); }
+    private AppColor _Accent = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
+    public AppColor Accent { get => _Accent; set => SetProperty(ref _Accent, value, Save.No, Notify.Yes); }
 
     public ObservableCollection<MenuItemViewModel> CopyMoveSelections { get; } = [];
 
@@ -161,7 +162,7 @@ public partial class CommandTimerViewModel : ViewModelBase {
         set { var old = Data.IsFavorite; Data.IsFavorite = value; SetPropertySaveNotify(old, value); }
     }
 
-    public SolidColorBrush ColorBarColor {
+    public AppColor ColorBarColor {
         get => Data.ColorBarColor;
         set { var old = Data.ColorBarColor; Data.ColorBarColor = value; SetPropertySaveNotify(old, value); }
     }

@@ -109,7 +109,7 @@ public static class Settings {
     /// Global Setting
     /// </summary>
     /// <remarks>Choose the accent color of the application.</remarks>
-    public static ResourceBackedObservableProperty AccentColorSelection => ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent;
+    public static ObservableProperty<AppColor> AccentColorSelection => ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent;
 }
 
 

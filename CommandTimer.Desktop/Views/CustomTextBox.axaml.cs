@@ -16,9 +16,11 @@ public partial class CustomTextBox : UserControl {
     private string _initializedEntry = string.Empty;
     private IBrush? _initializedBrush;
     public TextBox? TextBox;
+    public TextBlock? DisplayTextBlock;
     public Border? BackgroundBorder;
     private bool _accepted;
-    private Window? _parentWindow => MainWindow.Instance;
+    private bool _isEditing;
+    private Window? ParentWindow => TopLevel.GetTopLevel(this) as Window;
     private bool HasFocus => TextBox is not null && TextBox.IsFocused;
     private bool PointerOver => TextBox is not null && TextBox.IsPointerOver;
     public object? Parameter { get; set; }
@@ -33,6 +35,7 @@ public partial class CustomTextBox : UserControl {
 
     public CustomTextBox() {
         InitializeComponent();
+        Focusable = true;
     }
 
     //...
@@ -226,9 +229,26 @@ public partial class CustomTextBox : UserControl {
         base.OnApplyTemplate(e);
 
         TextBox = e.NameScope.Find<TextBox>("PART_TextBox");
+        DisplayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayTextBlock");
         BackgroundBorder = e.NameScope.Find<Border>("PART_BorderElement");
-        _lastEntry = TextBox?.Text ?? string.Empty;
-        _initializedEntry = TextBox?.Text ?? string.Empty;
+        _lastEntry = Text;
+        _initializedEntry = Text;
+
+        if (TextBox is not null) {
+            TextBox.Text = Text;
+        }
+
+        SetEditingState(false);
+    }
+
+    public void BeginEdit(bool selectAll = true) {
+        if (TextBox is null) return;
+
+        _lastEntry = Text;
+        _initializedEntry = Text;
+        TextBox.Text = Text;
+        SetEditingState(true);
+        _ = FocusEditorAsync(selectAll);
     }
 
     /// <summary>
@@ -290,29 +310,33 @@ public partial class CustomTextBox : UserControl {
         /// Compare against last accepted value
         bool changed = (trimmedText != _lastEntry);
 
-        _accepted = changed;
+        _accepted = true;
+        _lastEntry = trimmedText;
+        _initializedEntry = trimmedText;
+        Text = trimmedText;
+        TextBox.Text = trimmedText;
 
         if (changed) {
-            _lastEntry = trimmedText;
-            /// Update both the styled property AND the internal TextBox synchronously
-            Text = trimmedText;
-            TextBox.Text = trimmedText;
             OnAccept?.Invoke();
         }
 
         TextBox.CaretIndex = 0;
         TextBox.ScrollToLine(0);
 
-        /// Remove focus from TextBox
-        _parentWindow?.Focus();
+        EndEditing(redirectFocus: true);
     }
 
-    private void CancelEntry() {
+    private void CancelEntry(bool redirectFocus = true) {
         Text = _lastEntry;
         if (TextBox is not null) {
             TextBox.Text = _lastEntry;
         }
+
+        _initializedEntry = _lastEntry;
+        _accepted = true;
         OnCancel?.Invoke();
+
+        EndEditing(redirectFocus);
     }
 
     /// Skip the initial value. Avoid callbacks on the default value at start.
@@ -331,8 +355,14 @@ public partial class CustomTextBox : UserControl {
         if (IsPointerInsideControl(e)) return;
 
         if (AcceptWithDismiss) AcceptEntry(); else CancelEntry();
+    }
 
-        _parentWindow?.Focus();
+    private void OnControlPointerPressed(object? sender, PointerPressedEventArgs args) {
+        if (_isEditing) return;
+        if (args.GetCurrentPoint(this).Properties.IsLeftButtonPressed is false) return;
+
+        BeginEdit();
+        args.Handled = true;
     }
 
     private bool IsPointerInsideControl(PointerPressedEventArgs e) {
@@ -361,9 +391,10 @@ public partial class CustomTextBox : UserControl {
     /// - Monitors window for clicks off the control.
     /// </remarks>
     private async void OnGotFocus(object? sender, GotFocusEventArgs args) {
+        SetEditingState(true);
         _accepted = false;
-        _parentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
-        _parentWindow?.AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
+        ParentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+        ParentWindow?.AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
 
         var color = (PointerOverColor as SolidColorBrush)?.Color
             ?? (PointerOverColor as IImmutableSolidColorBrush)?.Color
@@ -393,14 +424,62 @@ public partial class CustomTextBox : UserControl {
     /// - Cancels entry if not already accepted.
     /// </remarks>
     private void OnLostFocus(object? sender, RoutedEventArgs args) {
-        _parentWindow?.RemoveHandler(KeyDownEvent, OnKeyDown);
-        _parentWindow?.RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
+        ParentWindow?.RemoveHandler(KeyDownEvent, OnKeyDown);
+        ParentWindow?.RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
 
         Background = PointerOver ? PointerOverColor : _initializedBrush ?? Brushes.Transparent;
 
         /// If you click outside the control, it's detected OnWindowPointerPressed. But if you click another button directly
         /// then it appears there is a new value in this text box, but the backing still has the old, so if not accepted already, cancel.
-        if (!_accepted) CancelEntry();
+        if (!_accepted) {
+            CancelEntry(redirectFocus: false);
+            return;
+        }
+
+        SetEditingState(false);
+    }
+
+    private void EndEditing(bool redirectFocus) {
+        SetEditingState(false);
+
+        if (redirectFocus) {
+            Focus();
+        }
+    }
+
+    private void SetEditingState(bool isEditing) {
+        _isEditing = isEditing;
+
+        if (TextBox is not null) {
+            TextBox.IsVisible = isEditing;
+            TextBox.IsHitTestVisible = isEditing;
+        }
+
+        if (DisplayTextBlock is not null) {
+            DisplayTextBlock.IsVisible = !isEditing;
+        }
+    }
+
+    private async Task FocusEditorAsync(bool selectAll) {
+        if (TextBox is null) return;
+
+        try {
+            await Dispatcher.UIThread.Invoke(async () => {
+                await Task.Delay(50);
+
+                if (TextBox is null) return;
+
+                if (selectAll) {
+                    TextBox.SelectAll();
+                }
+                else {
+                    TextBox.CaretIndex = TextBox.Text?.Length ?? 0;
+                }
+
+                TextBox.Focus();
+            }, DispatcherPriority.Background);
+        }
+        catch (OperationCanceledException) { }
     }
 }
 

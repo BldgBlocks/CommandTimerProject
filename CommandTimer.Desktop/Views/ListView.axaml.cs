@@ -1,16 +1,12 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using CommandTimer.Core.Static;
+using CommandTimer.Core.Utilities;
 using CommandTimer.Core.Utilities.ExtensionMethods;
-using CommandTimer.Core.ViewModels;
 using CommandTimer.Core.ViewModels.MenuItems;
-using CommandTimer.Desktop.Utilities;
 using CommandTimer.Desktop.Views.Menus;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -120,11 +116,9 @@ public partial class ListView : UserControl {
             AddLibraryButton.Flyout?.Hide();
         };
         AddLibraryButton.Flyout!.Opened += (o, a) => {
-            NewLibraryName.TextBox!.SelectAll();
-            NewLibraryName.TextBox.Focus();
-            NewLibraryName.TextBox.CaretIndex = 0;
+            NewLibraryName.BeginEdit();
             NewLibraryName.BackgroundBorder!.BorderThickness = new Thickness(1);
-            NewLibraryName.BackgroundBorder.BorderBrush = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
+            NewLibraryName.BackgroundBorder.BorderBrush = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush();
         };
 
         base.OnLoaded(e);
@@ -177,12 +171,8 @@ public partial class ListView : UserControl {
         UpdateControl_MenuItem(viewModel.LibrarySelections, viewModel.LibrarySelection);
     }
 
-    private void AccentColorSelection_ValueChanged(SolidColorBrush obj) {
-        /// Cycle flyout for repaint.
-        if (FlyoutBase.GetAttachedFlyout(SettingsButton) is Flyout settingsFlyout && settingsFlyout.IsOpen) {
-            settingsFlyout.Hide();
-            settingsFlyout.ShowAt(SettingsButton);
-        }
+    private void AccentColorSelection_ValueChanged(AppColor color) {
+        RestripeList(Settings.ShouldStripeList.Value);
     }
 
     private void ShouldStripeList_ValueChanged(bool state) => RestripeList(state);
@@ -237,7 +227,7 @@ public partial class ListView : UserControl {
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value;
+            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush() : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value.AsBrush();
         }
     }
 
@@ -394,6 +384,27 @@ public partial class ListView : UserControl {
             => tooltip.OnPointerOver((Control)s!, "Perform bulk actions", properties);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

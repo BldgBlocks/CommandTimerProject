@@ -28,8 +28,8 @@
     <Border Name="RootBorderContainer"
             Margin="10"
             Padding="10,5,10,5"
-            Background="{Binding Background}"
-            BorderBrush="{Binding Accent}"
+            Background="{Binding Background, Converter={StaticResource AppColorToBrushConverter}}"
+            BorderBrush="{Binding Accent, Converter={StaticResource AppColorToBrushConverter}}"
             BorderThickness="1"
             CornerRadius="15">
 
@@ -53,7 +53,7 @@
                     Margin="-3,8,0,8"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Stretch"
-                    Background="{Binding ColorBarColor}"
+                    Background="{Binding ColorBarColor, Converter={StaticResource AppColorToBrushConverter}}"
                     CornerRadius="2"
                     Tapped="Tapped_ColorBar">
 
@@ -74,7 +74,7 @@
                                        ColorChanged="Changed_ColorPick"
                                        ColorSpectrumShape="Ring"
                                        IsVisible="True"
-                                       Color="{Binding ColorBarColor.Color, Mode=OneWay}" />
+                                       Color="{Binding ColorBarColor, Converter={StaticResource AppColorToColorConverter}, Mode=OneWay}" />
 
                             <!--  Apply and Cancel Buttons  -->
                             <StackPanel Margin="5"

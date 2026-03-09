@@ -332,17 +332,17 @@ public class SettingsFlyoutViewModel : ViewModelBase {
 
     [JsonInclude]
     [JsonPropertyName("AccentColorSelection")]
-    private SolidColorBrush _AccentColorSelection = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
+    private AppColor _AccentColorSelection = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
 
     /// <summary>
     /// Global Setting
     /// </summary>
     /// <remarks>Choose the accent color of the application.</remarks>
     [JsonIgnore]
-    public SolidColorBrush AccentColorSelection {
+    public AppColor AccentColorSelection {
         get => _AccentColorSelection;
         set {
-            if (value.Color != _AccentColorSelection.Color) {
+            if (value != _AccentColorSelection) {
                 Settings.AccentColorSelection.Value = value;
                 SetProperty(ref _AccentColorSelection, value, Save.Yes, Notify.Yes);
             }

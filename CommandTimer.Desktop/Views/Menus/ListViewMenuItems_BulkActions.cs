@@ -1,8 +1,4 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
-using CommandTimer.Core.Static;
-using CommandTimer.Core.ViewModels;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;

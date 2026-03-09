@@ -1,11 +1,7 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using CommandTimer.Core.Static;
-using CommandTimer.Core.ViewModels;
 using System;
 using System.Threading.Tasks;
 
