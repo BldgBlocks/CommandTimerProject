@@ -1,4 +1,3 @@
-using Avalonia;
 using System;
 
 namespace CommandTimer.Desktop;

@@ -2,7 +2,7 @@ namespace CommandTimer.Core.Static;
 
 public class ObservableProperty<T>(T _value) {
 
-    public T Value {
+    public virtual T Value {
         get {
             return GetValue();
         }
@@ -18,11 +18,13 @@ public class ObservableProperty<T>(T _value) {
     }
 
     public event Action<T>? ValueChanged;
-    private void OnValueChanged(T value) => ValueChanged?.Invoke(value);
-    public T GetValue() {
+    protected void OnValueChanged(T value) => ValueChanged?.Invoke(value);
+    protected virtual T GetValue() {
         return _value ?? throw new InvalidOperationException("The static property must be initialized before use.");
     }
 }
+
+
 
 
 

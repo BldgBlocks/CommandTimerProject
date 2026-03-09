@@ -1,8 +1,7 @@
-using Avalonia;
 using Avalonia.Media;
 using Avalonia.Styling;
 using CommandTimer.Core.Static.Exceptions;
-using CommandTimer.Core.Utilities;
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,8 +14,9 @@ namespace CommandTimer.Desktop.Utilities.ColorProvider;
 /// </summary>
 public class AvaloniaColorProvider : IColorProvider {
 
-    private readonly Dictionary<string, Color> _darkDefaults = [];
-    private readonly Dictionary<string, Color> _lightDefaults = [];
+    private readonly Dictionary<string, Avalonia.Media.Color> _darkDefaults = [];
+    private readonly Dictionary<string, Avalonia.Media.Color> _lightDefaults = [];
+    private readonly Dictionary<AppColor, SolidColorBrush> _brushCache = [];
 
     public AvaloniaColorProvider() {
         InitializeDefaults();
@@ -28,7 +28,7 @@ public class AvaloniaColorProvider : IColorProvider {
             throw new Exceptions.ApplicationException($"Application not found.");
 
         var properties = typeof(IColorProvider).GetProperties()
-            .Where(p => p.PropertyType == typeof(ResourceBackedObservableProperty))
+            .Where(p => p.PropertyType == typeof(ObservableProperty<AppColor>))
             .ToList();
 
         properties.ForEach(p => {
@@ -48,11 +48,18 @@ public class AvaloniaColorProvider : IColorProvider {
         ApplicationBrush_Accent = new(nameof(ApplicationBrush_Accent));
         ApplicationBrush_Inconspicuous = new(nameof(ApplicationBrush_Inconspicuous));
         ApplicationBrush_Stripe = new(nameof(ApplicationBrush_Stripe));
-        ApplicationBrush_Transparent = new(new SolidColorBrush(new Color(0, 0, 0, 0)));
+        ApplicationBrush_Transparent = new(AppColor.Transparent);
         ApplicationBrush_DoThingIntended = new(nameof(ApplicationBrush_DoThingIntended));
         ApplicationBrush_Bad = new(nameof(ApplicationBrush_Bad));
         ApplicationBrush_Text = new(nameof(ApplicationBrush_Text));
         ApplicationBrush_Highlight = new(nameof(ApplicationBrush_Highlight));
+    }
+
+    public SolidColorBrush GetCachedBrush(AppColor color) {
+        if (_brushCache.TryGetValue(color, out var brush)) return brush;
+        brush = new SolidColorBrush(new Avalonia.Media.Color(color.A, color.R, color.G, color.B));
+        _brushCache[color] = brush;
+        return brush;
     }
 
     public bool TryGetDefaultBrush(string resourceKey, out SolidColorBrush brush, ThemeVariant? themeVariant = null) {
@@ -98,17 +105,17 @@ public class AvaloniaColorProvider : IColorProvider {
     }
 
     //... Interface Required Properties
-    public ResourceBackedObservableProperty ApplicationBrush_Background { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Contrast { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Overlay { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Accent { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Inconspicuous { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Stripe { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Transparent { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_DoThingIntended { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Bad { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Text { get; private set; } = null!;
-    public ResourceBackedObservableProperty ApplicationBrush_Highlight { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Background { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Contrast { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Overlay { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Accent { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Inconspicuous { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Stripe { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Transparent { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_DoThingIntended { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Bad { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Text { get; private set; } = null!;
+    public ObservableProperty<AppColor> ApplicationBrush_Highlight { get; private set; } = null!;
 }
 
 

@@ -1,5 +1,3 @@
-namespace CommandTimer.Core.Interfaces;
-
 /// <summary>
 /// Service contract for accessing application theme colors.
 /// All colors are resource-backed observables — subscribers can attach to ValueChanged events.
@@ -7,17 +5,17 @@ namespace CommandTimer.Core.Interfaces;
 /// </summary>
 public interface IColorProvider {
 
-    ResourceBackedObservableProperty ApplicationBrush_Background { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Contrast { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Overlay { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Accent { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Inconspicuous { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Stripe { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Transparent { get; }
-    ResourceBackedObservableProperty ApplicationBrush_DoThingIntended { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Bad { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Text { get; }
-    ResourceBackedObservableProperty ApplicationBrush_Highlight { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Background { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Contrast { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Overlay { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Accent { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Inconspicuous { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Stripe { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Transparent { get; }
+    ObservableProperty<AppColor> ApplicationBrush_DoThingIntended { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Bad { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Text { get; }
+    ObservableProperty<AppColor> ApplicationBrush_Highlight { get; }
 }
 
 

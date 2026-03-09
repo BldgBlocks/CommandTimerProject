@@ -1,5 +1,3 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using System.Globalization;
