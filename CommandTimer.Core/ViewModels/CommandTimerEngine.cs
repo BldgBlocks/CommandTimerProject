@@ -70,7 +70,7 @@ public class CommandTimerEngine {
             }
 
             if (Settings.ShouldExecuteOnTimer.Value) {
-                MessageRelay.OnMessagePosted(this, $"Executing [{_viewModel.Name}]", MessageRelay.MessageCategory.User, Settings.ShouldAutoNotificationsExpire.Value ? 0 : 100);
+                MessageRelay.OnMessagePosted(this, $"Executing [{_viewModel.Name}]", MessageRelay.MessageCategory.User, Settings.ShouldAutoNotificationsExpire.Value ? 0 : MessageRelay.StickyPriority);
                 ExecuteCommand();
             }
         }

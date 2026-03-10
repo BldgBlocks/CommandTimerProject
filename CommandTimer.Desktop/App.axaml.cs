@@ -23,6 +23,7 @@ namespace CommandTimer.Desktop;
 public partial class App : Application {
 
     private static bool _willCommit;
+    public static Window? AnyWindow => (Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
     public override void Initialize() {
         AvaloniaXamlLoader.Load(this);
@@ -43,7 +44,7 @@ public partial class App : Application {
     }
 
     public static async void CopyToClipboard(string text) {
-        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return;
+        if (AnyWindow is not { Clipboard: { } clipboard }) return;
         try {
             await clipboard.SetTextAsync(text);
         }
@@ -52,7 +53,7 @@ public partial class App : Application {
     }
 
     public static Task<string?> CopyFromClipboardAsync() {
-        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
+        if (AnyWindow is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
 
         return ClipboardExtensions.TryGetTextAsync(clipboard);
     }
@@ -158,7 +159,7 @@ public partial class App : Application {
     }
 
     private void LogException(string context, Exception ex) {
-        MessageRelay.OnMessagePosted(nameof(App), $"[{context}] {ex.GetType().Name}: {ex.Message}", MessageRelay.MessageCategory.Exception);
+        MessageRelay.OnMessagePosted(this, $"[{context}] {ex.GetType().Name}: {ex.Message}", MessageRelay.MessageCategory.Exception);
     }
 
     private static string FlattenException(Exception exception) {
@@ -182,7 +183,7 @@ public partial class App : Application {
 
     private void ShowUserError(string message) {
         int limit = 3000;
-        MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, MessageRelay.MessageCategory.Exception, 100);
+        MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, MessageRelay.MessageCategory.Exception, MessageRelay.StickyPriority);
     }
 
     private static void SetupSerialization() {

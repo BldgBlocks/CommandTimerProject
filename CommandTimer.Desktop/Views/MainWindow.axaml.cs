@@ -6,13 +6,7 @@ namespace CommandTimer.Desktop.Views;
 
 public partial class MainWindow : Window {
 
-    public static Window? Instance { get; private set; }
-    public static Panel? Layout { get; private set; }
-
     public MainWindow() {
-        Instance = this;
-        Layout = ContentPresenter;
-
         ServiceProvider.Set<IShowToolTip>(RegisterCustomToolTip());
         ServiceProvider.Set<IAskTheUser>(new AskTheUserForMe());
         ServiceProvider.Set<IDefaultTimerCollection>(new DefaultTimers_Simple(SystemInteraction.Platform.Get()));

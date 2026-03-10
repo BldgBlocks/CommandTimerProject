@@ -34,12 +34,12 @@ public class ResourceBackedObservableProperty : ObservableProperty<AppColor> {
         var found = current.Resources.TryGetResource(_resourceKey, current.ActualThemeVariant, out var value);
 
         if (found is false) {
-            MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' not found. Theme: {current.ActualThemeVariant}. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
+            MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' not found. Theme: {current.ActualThemeVariant}. Returning purple fallback.", MessageRelay.MessageCategory.Exception, MessageRelay.StickyPriority);
             return AppColor.Fallback;
         }
 
         if (value is not SolidColorBrush brush) {
-            MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' found but is type '{value?.GetType().Name}', not SolidColorBrush. Returning purple fallback.", MessageRelay.MessageCategory.Exception, 100);
+            MessageRelay.OnMessagePosted(this, $"ResourceBackedObservableProperty: Key '{_resourceKey}' found but is type '{value?.GetType().Name}', not SolidColorBrush. Returning purple fallback.", MessageRelay.MessageCategory.Exception, MessageRelay.StickyPriority);
             return AppColor.Fallback;
         }
 

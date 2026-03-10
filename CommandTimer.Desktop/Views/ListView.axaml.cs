@@ -18,6 +18,9 @@ namespace CommandTimer.Desktop.Views;
 
 public partial class ListView : UserControl {
 
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
+    private EventHandler<PointerPressedEventArgs>? _toolTipPointerPressedHandler;
+
     public ListView() {
         InitializeComponent();
 
@@ -126,6 +129,7 @@ public partial class ListView : UserControl {
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
+        ClearCustomToolTipHandlers();
         LibraryManager.CurrentLibraryChanging -= LibraryManager_CurrentLibraryChanging;
         LibraryManager.CurrentLibraryChanged -= LibraryManager_CurrentLibraryChanged;
         Settings.AccentColorSelection.ValueChanged -= AccentColorSelection_ValueChanged;
@@ -139,7 +143,7 @@ public partial class ListView : UserControl {
 
     private void BulkActionsButton_SetupMenuItemsContextMenu() {
         if (DataContext is not ListViewModel viewModel) return;
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         BulkActionButton.Flyout = new MenuFlyout() {
             ItemsSource = new ListViewMenuItems_BulkActions(viewModel, window.MainWindowLayout).Items
@@ -202,22 +206,12 @@ public partial class ListView : UserControl {
     }
 
     private void LibraryManager_CurrentLibraryChanging(object? sender, CommandTimerLibrary e) {
-        if (DataContext is not ListViewModel viewModel) return;
-
-        viewModel.ActiveLibrary.TimerRemoved -= ActiveLibrary_TimerRemoved;
     }
 
     private void LibraryManager_CurrentLibraryChanged(object? sender, CommandTimerLibrary e) {
         if (DataContext is not ListViewModel viewModel) return;
 
         viewModel.ActiveLibrary = LibraryManager.CurrentLibrary;
-        viewModel.ActiveLibrary.TimerRemoved += ActiveLibrary_TimerRemoved;
-    }
-
-    private void ActiveLibrary_TimerRemoved(object? sender, CommandTimerViewModel e) {
-        if (DataContext is not ListViewModel viewModel) return;
-
-        viewModel.SortRelevantTimers();
     }
 
     /// <summary>
@@ -332,6 +326,8 @@ public partial class ListView : UserControl {
 
 
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         properties.Reference.Placement = PlacementMode.Bottom;
         properties.Reference.VerticalOffset = 5;
@@ -341,45 +337,40 @@ public partial class ListView : UserControl {
             flyout.Opening += (o, e) => ServiceProvider.Get<IShowToolTip>().Hide();
         }
 
-        NewLibraryName.AddHandler(PointerPressedEvent, (o, a) => tooltip.Hide(), RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
+        _toolTipPointerPressedHandler = (o, a) => tooltip.Hide();
+        NewLibraryName.AddHandler(PointerPressedEvent, _toolTipPointerPressedHandler, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
 
-        LogoButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "A place to organize common commands and timed tasks", properties);
+        RegisterToolTip(LogoButton, "A place to organize common commands and timed tasks");
+        RegisterToolTip(AddLibraryButton, "Add new library");
+        RegisterToolTip(NewLibraryName, "Enter a unique name");
+        RegisterToolTip(LibraryButton, $"Organize timers into libraries{Environment.NewLine}Right Click: Rename");
+        RegisterToolTip(AddTimerButton, "Add new command timer");
+        RegisterToolTip(UserSearchBox, "Type a filter");
+        RegisterToolTip(QuickFilterButton, "Quick Filter Presets");
+        RegisterToolTip(QuickFilterValue, "Selected Quick Filter");
+        RegisterToolTip(SortStrategyButton, "Sorting Strategy");
+        RegisterToolTip(RefreshButton, "Sort the list again");
+        RegisterToolTip(SettingsButton, "Settings");
+        RegisterToolTip(AboutButton, "About");
+        RegisterToolTip(BulkActionButton, "Perform bulk actions");
 
-        AddLibraryButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Add new library", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        NewLibraryName.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a unique name", properties);
+    private void ClearCustomToolTipHandlers() {
+        if (_toolTipPointerPressedHandler is not null) {
+            NewLibraryName.RemoveHandler(PointerPressedEvent, _toolTipPointerPressedHandler);
+            _toolTipPointerPressedHandler = null;
+        }
 
-        LibraryButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"Organize timers into libraries{Environment.NewLine}Right Click: Rename", properties);
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        AddTimerButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Add new command timer", properties);
-
-        UserSearchBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Type a filter", properties);
-
-        QuickFilterButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Quick Filter Presets", properties);
-
-        QuickFilterValue.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Selected Quick Filter", properties);
-
-        SortStrategyButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Sorting Strategy", properties);
-
-        RefreshButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Sort the list again", properties);
-
-        SettingsButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Settings", properties);
-
-        AboutButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "About", properties);
-
-        BulkActionButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Perform bulk actions", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 }

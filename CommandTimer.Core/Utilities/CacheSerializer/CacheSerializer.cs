@@ -100,7 +100,7 @@ public partial class CacheSerializer : ISerializer {
     /// <summary>
     /// Purge a single data path.
     /// </summary>
-    private void PurgeData(string dataPath) => _data[dataPath]?.Clear();
+    private void PurgeData(string dataPath) => _data.Remove(dataPath);
     /// <summary>
     /// Purge all data paths.
     /// </summary>

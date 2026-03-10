@@ -17,6 +17,8 @@ public partial class SettingsFlyout : UserControl {
     private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
 
     private FlyoutBase? _colorBarFlyout;
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
+    private EventHandler<PointerPressedEventArgs>? _toolTipPointerPressedHandler;
 
     public SettingsFlyout() {
         InitializeComponent();
@@ -36,12 +38,12 @@ public partial class SettingsFlyout : UserControl {
         _colorBarFlyout = FlyoutBase.GetAttachedFlyout(ColorBar);
         if (_colorBarFlyout is not null) {
             _colorBarFlyout.Opened += (s, e) => {
-                if (MainWindow.Instance is MainWindow window) {
+                if (TopLevel.GetTopLevel(this) is MainWindow window) {
                     window.AddHandler(Window.KeyDownEvent, ColorBar_KeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
                 }
             };
             _colorBarFlyout.Closed += (s, e) => {
-                if (MainWindow.Instance is MainWindow window) {
+                if (TopLevel.GetTopLevel(this) is MainWindow window) {
                     window.RemoveHandler(Window.KeyDownEvent, ColorBar_KeyDown);
                 }
             };
@@ -49,11 +51,12 @@ public partial class SettingsFlyout : UserControl {
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
+        ClearCustomToolTipHandlers();
         ColorPickerControl.KeyDown -= ColorBar_KeyDown;
     }
 
     private async void Tapped_StartAutoStartsButton(object? sender, TappedEventArgs args) {
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         try {
             List<CommandTimerViewModel> autoTimers = [];
@@ -75,7 +78,7 @@ public partial class SettingsFlyout : UserControl {
 
     private async void Tapped_PromptPasswordButton(object? sender, TappedEventArgs args) {
         if (DataContext is not SettingsFlyoutViewModel viewModel) return;
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
         if (viewModel.ShouldUsePasswordConfirmation) {
             viewModel.ShouldUsePasswordConfirmation = false;
             return;
@@ -126,7 +129,7 @@ public partial class SettingsFlyout : UserControl {
     }
 
     private async void Tapped_StopAutoStartsButton(object? sender, TappedEventArgs args) {
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         try {
             List<CommandTimerViewModel> autoTimers = [];
@@ -147,7 +150,7 @@ public partial class SettingsFlyout : UserControl {
     }
 
     private async void Tapped_RestoreBackupButton(object? sender, TappedEventArgs args) {
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         try {
             bool? result = await ConfirmationDialog.Create()
@@ -166,7 +169,7 @@ public partial class SettingsFlyout : UserControl {
     }
 
     private async void Tapped_CreateBackupButton(object? sender, TappedEventArgs args) {
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         try {
             bool? result = await ConfirmationDialog.Create()
@@ -184,7 +187,7 @@ public partial class SettingsFlyout : UserControl {
     }
 
     private async void Tapped_EraseBackupsButton(object? sender, TappedEventArgs args) {
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
         try {
             List<CommandTimerViewModel> autoTimers = [];
@@ -298,75 +301,55 @@ public partial class SettingsFlyout : UserControl {
     private void PointerExited_ColorBar(object? sender, PointerEventArgs args) => ColorBar.BorderThickness = new Thickness(0);
 
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         properties.Reference.Placement = PlacementMode.Bottom;
         var tooltip = ServiceProvider.Get<IShowToolTip>();
 
-        RootPanel.AddHandler(PointerPressedEvent, (o, a) => tooltip.Hide(), RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
+        _toolTipPointerPressedHandler = (o, a) => tooltip.Hide();
+        RootPanel.AddHandler(PointerPressedEvent, _toolTipPointerPressedHandler, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
 
-        ThemeButtonTop.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Light Mode | Dark Mode", properties);
+        RegisterToolTip(ThemeButtonTop, "Light Mode | Dark Mode");
+        RegisterToolTip(ShouldAnimateCheckBox, "Show animations on list actions");
+        RegisterToolTip(ShouldExecuteOnTimerCheckBox, "Manual executions only");
+        RegisterToolTip(ShouldNotifExpireCheckBox, "A timer execution notification will expire by default. Switch this off to preserve notifications for manual dismissal. (So you can see what happened while away.)");
+        RegisterToolTip(ShouldAutoStartCheckBox, "Globally control auto start at program startd");
+        RegisterToolTip(StartAutoStartButton, "Start all auto start timers");
+        RegisterToolTip(StopAutoStartButton, "Stop all auto start timers");
+        RegisterToolTip(ShouldExpandColorBarCheckBox, "Expand Color Bar color to shade command field");
+        RegisterToolTip(ShouldStripeCheckBox, "Show alternating background colors for list items");
+        RegisterToolTip(ShouldLogCheckBox, "Log commands executed and their outputs");
+        RegisterToolTip(ShouldPromptCheckBox, "Prompt before manual execution");
+        RegisterToolTip(ShouldCleanDatabaseCheckBox, "Current data is moved to a backup and a fresh copy is sorted before beginning");
+        RegisterToolTip(RestoreBackupButton, "Restore the previous backup");
+        RegisterToolTip(CreateBackupButton, "Perform backup and data cleaning");
+        RegisterToolTip(EraseBackupsButton, "Erase all backups");
+        RegisterToolTip(BackupVersionsSlider, "Choose how many save data versions to keep after database cleaning");
+        RegisterToolTip(MaxLinesSlider, "Choose how many lines to expand for large descriptions");
+        RegisterToolTip(ColorBar, "Select an accent color");
+        RegisterToolTip(ResetColorButton, "Reset the accent color to the application default accent color");
+        RegisterToolTip(SystemColorButton, "Reset the accent color to your system accent color");
+        RegisterToolTip(PromptPasswordButton, "Require a password for confirmation windows");
 
-        ShouldAnimateCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Show animations on list actions", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        ShouldExecuteOnTimerCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Manual executions only", properties);
+    private void ClearCustomToolTipHandlers() {
+        if (_toolTipPointerPressedHandler is not null) {
+            RootPanel.RemoveHandler(PointerPressedEvent, _toolTipPointerPressedHandler);
+            _toolTipPointerPressedHandler = null;
+        }
 
-        ShouldNotifExpireCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!,
-            "A timer execution notification will expire by default. Switch this off to preserve notifications for manual dismissal. (So you can see what happened while away.)", properties);
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        ShouldAutoStartCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Globally control auto start at program startd", properties);
-
-        StartAutoStartButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Start all auto start timers", properties);
-
-        StopAutoStartButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Stop all auto start timers", properties);
-
-        ShouldExpandColorBarCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Expand Color Bar color to shade command field", properties);
-
-        ShouldStripeCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Show alternating background colors for list items", properties);
-
-        ShouldLogCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Log commands executed and their outputs", properties);
-
-        ShouldPromptCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Prompt before manual execution", properties);
-
-        ShouldCleanDatabaseCheckBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Current data is moved to a backup and a fresh copy is sorted before beginning", properties);
-
-        RestoreBackupButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Restore the previous backup", properties);
-
-        CreateBackupButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Perform backup and data cleaning", properties);
-
-        EraseBackupsButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Erase all backups", properties);
-
-        BackupVersionsSlider.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Choose how many save data versions to keep after database cleaning", properties);
-
-        MaxLinesSlider.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Choose how many lines to expand for large descriptions", properties);
-
-        ColorBar.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Select an accent color", properties);
-
-        ResetColorButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Reset the accent color to the application default accent color", properties);
-
-        SystemColorButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Reset the accent color to your system accent color", properties);
-
-        PromptPasswordButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Require a password for confirmation windows", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 }
 

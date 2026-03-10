@@ -1,6 +1,7 @@
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using System;
+using System.Collections.Generic;
 
 namespace CommandTimer.Desktop.Views;
 
@@ -10,6 +11,8 @@ public partial class AboutFlyout : UserControl {
     private readonly string _aboutMessage02 = $"Anything you run in the terminal should be entered exactly the same here.{Environment.NewLine}{Environment.NewLine}";
     private readonly string _aboutMessage03 = $"This is a Visual Studio C# project made with the Avalonia Framework.{Environment.NewLine}{Environment.NewLine}";
     private readonly string _donationMessage = $"{Environment.NewLine}Please show your support:{Environment.NewLine}";
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
+    private EventHandler<PointerPressedEventArgs>? _toolTipPointerPressedHandler;
 
     public AboutFlyout() {
         InitializeComponent();
@@ -27,6 +30,12 @@ public partial class AboutFlyout : UserControl {
         }
     }
 
+    protected override void OnUnloaded(RoutedEventArgs e) {
+        ClearCustomToolTipHandlers();
+
+        base.OnUnloaded(e);
+    }
+
     private void Tapped_DonationButton_Monero(object? sender, TappedEventArgs args)
         => App.CopyToClipboard(Settings.Keys.DonationKey_Monero);
 
@@ -34,29 +43,42 @@ public partial class AboutFlyout : UserControl {
         => App.CopyToClipboard(Settings.Keys.DonationKey_Btc);
 
     private void Tapped_PrivacyStatementButton(object? sender, TappedEventArgs args)
-        => PrivacyStatement.Get().Show((MainWindow.Instance as MainWindow)?.MainWindowLayout!);
+        => PrivacyStatement.Get().Show((TopLevel.GetTopLevel(this) as MainWindow)?.MainWindowLayout!);
 
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         properties.Reference.Placement = PlacementMode.Bottom;
         var tooltip = ServiceProvider.Get<IShowToolTip>();
 
-        RootPanel.AddHandler(PointerPressedEvent, (o, a) => tooltip.Hide(), RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
+        _toolTipPointerPressedHandler = (o, a) => tooltip.Hide();
+        RootPanel.AddHandler(PointerPressedEvent, _toolTipPointerPressedHandler, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
 
-        PrivacyStatementButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Privacy Statement", properties);
+        RegisterToolTip(PrivacyStatementButton, "Privacy Statement");
+        RegisterToolTip(DonationButton_Monero, "Click to copy to clipboard");
+        RegisterToolTip(DonationButton_MoneroQR, "Click to copy to clipboard");
+        RegisterToolTip(DonationButton_Btc, "Click to copy to clipboard");
+        RegisterToolTip(DonationButton_BtcQR, "Click to copy to clipboard");
 
-        DonationButton_Monero.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Click to copy to clipboard", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        DonationButton_MoneroQR.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Click to copy to clipboard", properties);
+    private void ClearCustomToolTipHandlers() {
+        if (_toolTipPointerPressedHandler is not null) {
+            RootPanel.RemoveHandler(PointerPressedEvent, _toolTipPointerPressedHandler);
+            _toolTipPointerPressedHandler = null;
+        }
 
-        DonationButton_Btc.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Click to copy to clipboard", properties);
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        DonationButton_BtcQR.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Click to copy to clipboard", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 
 }

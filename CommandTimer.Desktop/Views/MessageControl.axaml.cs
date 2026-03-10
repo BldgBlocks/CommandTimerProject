@@ -96,7 +96,7 @@ public partial class MessageControl : UserControl {
             await Task.Delay(_slideInTransition?.Duration.Milliseconds ?? 500);
         }
         catch (ArgumentOutOfRangeException ex) {
-            MessageRelay.OnMessagePosted($"{nameof(MessageControl)}>{nameof(PlayRemoveAnimation)}", $"{ex.Message}");
+            MessageRelay.OnMessagePosted(this, ex.Message);
             throw;
         }
     }

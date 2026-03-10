@@ -24,9 +24,7 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         /// Theme Selection Menu
         var themeSelectionMenu = new ThemeSelectionsMenu(Command_ThemeSelection);
         ThemeSelections = new ObservableCollection<MenuItemViewModel>(themeSelectionMenu.Items);
-        /// Force the getter to run to set a valid default if the data value is invalid, and apply the theme selection to the application.
-        /// Comeback and create a NormalizeThemeSelection() call
-        _ = ThemeSelection;
+        InitializeThemeSelection();
 
         ApplyRuntimeStateFromData();
     }
@@ -292,6 +290,12 @@ public class SettingsFlyoutViewModel : ViewModelBase {
     private void Command_ThemeSelection(object? parameter) => ThemeSelection = parameter as MenuItemViewModel ?? ThemeSelection;
 
     private static MenuItemViewModel? GetMenuItem(IEnumerable<MenuItemViewModel> menuItems, string itemName) => menuItems.FirstOrDefault((item) => item.Header == itemName);
+
+    private void InitializeThemeSelection() {
+        if (GetMenuItem(ThemeSelections, Data.ThemeSelection) is null) {
+            Data.ThemeSelection = ThemeSelections[0].Header;
+        }
+    }
 
     private void Application_ThemeSelectionChanged() {
         var variant = ThemeSelection.Header switch {

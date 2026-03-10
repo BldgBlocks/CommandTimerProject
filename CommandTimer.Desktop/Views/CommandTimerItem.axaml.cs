@@ -34,6 +34,7 @@ public partial class CommandTimerItem : UserControl {
     private ThicknessTransition? _slideInTransition;
     private BindingExpressionBase? _slideInTransitionToken;
     private BindingExpressionBase? _fadeInTransitionToken;
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
 
     private readonly Styles _accentStyle;
 
@@ -181,6 +182,7 @@ public partial class CommandTimerItem : UserControl {
     protected override void OnUnloaded(RoutedEventArgs e) {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
+        ClearCustomToolTipHandlers();
         viewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
         LibraryManager.LibraryAdded -= LibraryManager_LibraryNamesChanged;
@@ -757,67 +759,44 @@ public partial class CommandTimerItem : UserControl {
     /// Built-in tooltip is not flexible, flicker and crash in linux.
     /// </summary>
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         var tooltip = ServiceProvider.Get<IShowToolTip>();
 
-        TimePickerControl.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Choose a time as duration or absolute", properties);
+        RegisterToolTip(TimePickerControl, "Choose a time as duration or absolute");
+        RegisterToolTip(NameBlock, "Enter a unique name");
+        RegisterToolTip(CopyMoveLibrary, "Copy or move to another library");
+        RegisterToolTip(DescriptionBlock, $"A place for description or notes{Environment.NewLine}Check the settings menu to expand this field");
+        RegisterToolTip(CopyButton, "Copy to Clipboard");
+        RegisterToolTip(PromptExecuteButton, "Prompt for confirmation upon manual execution");
+        RegisterToolTip(ExecuteNowButton, "Run the command right now");
+        RegisterToolTip(CommandBlockAndBorderPanel, $"Enter the command exactly as in a terminal{Environment.NewLine}Check the Settings menu to expand this field");
+        RegisterToolTip(FavoriteButton, "Favorites are always filtered to the top when relevant");
+        RegisterToolTip(RemoveButton, "Delete");
+        RegisterToolTip(TimeStrategySelection, "'Duration' is a timer, 'Time' is a clock time for execution, 'Date' is a day and time");
+        RegisterToolTip(SecondsButton, "Enter a seconds value.");
+        RegisterToolTip(DaysButton, "Enter a days value.");
+        RegisterToolTip(CountdownBlock, "Countdown/Total Time");
+        RegisterToolTip(LogStackPanel, "Should activity be logged.");
+        RegisterToolTip(ShowTerminalStackPanel, "Open a terminal to show command output");
+        RegisterToolTip(LoopToggleStackPanel, "Loop or repeat the timer continuously. Daily for time, or every duration.");
+        RegisterToolTip(AutoStartToggleStackPanel, "Start the timer automatically upon program start");
+        RegisterToolTip(ActiveIndicator, "Active Status");
+        RegisterToolTip(StartStopButton, "Start/Stop timer");
 
-        NameBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a unique name", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        CopyMoveLibrary.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Copy or move to another library", properties);
+    private void ClearCustomToolTipHandlers() {
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        DescriptionBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"A place for description or notes{Environment.NewLine}Check the settings menu to expand this field", properties);
-
-        CopyButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Copy to Clipboard", properties);
-
-        PromptExecuteButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Prompt for confirmation upon manual execution", properties);
-
-        ExecuteNowButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Run the command right now", properties);
-
-        CommandBlockAndBorderPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"Enter the command exactly as in a terminal{Environment.NewLine}Check the Settings menu to expand this field", properties);
-
-        FavoriteButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Favorites are always filtered to the top when relevant", properties);
-
-        RemoveButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Delete", properties);
-
-        TimeStrategySelection.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "'Duration' is a timer, 'Time' is a clock time for execution, 'Date' is a day and time", properties);
-
-        SecondsButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a seconds value.", properties);
-
-        DaysButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a days value.", properties);
-
-        CountdownBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Countdown/Total Time", properties);
-
-        LogStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Should activity be logged.", properties);
-
-        ShowTerminalStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Open a terminal to show command output", properties);
-
-        LoopToggleStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Loop or repeat the timer continuously. Daily for time, or every duration.", properties);
-
-        AutoStartToggleStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Start the timer automatically upon program start", properties);
-
-        ActiveIndicator.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Active Status", properties);
-
-        StartStopButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Start/Stop timer", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 }

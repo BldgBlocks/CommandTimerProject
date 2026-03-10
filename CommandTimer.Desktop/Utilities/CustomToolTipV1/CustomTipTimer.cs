@@ -61,8 +61,8 @@ public class CustomTipTimer : IShowToolTip {
     }
 
     private bool IsPointerOverControl(Control control) {
-        return control.IsPointerOver || Math.Abs(_lastTriggerPosition.X - _currentPosition.X) <= DISTANCE_FROM_TRIGGER &&
-                                        Math.Abs(_lastTriggerPosition.Y - _currentPosition.Y) <= DISTANCE_FROM_TRIGGER;
+        return control.IsPointerOver || (Math.Abs(_lastTriggerPosition.X - _currentPosition.X) <= DISTANCE_FROM_TRIGGER &&
+                                         Math.Abs(_lastTriggerPosition.Y - _currentPosition.Y) <= DISTANCE_FROM_TRIGGER);
     }
 
 

@@ -87,13 +87,13 @@ public static class IOUtils {
             }
         }
         catch (UnauthorizedAccessException ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"Access denied when trying to access or create directories/files: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access denied when trying to access or create directories/files: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
         catch (IOException ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"An I/O error occurred: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
         catch (Exception ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"Unexpected error during initialization: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Unexpected error during initialization: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
     }
 
@@ -111,7 +111,7 @@ public static class IOUtils {
             await writer.WriteLineAsync(text);
         }
         catch (Exception ex) {
-            MessageRelay.OnMessagePosted("Core", $"Failed to write to log: {ex.Message}", MessageRelay.MessageCategory.User, 0);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Failed to write to log: {ex.Message}", MessageRelay.MessageCategory.User, 0);
         }
         finally {
             semaphore.Release();
