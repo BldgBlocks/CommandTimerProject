@@ -216,9 +216,15 @@ public partial class SettingsFlyout : UserControl {
     /// Keep menu items in sync as a whole.
     /// </summary>
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
+        var colorProvider = ServiceProvider.Get<IColorProvider>();
+        var selectedBackground = colorProvider.ApplicationBrush_Accent.Value.AsBrush();
+        var selectedForeground = ColorUtilities.GetSlidingContrastColor(colorProvider.ApplicationBrush_Accent.Value).AsBrush();
+        var unselectedForeground = colorProvider.ApplicationBrush_Text.Value.AsBrush();
+
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush() : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value.AsBrush();
+            item.BackgroundColor = item.IsSelected ? selectedBackground : colorProvider.ApplicationBrush_Transparent.Value.AsBrush();
+            item.ForegroundColor = item.IsSelected ? selectedForeground : unselectedForeground;
         }
     }
 
@@ -319,8 +325,8 @@ public partial class SettingsFlyout : UserControl {
         RegisterToolTip(ShouldExpandColorBarCheckBox, "Expand Color Bar color to shade command field");
         RegisterToolTip(ShouldStripeCheckBox, "Show alternating background colors for list items");
         RegisterToolTip(ShouldLogCheckBox, "Log commands executed and their outputs");
-        RegisterToolTip(ShouldPromptCheckBox, "Prompt before manual execution");
-        RegisterToolTip(ShouldCleanDatabaseCheckBox, "Current data is moved to a backup and a fresh copy is sorted before beginning");
+        RegisterToolTip(ShouldPromptCheckBox, "Show prompt before manual execution");
+        RegisterToolTip(ShouldCleanDatabaseCheckBox, "Current data is moved to a backup");
         RegisterToolTip(RestoreBackupButton, "Restore the previous backup");
         RegisterToolTip(CreateBackupButton, "Perform backup and data cleaning");
         RegisterToolTip(EraseBackupsButton, "Erase all backups");
@@ -332,7 +338,7 @@ public partial class SettingsFlyout : UserControl {
         RegisterToolTip(PromptPasswordButton, "Require a password for confirmation windows");
 
         void RegisterToolTip(Control control, string message) {
-            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            void handler(object? s, PointerEventArgs args) => tooltip.OnPointerOver(control, message, properties);
             control.PointerEntered += handler;
             _toolTipPointerEnteredHandlers.Add((control, handler));
         }

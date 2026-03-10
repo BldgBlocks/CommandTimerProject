@@ -175,16 +175,6 @@ public partial class CustomTextBox : UserControl {
     /// <summary>
     /// Register the public property for changes.
     /// </summary>
-    public static new readonly StyledProperty<int> MinWidthProperty =
-        AvaloniaProperty.Register<CustomTextBox, int>(nameof(MinWidth), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
-    public new int MinWidth {
-        get => GetValue(MinWidthProperty);
-        set => SetValue(MinWidthProperty, value);
-    }
-
-    /// <summary>
-    /// Register the public property for changes.
-    /// </summary>
     public static readonly StyledProperty<bool> AcceptWithDismissProperty =
         AvaloniaProperty.Register<CustomTextBox, bool>(nameof(AcceptWithDismiss), true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
     public bool AcceptWithDismiss {

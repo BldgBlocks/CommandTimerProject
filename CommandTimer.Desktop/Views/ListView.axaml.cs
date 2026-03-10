@@ -218,9 +218,15 @@ public partial class ListView : UserControl {
     /// Keep menu items in sync as a whole.
     /// </summary>
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
+        var colorProvider = ServiceProvider.Get<IColorProvider>();
+        var selectedBackground = colorProvider.ApplicationBrush_Accent.Value.AsBrush();
+        var selectedForeground = ColorUtilities.GetSlidingContrastColor(colorProvider.ApplicationBrush_Accent.Value).AsBrush();
+        var unselectedForeground = colorProvider.ApplicationBrush_Text.Value.AsBrush();
+
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush() : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Transparent.Value.AsBrush();
+            item.BackgroundColor = item.IsSelected ? selectedBackground : colorProvider.ApplicationBrush_Transparent.Value.AsBrush();
+            item.ForegroundColor = item.IsSelected ? selectedForeground : unselectedForeground;
         }
     }
 
@@ -254,7 +260,7 @@ public partial class ListView : UserControl {
     private void Tapped_RefreshList(object sender, TappedEventArgs args) {
         if (DataContext is not ListViewModel viewModel) return;
 
-        viewModel.SortRelevantTimers();
+        viewModel.SortRelevantTimers(true);
     }
 
     private void Tapped_Settings(object sender, TappedEventArgs args)

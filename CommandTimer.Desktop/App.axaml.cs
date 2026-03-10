@@ -63,6 +63,12 @@ public partial class App : Application {
         /// Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
+        /// Skip heavy initialization during design-time (XAML preview)
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime) {
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
+
         /// Services
         ServiceProvider.Set<ITimerProvider>(new AvaloniaTimerProvider());
         ServiceProvider.Set<IColorProvider>(new AvaloniaColorProvider());

@@ -44,7 +44,7 @@
 
                                 <TextBlock Name="PART_DisplayTextBlock"
                                            Margin="5"
-                                           Padding="0"
+                                           Padding="5,0,0,0"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch"
                                            FontSize="{TemplateBinding FontSize}"

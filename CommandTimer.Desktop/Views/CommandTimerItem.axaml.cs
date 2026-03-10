@@ -233,10 +233,9 @@ public partial class CommandTimerItem : UserControl {
     }
 
     private void GlobalSetting_AccentColorSelectionChanged(AppColor brush) {
-        if (DataContext is not CommandTimerViewModel viewModel) return;
+        if (DataContext is not CommandTimerViewModel) return;
         if (Settings.ShouldExpandColorBar.Value) return;
 
-        viewModel.Accent = brush;
         UpdateUI();
     }
 
@@ -430,6 +429,7 @@ public partial class CommandTimerItem : UserControl {
     private void UpdateUI() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
+        UpdateControl_AccentColors();
         UpdateControl_Text();
         UpdateControl_Favorite();
         UpdateControl_StartStop();
@@ -777,7 +777,7 @@ public partial class CommandTimerItem : UserControl {
         RegisterToolTip(TimeStrategySelection, "'Duration' is a timer, 'Time' is a clock time for execution, 'Date' is a day and time");
         RegisterToolTip(SecondsButton, "Enter a seconds value.");
         RegisterToolTip(DaysButton, "Enter a days value.");
-        RegisterToolTip(CountdownBlock, "Countdown/Total Time");
+        RegisterToolTip(CountdownBlock, "DD:HH:MM:SS -> Days/Hours/Minutes/Seconds");
         RegisterToolTip(LogStackPanel, "Should activity be logged.");
         RegisterToolTip(ShowTerminalStackPanel, "Open a terminal to show command output");
         RegisterToolTip(LoopToggleStackPanel, "Loop or repeat the timer continuously. Daily for time, or every duration.");
