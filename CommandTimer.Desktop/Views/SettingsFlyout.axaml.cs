@@ -220,11 +220,14 @@ public partial class SettingsFlyout : UserControl {
         var selectedBackground = colorProvider.ApplicationBrush_Accent.Value.AsBrush();
         var selectedForeground = ColorUtilities.GetSlidingContrastColor(colorProvider.ApplicationBrush_Accent.Value).AsBrush();
         var unselectedForeground = colorProvider.ApplicationBrush_Text.Value.AsBrush();
+        var selectedFontWeight = ResourceHelper.GetResourceOrThrow<FontWeight>("ApplicationFontWeight_Heavy");
+        var unselectedFontWeight = ResourceHelper.GetResourceOrThrow<FontWeight>("ApplicationFontWeight_Medium");
 
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
             item.BackgroundColor = item.IsSelected ? selectedBackground : colorProvider.ApplicationBrush_Transparent.Value.AsBrush();
             item.ForegroundColor = item.IsSelected ? selectedForeground : unselectedForeground;
+            item.FontWeight = item.IsSelected ? selectedFontWeight : unselectedFontWeight;
         }
     }
 

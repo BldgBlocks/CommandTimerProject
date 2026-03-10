@@ -177,7 +177,7 @@
                                                             CornerRadius="0"
                                                             FontSize="{DynamicResource ApplicationFontSize_Text}"
                                                             Foreground="{Binding ForegroundColor}"
-                                                            FontWeight="{DynamicResource ApplicationFontWeight_Medium}" />
+                                                            FontWeight="{Binding FontWeight}" />
 
                                                     <Button Grid.Column="1"
                                                             Width="30"
@@ -305,6 +305,7 @@
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
                                 <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>
@@ -335,6 +336,7 @@
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
                                 <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>

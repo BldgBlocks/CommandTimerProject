@@ -60,6 +60,7 @@
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
                                 <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>

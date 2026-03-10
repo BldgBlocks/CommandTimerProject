@@ -162,7 +162,6 @@ public partial class CommandTimerLibrary {
     public void AddToLibrary(CommandTimerViewModel newTimer) {
         var wasNotLoaded = !IsLoaded;
         Load();
-        newTimer.Unserialize();
 
         newTimer.LibraryName = LibraryName;
         newTimer.Name = MakeUniqueTimerName(newTimer.Name);
