@@ -30,7 +30,7 @@ public class SettingsFlyoutData {
     public bool ShouldAutoStart { get; set; } = true;
 
     [JsonPropertyName("ShouldExpandColorBar")]
-    public bool ShouldExpandColorBar { get; set; }
+    public bool ShouldExpandColorBar { get; set; } = true;
 
     [JsonPropertyName("ShouldStripeList")]
     public bool ShouldStripeList { get; set; } = true;
@@ -42,7 +42,7 @@ public class SettingsFlyoutData {
     public int MaxLines { get; set; } = 1;
 
     [JsonPropertyName("BackupVersions")]
-    public int BackupVersionsToKeep { get; set; }
+    public int BackupVersionsToKeep { get; set; } = 2;
 
     [JsonPropertyName("ThemeSelection")]
     public string ThemeSelection { get; set; } = "Dark";

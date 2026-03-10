@@ -9,10 +9,61 @@ namespace CommandTimer.Core.ViewModels;
 
 public class SettingsFlyoutViewModel : ViewModelBase {
 
+    private static SettingsFlyoutData? _loadedData;
+
+    public static void Initialize(ISerializer serializer, bool persistDefaults = false) {
+        var data = LoadData(serializer, persistDefaults);
+        ApplyRuntimeState(data);
+    }
+
+    public static SettingsFlyoutData LoadData(ISerializer serializer, bool persistDefaults = false) {
+        if (_loadedData is not null) {
+            return _loadedData;
+        }
+
+        var data = serializer.Deserialize<SettingsFlyoutData>(Settings.Keys.GlobalSettings, Settings.DEFAULT_DATA_FILE);
+        if (data is not null) {
+            _loadedData = data;
+            return _loadedData;
+        }
+
+        data = new SettingsFlyoutData();
+        if (persistDefaults) {
+            serializer.Serialize(Settings.Keys.GlobalSettings, data, Settings.DEFAULT_DATA_FILE);
+        }
+
+        _loadedData = data;
+        return _loadedData;
+    }
+
+    private static void ApplyRuntimeState(SettingsFlyoutData data) {
+        Settings.ShouldAnimate.Value = data.ShouldAnimate;
+        Settings.ShouldExecuteOnTimer.Value = data.ShouldExecuteOnTimer;
+        Settings.ShouldAutoNotificationsExpire.Value = data.ShouldAutoNotificationsExpire;
+        Settings.ShouldLog.Value = data.ShouldLog;
+        Settings.ShouldPromptByDefault.Value = data.ShouldPromptByDefault;
+        Settings.ShouldUsePasswordConfirmation.Value = data.ShouldUsePasswordConfirmation;
+        Settings.ShouldAutoStart.Value = data.ShouldAutoStart;
+        Settings.ShouldExpandColorBar.Value = data.ShouldExpandColorBar;
+        Settings.ShouldStripeList.Value = data.ShouldStripeList;
+        Settings.ShouldCleanDatabase.Value = data.ShouldCleanDatabase;
+        Settings.MaxLines.Value = data.MaxLines;
+        Settings.BackupVersionsToKeep.Value = data.BackupVersionsToKeep;
+        Settings.AccentColorSelection.Value = data.AccentColorSelection;
+
+        Application_ApplyTheme(data.ThemeSelection switch {
+            var h when h == ThemeVariant.Dark.ToString() => ThemeVariant.Dark,
+            var h when h == ThemeVariant.Light.ToString() => ThemeVariant.Light,
+            var h when h == ThemeVariant.Default.ToString() => ThemeVariant.Default,
+            _ => ThemeVariant.Default
+        });
+    }
+
     public SettingsFlyoutViewModel() : this(new SettingsFlyoutData()) { }
 
     public SettingsFlyoutViewModel(SettingsFlyoutData data) {
         Data = data;
+        _loadedData = data;
 
         /// Global Action
         ActionRelay.ActionPosted += (o, a) => {
@@ -26,34 +77,12 @@ public class SettingsFlyoutViewModel : ViewModelBase {
         ThemeSelections = new ObservableCollection<MenuItemViewModel>(themeSelectionMenu.Items);
         InitializeThemeSelection();
 
-        ApplyRuntimeStateFromData();
+        ApplyRuntimeState(Data);
     }
 
     internal SettingsFlyoutData Data { get; }
 
     public override void Serialize() => ServiceProvider.Get<ISerializer>().Serialize(Settings.Keys.GlobalSettings, Data, Settings.DEFAULT_DATA_FILE);
-
-    /// <summary>
-    /// Restore the static runtime Settings state from the data object after construction.
-    /// The data is the persistence authority, while Settings remains the runtime authority read throughout the app.
-    /// </summary>
-    private void ApplyRuntimeStateFromData() {
-        Settings.ShouldAnimate.Value = Data.ShouldAnimate;
-        Settings.ShouldExecuteOnTimer.Value = Data.ShouldExecuteOnTimer;
-        Settings.ShouldAutoNotificationsExpire.Value = Data.ShouldAutoNotificationsExpire;
-        Settings.ShouldLog.Value = Data.ShouldLog;
-        Settings.ShouldPromptByDefault.Value = Data.ShouldPromptByDefault;
-        Settings.ShouldUsePasswordConfirmation.Value = Data.ShouldUsePasswordConfirmation;
-        Settings.ShouldAutoStart.Value = Data.ShouldAutoStart;
-        Settings.ShouldExpandColorBar.Value = Data.ShouldExpandColorBar;
-        Settings.ShouldStripeList.Value = Data.ShouldStripeList;
-        Settings.ShouldCleanDatabase.Value = Data.ShouldCleanDatabase;
-        Settings.MaxLines.Value = Data.MaxLines;
-        Settings.BackupVersionsToKeep.Value = Data.BackupVersionsToKeep;
-        Settings.AccentColorSelection.Value = Data.AccentColorSelection;
-
-        Application_ThemeSelectionChanged();
-    }
 
     //...
 

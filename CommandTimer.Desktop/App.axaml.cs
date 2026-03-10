@@ -67,6 +67,7 @@ public partial class App : Application {
         ServiceProvider.Set<ITimerProvider>(new AvaloniaTimerProvider());
         ServiceProvider.Set<IColorProvider>(new AvaloniaColorProvider());
         SetupSerialization();
+        SettingsFlyoutViewModel.Initialize(ServiceProvider.Get<ISerializer>(), true);
         ServiceProvider.Set<ILibraryManager>(new LibraryManager());
 
         MessageLogger.Create(SystemInteraction.Files.GetPlatformLogFile()).StartLogging();

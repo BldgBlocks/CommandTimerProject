@@ -24,8 +24,7 @@ public partial class SettingsFlyout : UserControl {
         InitializeComponent();
 
         /// Settings Flyout
-        var settingsData = ServiceProvider.Get<ISerializer>().Deserialize<SettingsFlyoutData>(Settings.Keys.GlobalSettings, Settings.DEFAULT_DATA_FILE)
-            ?? new SettingsFlyoutData();
+        var settingsData = SettingsFlyoutViewModel.LoadData(ServiceProvider.Get<ISerializer>());
         DataContext = new SettingsFlyoutViewModel(settingsData);
     }
 
