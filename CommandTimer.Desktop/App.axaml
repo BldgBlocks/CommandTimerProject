@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:views="clr-namespace:CommandTimer.Desktop.Views;assembly=CommandTimer.Desktop"
+             xmlns:views="clr-namespace:CommandTimer.Desktop.Views;assembly=CommandTimer"
+             xmlns:converters="clr-namespace:CommandTimer.Desktop.Converters;assembly=CommandTimer"
              RequestedThemeVariant="Dark">
     <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
 
@@ -18,6 +19,8 @@
                 <ResourceInclude x:Key="Light"
                                  Source="avares://CommandTimer.Core/Assets/Styles/LightTheme.axaml" />
             </ResourceDictionary.ThemeDictionaries>
+            <converters:AppColorToBrushConverter x:Key="AppColorToBrushConverter" />
+            <converters:AppColorToColorConverter x:Key="AppColorToColorConverter" />
         </ResourceDictionary>
     </Application.Resources>
 

@@ -1,4 +1,4 @@
-﻿namespace CommandTimer.Core.Utilities.DependencyInversion;
+namespace CommandTimer.Core.Interfaces;
 
 public interface IPasswordValidation {
     public bool IsSet();
@@ -10,3 +10,4 @@ public interface IPasswordFormatValidation {
     public bool IsFormatValid(string password);
     public string Reason { get; }
 }
+

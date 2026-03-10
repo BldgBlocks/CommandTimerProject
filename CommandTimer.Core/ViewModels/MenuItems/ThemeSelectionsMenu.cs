@@ -1,7 +1,5 @@
-﻿using Avalonia.Styling;
+using Avalonia.Styling;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 
 namespace CommandTimer.Core.ViewModels.MenuItems;
 
@@ -23,3 +21,4 @@ public record ThemeSelectionsMenu : Menu<MenuItemViewModel> {
     public override string Description { get; } = "Light/Dark color schemes for the application.";
     public override IEnumerable<MenuItemViewModel> Items { get; }
 }
+

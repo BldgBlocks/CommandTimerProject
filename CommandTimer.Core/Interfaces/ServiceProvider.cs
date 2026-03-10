@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CommandTimer.Core.Utilities;
+namespace CommandTimer.Core.Interfaces;
 
 public static class ServiceProvider {
 
@@ -22,3 +19,4 @@ public static class ServiceProvider {
         _registry[typeof(T)] = service;
     }
 }
+

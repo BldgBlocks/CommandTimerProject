@@ -1,10 +1,9 @@
-﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using System.Globalization;
 
 namespace CommandTimer.Desktop.Utilities;
+
 public static class VisualHelpers {
 
     public static bool IsOverlapping(this Control control1, Control control2) {
@@ -66,7 +65,7 @@ public static class VisualHelpers {
     }
 
     private static Size MeasureText(string text, int fontSize, FontFamily fontFamily, double maxWidth) {
-        var formattedText = 
+        var formattedText =
             new FormattedText(
                     text,
                     CultureInfo.CurrentCulture,
@@ -81,3 +80,5 @@ public static class VisualHelpers {
         return new Size(formattedText.Width, formattedText.Height);
     }
 }
+
+

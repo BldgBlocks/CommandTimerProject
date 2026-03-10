@@ -401,3 +401,4 @@ FodyWeavers.xsd
 # Development notes — local only
 .development/
 /.github/copilot-instructions.md
+/CommandTimer.Core/.github/copilot-instructions.md

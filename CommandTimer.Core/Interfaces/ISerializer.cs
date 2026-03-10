@@ -1,4 +1,4 @@
-﻿namespace CommandTimer.Core;
+namespace CommandTimer.Core.Interfaces;
 
 public interface ISerializer {
 
@@ -13,3 +13,4 @@ public interface ISerializer {
     public void RestoreFile(string fileName);
 
 }
+

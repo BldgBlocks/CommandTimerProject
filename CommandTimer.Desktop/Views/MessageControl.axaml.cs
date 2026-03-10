@@ -1,10 +1,7 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using CommandTimer.Core.ViewModels;
 using System;
 using System.Threading.Tasks;
 
@@ -13,12 +10,12 @@ namespace CommandTimer.Desktop.Views;
 public partial class MessageControl : UserControl {
 
     //...
-    private readonly DoubleTransition? _fadeInTransition = new() {
+    private readonly DoubleTransition _fadeInTransition = new() {
         Duration = TimeSpan.FromMilliseconds(100),
         Easing = new LinearEasing(),
         Property = OpacityProperty,
     };
-    private readonly ThicknessTransition? _slideInTransition = new() {
+    private readonly ThicknessTransition _slideInTransition = new() {
         Duration = TimeSpan.FromMilliseconds(600),
         Easing = new CircularEaseInOut(),
         Property = PaddingProperty,
@@ -88,8 +85,8 @@ public partial class MessageControl : UserControl {
     private void EventHandler_ActualThemeVariantChanged(object? sender, EventArgs e) {
         if (DataContext is not MessageControlViewModel viewModel) return;
 
-        viewModel.Background = Core.Colors.ApplicationBrush_Overlay;
-        viewModel.Foreground = Core.Colors.ApplicationBrush_Text;
+        viewModel.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
+        viewModel.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
     }
 
     private async Task PlayRemoveAnimation() {
@@ -99,8 +96,10 @@ public partial class MessageControl : UserControl {
             await Task.Delay(_slideInTransition?.Duration.Milliseconds ?? 500);
         }
         catch (ArgumentOutOfRangeException ex) {
-            Core.MessageRelay.OnMessagePosted($"{nameof(MessageControl)}>{nameof(PlayRemoveAnimation)}", $"{ex.Message}");
+            MessageRelay.OnMessagePosted(this, ex.Message);
             throw;
         }
     }
 }
+
+

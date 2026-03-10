@@ -1,6 +1,5 @@
-﻿using Avalonia.Media;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.Generic;
 
 namespace CommandTimer.Core.ViewModels.MenuItems;
 
@@ -15,6 +14,8 @@ public class MenuItemViewModel : ViewModelBase {
         _Command = menuItemSelected;
         _Parameter = this;
         _BackgroundColor = new SolidColorBrush(Avalonia.Media.Colors.Transparent);
+        _ForegroundColor = new SolidColorBrush(Avalonia.Media.Colors.White);
+        _FontWeight = FontWeight.Medium;
 
         Command_2 = secondaryCommand;
         Parameter_2 = this;
@@ -70,4 +71,17 @@ public class MenuItemViewModel : ViewModelBase {
     /// </summary>
     private SolidColorBrush _BackgroundColor;
     public SolidColorBrush BackgroundColor { get => _BackgroundColor; set => SetProperty(ref _BackgroundColor, value); }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private SolidColorBrush _ForegroundColor;
+    public SolidColorBrush ForegroundColor { get => _ForegroundColor; set => SetProperty(ref _ForegroundColor, value); }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private FontWeight _FontWeight;
+    public FontWeight FontWeight { get => _FontWeight; set => SetProperty(ref _FontWeight, value); }
 }
+

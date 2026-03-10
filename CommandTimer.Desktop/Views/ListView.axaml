@@ -98,6 +98,7 @@
                                                  Margin="2,0,0,0"
                                                  HorizontalAlignment="Left"
                                                  VerticalAlignment="Center"
+                                                 AcceptsReturn="False"
                                                  AcceptWithDismiss="False"
                                                  Background="Transparent"
                                                  FontSize="{DynamicResource ApplicationFontSize_Text}"
@@ -114,6 +115,7 @@
                 <materialIcons:MaterialIcon Name="AddLibraryButtonIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="PlusBoxMultipleOutline" />
             </Button>
@@ -174,7 +176,8 @@
                                                             Content="{Binding Header}"
                                                             CornerRadius="0"
                                                             FontSize="{DynamicResource ApplicationFontSize_Text}"
-                                                            FontWeight="{DynamicResource ApplicationFontWeight_Medium}" />
+                                                            Foreground="{Binding ForegroundColor}"
+                                                            FontWeight="{Binding FontWeight}" />
 
                                                     <Button Grid.Column="1"
                                                             Width="30"
@@ -190,6 +193,7 @@
                                                         <materialIcons:MaterialIcon Name="RemoveIcon"
                                                                                     Width="25"
                                                                                     Height="25"
+											                                        Padding="1"
                                                                                     Foreground="{DynamicResource ApplicationBrush_Bad}"
                                                                                     Kind="Remove" />
                                                     </Button>
@@ -221,6 +225,7 @@
                 <materialIcons:MaterialIcon Name="AddTimerButtonIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="Add" />
             </Button>
@@ -251,6 +256,7 @@
                 <materialIcons:MaterialIcon Name="FilterMenu"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="ChevronDoubleRight" />
             </Button>
@@ -298,6 +304,8 @@
                                 <Setter Property="Command" Value="{Binding Command}" />
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
+                                <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>
@@ -327,6 +335,8 @@
                                 <Setter Property="Command" Value="{Binding Command}" />
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
+                                <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>
@@ -335,6 +345,7 @@
                 <materialIcons:MaterialIcon Name="SortStrategyIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="Sort" />
             </Button>
@@ -352,6 +363,7 @@
                 <materialIcons:MaterialIcon Name="RefreshButtonIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="Refresh" />
             </Button>
@@ -367,7 +379,8 @@
                     RelativePanel.RightOf="RefreshButton">
 				<materialIcons:MaterialIcon Name="BulkActionButtonIcon"
                                             Width="25"
-                                            Height="25"
+										    Height="25"
+										    Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="ListStatus" />
 			</Button>
@@ -402,6 +415,7 @@
                 <materialIcons:MaterialIcon Name="SettingsButtonIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="Settings" />
             </Button>
@@ -429,6 +443,7 @@
                 <materialIcons:MaterialIcon Name="AboutButtonIcon"
                                             Width="25"
                                             Height="25"
+											Padding="1"
                                             Foreground="{DynamicResource ApplicationBrush_Inconspicuous}"
                                             Kind="About" />
             </Button>

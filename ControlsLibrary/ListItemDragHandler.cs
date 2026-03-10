@@ -1,9 +1,8 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
-using System;
-using Avalonia.Controls.Primitives;
 
 namespace ControlsLibrary;
 
@@ -16,7 +15,7 @@ public class ListItemDragHandler {
     private readonly Control _handle;
     private readonly UserControl _activeView;
     private readonly Panel _itemView;
-    private readonly DataObject _data;
+    private readonly DataTransfer _data;
     private bool _isPointerDown;
     private bool _isDragDropActive;
     private Point _initialPosition;
@@ -27,7 +26,7 @@ public class ListItemDragHandler {
     public Popup Ghost { get; private set; }
     public Border GhostContent { get; private set; }
 
-    public ListItemDragHandler(Control handle, Panel item, UserControl activeArea, DataObject data) {
+    public ListItemDragHandler(Control handle, Panel item, UserControl activeArea, DataTransfer data) {
         _handle = handle;
         _activeView = activeArea;
         _itemView = item;
@@ -171,6 +170,7 @@ public class ListItemDragHandler {
     }
 
     private void InitiateDragOperation(PointerReleasedEventArgs e) {
-        DragDrop.DoDragDrop(e, _data, DragDropEffects.Move);
+        DragDrop.DoDragDropAsync(e, _data, DragDropEffects.Move);
     }
 }
+

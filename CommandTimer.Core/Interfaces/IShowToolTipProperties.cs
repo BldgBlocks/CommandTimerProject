@@ -1,7 +1,7 @@
-﻿using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Interfaces;
 
 public interface IShowToolTipProperties {
     public IBrush? Background { get; set; }
@@ -10,3 +10,4 @@ public interface IShowToolTipProperties {
     /// </summary>
     public Popup Reference { get; set; }
 }
+

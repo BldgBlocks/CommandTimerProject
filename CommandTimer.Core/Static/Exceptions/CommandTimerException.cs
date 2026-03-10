@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static.Exceptions;
 
 public static class Exceptions {
 
@@ -37,3 +35,4 @@ public static class Exceptions {
         public override int ErrorCode { get; init; } = 2;
     }
 }
+

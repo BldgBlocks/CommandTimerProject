@@ -59,6 +59,8 @@
                                 <Setter Property="Command" Value="{Binding Command}" />
                                 <Setter Property="CommandParameter" Value="{Binding Parameter}" />
                                 <Setter Property="Background" Value="{Binding BackgroundColor}" />
+                                <Setter Property="Foreground" Value="{Binding ForegroundColor}" />
+                                <Setter Property="FontWeight" Value="{Binding FontWeight}" />
 
                             </ControlTheme>
                         </MenuFlyout.ItemContainerTheme>
@@ -74,7 +76,7 @@
         </DockPanel>
 
         <Separator Name="TopSeparator"
-                   Background="{Binding AccentColorSelection}" />
+                   Background="{Binding AccentColorSelection, Converter={StaticResource AppColorToBrushConverter}}" />
 
         <CheckBox Name="ShouldAnimateCheckBox"
                   Margin="10,0,0,0"
@@ -303,7 +305,7 @@
                     Margin="0,0,0,0"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Background="{Binding AccentColorSelection}"
+                    Background="{Binding AccentColorSelection, Converter={StaticResource AppColorToBrushConverter}}"
                     BorderBrush="{DynamicResource ApplicationBrush_Text}"
                     CornerRadius="4"
                     PointerEntered="PointerEntered_ColorBar"
@@ -325,7 +327,7 @@
                                        ColorChanged="Changed_ColorPick"
                                        ColorSpectrumShape="Ring"
                                        IsVisible="True"
-                                       Color="{Binding AccentColorSelection.Color, Mode=OneWay}" />
+                                       Color="{Binding AccentColorSelection, Converter={StaticResource AppColorToColorConverter}, Mode=OneWay}" />
 
                             <!--  Apply and Cancel Buttons  -->
                             <StackPanel Margin="5"

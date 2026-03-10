@@ -1,16 +1,13 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using CommandTimer.Core;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
-using CommandTimer.Desktop.Utilities;
+using CommandTimer.Desktop.Views.Menus;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
@@ -21,15 +18,18 @@ namespace CommandTimer.Desktop.Views;
 
 public partial class ListView : UserControl {
 
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
+    private EventHandler<PointerPressedEventArgs>? _toolTipPointerPressedHandler;
+
     public ListView() {
         InitializeComponent();
 
-        if (ServiceProvider.Get<ISerializer>().Deserialize<ListViewModel>(Core.Settings.Keys.ListView, Core.Settings.DEFAULT_DATA_FILE) is not ListViewModel listViewModel) {
-            listViewModel = new ListViewModel();
-        }
-        DataContext = listViewModel;
+        var listViewData = ServiceProvider.Get<ISerializer>().Deserialize<ListViewData>(Settings.Keys.ListView, Settings.DEFAULT_DATA_FILE)
+            ?? new ListViewData();
+        DataContext = new ListViewModel(listViewData);
     }
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
 
     //...
 
@@ -63,8 +63,8 @@ public partial class ListView : UserControl {
         viewModel.PropertyChanged += ViewModel_PropertyChanged;
         LibraryManager.CurrentLibraryChanging += LibraryManager_CurrentLibraryChanging;
         LibraryManager.CurrentLibraryChanged += LibraryManager_CurrentLibraryChanged;
-        Core.Settings.AccentColorSelection.ValueChanged += AccentColorSelection_ValueChanged;
-        Core.Settings.ShouldStripeList.ValueChanged += ShouldStripeList_ValueChanged;
+        Settings.AccentColorSelection.ValueChanged += AccentColorSelection_ValueChanged;
+        Settings.ShouldStripeList.ValueChanged += ShouldStripeList_ValueChanged;
         if (Application.Current is not null) {
             Application.Current.ActualThemeVariantChanged += EventHandler_ActualThemeVariantChanged;
         }
@@ -103,13 +103,13 @@ public partial class ListView : UserControl {
             if (NewLibraryName.Parameter is string parameter) {
                 if (parameter == "rename") {
                     var clone = LibraryManager.RenameLibrary(viewModel.ActiveLibrary, NewLibraryName.Text);
-                    LibraryManager.LoadLibraryToCurrent(clone.LibraryName);
+                    LibraryManager.SetCurrent(clone.LibraryName);
                 }
                 else if (parameter == "new") {
-                    LibraryManager.LoadLibraryToCurrent(NewLibraryName.Text);
+                    LibraryManager.SetCurrent(NewLibraryName.Text);
                 }
                 else {
-                    LibraryManager.LoadLibraryToCurrent(NewLibraryName.Text);
+                    LibraryManager.SetCurrent(NewLibraryName.Text);
                 }
             }
             AddLibraryButton.Flyout?.Hide();
@@ -118,11 +118,9 @@ public partial class ListView : UserControl {
             AddLibraryButton.Flyout?.Hide();
         };
         AddLibraryButton.Flyout!.Opened += (o, a) => {
-            NewLibraryName.TextBox!.SelectAll();
-            NewLibraryName.TextBox.Focus();
-            NewLibraryName.TextBox.CaretIndex = 0;
+            NewLibraryName.BeginEdit();
             NewLibraryName.BackgroundBorder!.BorderThickness = new Thickness(1);
-            NewLibraryName.BackgroundBorder.BorderBrush = Core.Colors.ApplicationBrush_Accent;
+            NewLibraryName.BackgroundBorder.BorderBrush = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush();
         };
 
         base.OnLoaded(e);
@@ -131,10 +129,11 @@ public partial class ListView : UserControl {
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
+        ClearCustomToolTipHandlers();
         LibraryManager.CurrentLibraryChanging -= LibraryManager_CurrentLibraryChanging;
         LibraryManager.CurrentLibraryChanged -= LibraryManager_CurrentLibraryChanged;
-        Core.Settings.AccentColorSelection.ValueChanged -= AccentColorSelection_ValueChanged;
-        Core.Settings.ShouldStripeList.ValueChanged -= ShouldStripeList_ValueChanged;
+        Settings.AccentColorSelection.ValueChanged -= AccentColorSelection_ValueChanged;
+        Settings.ShouldStripeList.ValueChanged -= ShouldStripeList_ValueChanged;
         LibraryManager.LibraryAdded -= LibraryManager_LibraryNamesChanged;
         LibraryManager.LibraryRemoved -= LibraryManager_LibraryNamesChanged;
         if (Application.Current is not null) {
@@ -144,15 +143,15 @@ public partial class ListView : UserControl {
 
     private void BulkActionsButton_SetupMenuItemsContextMenu() {
         if (DataContext is not ListViewModel viewModel) return;
-        if (MainWindow.Instance is not MainWindow window) return;
+        if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
-        BulkActionButton.Flyout = new MenuFlyout() { 
+        BulkActionButton.Flyout = new MenuFlyout() {
             ItemsSource = new ListViewMenuItems_BulkActions(viewModel, window.MainWindowLayout).Items
         };
     }
 
     private void EventHandler_ActualThemeVariantChanged(object? sender, EventArgs e) {
-        RestripeList(Core.Settings.ShouldStripeList.Value);
+        RestripeList(Settings.ShouldStripeList.Value);
     }
 
     private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args) {
@@ -175,12 +174,8 @@ public partial class ListView : UserControl {
         UpdateControl_MenuItem(viewModel.LibrarySelections, viewModel.LibrarySelection);
     }
 
-    private void AccentColorSelection_ValueChanged(SolidColorBrush obj) {
-        /// Cycle flyout for repaint.
-        if (FlyoutBase.GetAttachedFlyout(SettingsButton) is Flyout settingsFlyout && settingsFlyout.IsOpen) {
-            settingsFlyout.Hide();
-            settingsFlyout.ShowAt(SettingsButton);
-        }
+    private void AccentColorSelection_ValueChanged(AppColor color) {
+        RestripeList(Settings.ShouldStripeList.Value);
     }
 
     private void ShouldStripeList_ValueChanged(bool state) => RestripeList(state);
@@ -201,41 +196,40 @@ public partial class ListView : UserControl {
     private void MeasureLibrarySelection() {
         if (DataContext is not ListViewModel viewModel) return;
 
-        LibrarySelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)Core.Colors.GetSetting<double>("ApplicationFontSize_SubHeader"), 10, viewModel.LibrarySelection.Header, LibrarySelectionText, LibraryButton);
+        LibrarySelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)ResourceHelper.GetResourceOrThrow<double>("ApplicationFontSize_SubHeader"), 10, viewModel.LibrarySelection.Header, LibrarySelectionText, LibraryButton);
     }
 
     private void MeasureQuickFilterSelection() {
         if (DataContext is not ListViewModel viewModel) return;
 
-        QuickFilterSelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)Core.Colors.GetSetting<double>("ApplicationFontSize_SubHeader"), 10, viewModel.QuickFilter.Header, QuickFilterSelectionText, QuickFilterValue);
+        QuickFilterSelectionText.FontSize = VisualHelpers.FindOptimalTextSize((int)ResourceHelper.GetResourceOrThrow<double>("ApplicationFontSize_SubHeader"), 10, viewModel.QuickFilter.Header, QuickFilterSelectionText, QuickFilterValue);
     }
 
     private void LibraryManager_CurrentLibraryChanging(object? sender, CommandTimerLibrary e) {
-        if (DataContext is not ListViewModel viewModel) return;
-
-        viewModel.ActiveLibrary.TimerRemoved -= ActiveLibrary_TimerRemoved;
     }
 
     private void LibraryManager_CurrentLibraryChanged(object? sender, CommandTimerLibrary e) {
         if (DataContext is not ListViewModel viewModel) return;
 
         viewModel.ActiveLibrary = LibraryManager.CurrentLibrary;
-        viewModel.ActiveLibrary.TimerRemoved += ActiveLibrary_TimerRemoved;
-    }
-
-    private void ActiveLibrary_TimerRemoved(object? sender, CommandTimerViewModel e) {
-        if (DataContext is not ListViewModel viewModel) return;
-
-        viewModel.SortRelevantTimers();
     }
 
     /// <summary>
     /// Keep menu items in sync as a whole.
     /// </summary>
     private static void UpdateControl_MenuItem(IEnumerable<MenuItemViewModel> menuItems, MenuItemViewModel selected) {
+        var colorProvider = ServiceProvider.Get<IColorProvider>();
+        var selectedBackground = colorProvider.ApplicationBrush_Accent.Value.AsBrush();
+        var selectedForeground = ColorUtilities.GetSlidingContrastColor(colorProvider.ApplicationBrush_Accent.Value).AsBrush();
+        var unselectedForeground = colorProvider.ApplicationBrush_Text.Value.AsBrush();
+        var selectedFontWeight = ResourceHelper.GetResourceOrThrow<FontWeight>("ApplicationFontWeight_Heavy");
+        var unselectedFontWeight = ResourceHelper.GetResourceOrThrow<FontWeight>("ApplicationFontWeight_Medium");
+
         foreach (var item in menuItems) {
             item.IsSelected = item == selected;
-            item.BackgroundColor = item.IsSelected ? Core.Colors.ApplicationBrush_Accent : Core.Colors.ApplicationBrush_Transparent;
+            item.BackgroundColor = item.IsSelected ? selectedBackground : colorProvider.ApplicationBrush_Transparent.Value.AsBrush();
+            item.ForegroundColor = item.IsSelected ? selectedForeground : unselectedForeground;
+            item.FontWeight = item.IsSelected ? selectedFontWeight : unselectedFontWeight;
         }
     }
 
@@ -269,7 +263,7 @@ public partial class ListView : UserControl {
     private void Tapped_RefreshList(object sender, TappedEventArgs args) {
         if (DataContext is not ListViewModel viewModel) return;
 
-        viewModel.SortRelevantTimers();
+        viewModel.SortRelevantTimers(true);
     }
 
     private void Tapped_Settings(object sender, TappedEventArgs args)
@@ -282,7 +276,7 @@ public partial class ListView : UserControl {
         if (DataContext is not ListViewModel viewModel) return;
 
         viewModel.AddNewTimer();
-        if (Core.Settings.ShouldStripeList.Value) {
+        if (Settings.ShouldStripeList.Value) {
             RestripeList(true);
         }
     }
@@ -341,6 +335,8 @@ public partial class ListView : UserControl {
 
 
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         properties.Reference.Placement = PlacementMode.Bottom;
         properties.Reference.VerticalOffset = 5;
@@ -350,45 +346,40 @@ public partial class ListView : UserControl {
             flyout.Opening += (o, e) => ServiceProvider.Get<IShowToolTip>().Hide();
         }
 
-        NewLibraryName.AddHandler(PointerPressedEvent, (o, a) => tooltip.Hide(), RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
+        _toolTipPointerPressedHandler = (o, a) => tooltip.Hide();
+        NewLibraryName.AddHandler(PointerPressedEvent, _toolTipPointerPressedHandler, RoutingStrategies.Tunnel | RoutingStrategies.Bubble, true);
 
-        LogoButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "A place to organize common commands and timed tasks", properties);
+        RegisterToolTip(LogoButton, "A place to organize common commands and timed tasks");
+        RegisterToolTip(AddLibraryButton, "Add new library");
+        RegisterToolTip(NewLibraryName, "Enter a unique name");
+        RegisterToolTip(LibraryButton, $"Organize timers into libraries{Environment.NewLine}Right Click: Rename");
+        RegisterToolTip(AddTimerButton, "Add new command timer");
+        RegisterToolTip(UserSearchBox, "Type a filter");
+        RegisterToolTip(QuickFilterButton, "Quick Filter Presets");
+        RegisterToolTip(QuickFilterValue, "Selected Quick Filter");
+        RegisterToolTip(SortStrategyButton, "Sorting Strategy");
+        RegisterToolTip(RefreshButton, "Sort the list again");
+        RegisterToolTip(SettingsButton, "Settings");
+        RegisterToolTip(AboutButton, "About");
+        RegisterToolTip(BulkActionButton, "Perform bulk actions");
 
-        AddLibraryButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Add new library", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        NewLibraryName.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a unique name", properties);
+    private void ClearCustomToolTipHandlers() {
+        if (_toolTipPointerPressedHandler is not null) {
+            NewLibraryName.RemoveHandler(PointerPressedEvent, _toolTipPointerPressedHandler);
+            _toolTipPointerPressedHandler = null;
+        }
 
-        LibraryButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"Organize timers into libraries{Environment.NewLine}Right Click: Rename", properties);
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        AddTimerButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Add new command timer", properties);
-
-        UserSearchBox.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Type a filter", properties);
-
-        QuickFilterButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Quick Filter Presets", properties);
-
-        QuickFilterValue.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Selected Quick Filter", properties);
-
-        SortStrategyButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Sorting Strategy", properties);
-
-        RefreshButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Sort the list again", properties);
-
-        SettingsButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Settings", properties);
-
-        AboutButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "About", properties);
-
-        BulkActionButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Perform bulk actions", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 }

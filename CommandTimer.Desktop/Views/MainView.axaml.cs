@@ -1,6 +1,3 @@
-﻿using Avalonia.Controls;
-using CommandTimer.Core.ViewModels;
-
 namespace CommandTimer.Desktop.Views;
 
 public partial class MainView : UserControl {
@@ -16,3 +13,5 @@ public partial class MainView : UserControl {
     }
 
 }
+
+

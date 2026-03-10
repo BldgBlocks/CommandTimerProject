@@ -1,17 +1,16 @@
-﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
-using CommandTimer.Core;
 using CommandTimer.Core.Converters;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Desktop.Utilities.ColorProvider;
+using CommandTimer.Desktop.Utilities.TimerProvider;
 using CommandTimer.Desktop.Views;
 using System;
 using System.Linq;
@@ -24,6 +23,7 @@ namespace CommandTimer.Desktop;
 public partial class App : Application {
 
     private static bool _willCommit;
+    public static Window? AnyWindow => (Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
 
     public override void Initialize() {
         AvaloniaXamlLoader.Load(this);
@@ -44,7 +44,7 @@ public partial class App : Application {
     }
 
     public static async void CopyToClipboard(string text) {
-        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return;
+        if (AnyWindow is not { Clipboard: { } clipboard }) return;
         try {
             await clipboard.SetTextAsync(text);
         }
@@ -53,9 +53,9 @@ public partial class App : Application {
     }
 
     public static Task<string?> CopyFromClipboardAsync() {
-        if (MainWindow.Instance is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
+        if (AnyWindow is not { Clipboard: { } clipboard }) return Task.FromResult<string?>(string.Empty);
 
-        return clipboard.GetTextAsync();
+        return ClipboardExtensions.TryGetTextAsync(clipboard);
     }
 
     public override void OnFrameworkInitializationCompleted() {
@@ -63,8 +63,18 @@ public partial class App : Application {
         /// Without this line you will get duplicate validations from both Avalonia and CT
         BindingPlugins.DataValidators.RemoveAt(0);
 
+        /// Skip heavy initialization during design-time (XAML preview)
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime) {
+            base.OnFrameworkInitializationCompleted();
+            return;
+        }
+
         /// Services
+        ServiceProvider.Set<ITimerProvider>(new AvaloniaTimerProvider());
+        ServiceProvider.Set<IColorProvider>(new AvaloniaColorProvider());
         SetupSerialization();
+        SettingsFlyoutViewModel.Initialize(ServiceProvider.Get<ISerializer>(), true);
+        ServiceProvider.Set<ILibraryManager>(new LibraryManager());
 
         MessageLogger.Create(SystemInteraction.Files.GetPlatformLogFile()).StartLogging();
 
@@ -85,17 +95,13 @@ public partial class App : Application {
             };
         }
 
-        if (Design.IsDesignMode is false) {
-            LibraryManager.CleanDatabase();
-        }
-
         /// Fluent Theme Accent Color
-        var observable = Core.Settings.AccentColorSelection;
-        FluentTheme_UpdateAccentColor(ThemeVariant.Dark, observable.Value.Color);
-        FluentTheme_UpdateAccentColor(ThemeVariant.Light, observable.Value.Color);
-        observable.ValueChanged += (brush) => {
-            FluentTheme_UpdateAccentColor(ThemeVariant.Dark, brush.Color);
-            FluentTheme_UpdateAccentColor(ThemeVariant.Light, brush.Color);
+        var observable = Settings.AccentColorSelection;
+        FluentTheme_UpdateAccentColor(ThemeVariant.Dark, observable.Value.AsBrush().Color);
+        FluentTheme_UpdateAccentColor(ThemeVariant.Light, observable.Value.AsBrush().Color);
+        observable.ValueChanged += (color) => {
+            FluentTheme_UpdateAccentColor(ThemeVariant.Dark, color.AsBrush().Color);
+            FluentTheme_UpdateAccentColor(ThemeVariant.Light, color.AsBrush().Color);
         };
 
         /// Loading
@@ -145,7 +151,7 @@ public partial class App : Application {
         var message = FlattenException(exception);
 
         /// Avalonia Dbus nuisance
-        if ((exception is AggregateException 
+        if ((exception is AggregateException
             && message.Contains("com.canonical.AppMenu.Registrar"))
             || message.Contains("The name is not activatable")) {
             /// Avalonia Dbus integration is causing exceptions.
@@ -160,7 +166,7 @@ public partial class App : Application {
     }
 
     private void LogException(string context, Exception ex) {
-        Core.MessageRelay.OnMessagePosted(nameof(App), $"[{context}] {ex.GetType().Name}: {ex.Message}", Core.MessageRelay.MessageCategory.Exception);
+        MessageRelay.OnMessagePosted(this, $"[{context}] {ex.GetType().Name}: {ex.Message}", MessageRelay.MessageCategory.Exception);
     }
 
     private static string FlattenException(Exception exception) {
@@ -184,7 +190,7 @@ public partial class App : Application {
 
     private void ShowUserError(string message) {
         int limit = 3000;
-        Core.MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, Core.MessageRelay.MessageCategory.Exception, 100);
+        MessageRelay.OnMessagePosted(this, message.Length > limit ? message[..limit] : message, MessageRelay.MessageCategory.Exception, MessageRelay.StickyPriority);
     }
 
     private static void SetupSerialization() {
@@ -192,14 +198,14 @@ public partial class App : Application {
             WriteIndented = true,
             IncludeFields = true,
             Converters = {
-                new JsonConverter_SolidColorBrush(),
+                new JsonConverter_AppColor(),
             }
         };
 
         CacheSerializer serializer = new(jsonOptions,
-                                         Core.Settings.BackupVersionsToKeep.GetValue,
+                                         () => Settings.BackupVersionsToKeep.Value,
                                          SystemInteraction.Files.GetUserConfigPath,
-                                         (message) => Core.MessageRelay.OnMessagePosted(nameof(CacheSerializer), message, Core.MessageRelay.MessageCategory.Exception),
+                                         (message) => MessageRelay.OnMessagePosted(nameof(CacheSerializer), message, MessageRelay.MessageCategory.Exception),
                                          onCommit);
 
         ServiceProvider.Set<ISerializer>(serializer);
@@ -227,3 +233,36 @@ public partial class App : Application {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

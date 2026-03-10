@@ -1,6 +1,4 @@
-﻿using Avalonia.Media;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
 
 public static class Settings {
 
@@ -11,6 +9,8 @@ public static class Settings {
     public static string DEFAULT_DATA_FILE = "global_data";
 
     public static class Keys {
+
+        public static readonly string DefaultLibrary = "Default";
 
         public static readonly string ListView = "ListView:Settings";
 
@@ -27,6 +27,14 @@ public static class Settings {
         public static readonly string CommandTimerPrefix = "CommandTimer:";
 
         public static readonly string ActionRelay_Serialization = "Serialize";
+
+        public static readonly string ActionRelay_PreSerialize = "PreSerialize";
+
+        public static readonly string ActionRelay_PostSerialize = "PostSerialize";
+
+        public static readonly string ActionRelay_PreDeserialize = "PreDeserialize";
+
+        public static readonly string ActionRelay_PostDeserialize = "PostDeserialize";
 
         public static readonly string WillCall_Key_OnOneSecond = "WillCall_Key_OnOneSecond";
 
@@ -109,7 +117,8 @@ public static class Settings {
     /// Global Setting
     /// </summary>
     /// <remarks>Choose the accent color of the application.</remarks>
-    public static readonly ObservableProperty<SolidColorBrush> AccentColorSelection = new(new SolidColorBrush(Core.Colors.ApplicationColor_Accent));
+    public static ObservableProperty<AppColor> AccentColorSelection => ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent;
 }
+
 
 

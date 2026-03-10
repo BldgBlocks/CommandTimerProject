@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -102,7 +100,7 @@ public partial class CacheSerializer : ISerializer {
     /// <summary>
     /// Purge a single data path.
     /// </summary>
-    private void PurgeData(string dataPath) => _data[dataPath]?.Clear();
+    private void PurgeData(string dataPath) => _data.Remove(dataPath);
     /// <summary>
     /// Purge all data paths.
     /// </summary>
@@ -383,3 +381,4 @@ public partial class CacheSerializer : ISerializer {
     [GeneratedRegex(@".{0,3}\((\d{1,2})\)")]
     private static partial Regex DecodeVersionNumberRegex();
 }
+

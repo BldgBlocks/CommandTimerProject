@@ -1,10 +1,9 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.VisualTree;
-using System;
 
-namespace CommandTimer.Core.Utilities;
+namespace CommandTimer.Core.Utilities.ExtensionMethods;
 
 public class NumericUpDownBinding(FlyoutBase flyout, Button target, NumericUpDown entry) {
 
@@ -98,3 +97,4 @@ public class NumericUpDownBinding(FlyoutBase flyout, Button target, NumericUpDow
     public void Exited(object? sender, PointerEventArgs args) => target.Cursor = new Cursor(StandardCursorType.Arrow);
 
 }
+

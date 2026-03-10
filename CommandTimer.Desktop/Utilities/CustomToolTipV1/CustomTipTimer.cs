@@ -1,10 +1,7 @@
-﻿using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using CommandTimer.Core;
 using System;
 
 namespace CommandTimer.Desktop.Utilities;
@@ -64,8 +61,8 @@ public class CustomTipTimer : IShowToolTip {
     }
 
     private bool IsPointerOverControl(Control control) {
-        return control.IsPointerOver || Math.Abs(_lastTriggerPosition.X - _currentPosition.X) <= DISTANCE_FROM_TRIGGER &&
-                                        Math.Abs(_lastTriggerPosition.Y - _currentPosition.Y) <= DISTANCE_FROM_TRIGGER;
+        return control.IsPointerOver || (Math.Abs(_lastTriggerPosition.X - _currentPosition.X) <= DISTANCE_FROM_TRIGGER &&
+                                         Math.Abs(_lastTriggerPosition.Y - _currentPosition.Y) <= DISTANCE_FROM_TRIGGER);
     }
 
 
@@ -105,3 +102,5 @@ public class CustomTipTimer : IShowToolTip {
         _isEnabled = false;
     }
 }
+
+

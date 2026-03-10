@@ -9,15 +9,18 @@ using System;
 using System.Threading.Tasks;
 
 namespace CommandTimer.Desktop.Views;
+
 public partial class CustomTextBox : UserControl {
 
     private string _lastEntry = string.Empty;
-    private string _initializedEntry = string.Empty;
     private IBrush? _initializedBrush;
     public TextBox? TextBox;
+    public TextBlock? DisplayTextBlock;
     public Border? BackgroundBorder;
     private bool _accepted;
-    private Window? _parentWindow => MainWindow.Instance;
+    private bool _isEditing;
+    private bool _selectAllOnNextFocus = true;
+    private Window? ParentWindow => TopLevel.GetTopLevel(this) as Window;
     private bool HasFocus => TextBox is not null && TextBox.IsFocused;
     private bool PointerOver => TextBox is not null && TextBox.IsPointerOver;
     public object? Parameter { get; set; }
@@ -32,6 +35,7 @@ public partial class CustomTextBox : UserControl {
 
     public CustomTextBox() {
         InitializeComponent();
+        Focusable = true;
     }
 
     //...
@@ -171,16 +175,6 @@ public partial class CustomTextBox : UserControl {
     /// <summary>
     /// Register the public property for changes.
     /// </summary>
-    public static new readonly StyledProperty<int> MinWidthProperty =
-        AvaloniaProperty.Register<CustomTextBox, int>(nameof(MinWidth), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
-    public new int MinWidth {
-        get => GetValue(MinWidthProperty);
-        set => SetValue(MinWidthProperty, value);
-    }
-
-    /// <summary>
-    /// Register the public property for changes.
-    /// </summary>
     public static readonly StyledProperty<bool> AcceptWithDismissProperty =
         AvaloniaProperty.Register<CustomTextBox, bool>(nameof(AcceptWithDismiss), true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
     public bool AcceptWithDismiss {
@@ -200,19 +194,25 @@ public partial class CustomTextBox : UserControl {
 
     //...
 
+    private int _pendingCaretPosition = -1;
+
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
         _accepted = false;
         _lastEntry = TextBox?.Text ?? string.Empty;
 
-        TextBox?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Bubble, true);
+        AddHandler(PointerPressedEvent, OnControlPointerPressed, RoutingStrategies.Tunnel);
+        TextBox?.AddHandler(KeyDownEvent, OnKeyDown_CaptureSelection, RoutingStrategies.Tunnel);
+        TextBox?.AddHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition, RoutingStrategies.Bubble, true);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
         /// Global Setting
-        TextBox?.RemoveHandler(KeyDownEvent, OnKeyDown);
+        RemoveHandler(PointerPressedEvent, OnControlPointerPressed);
+        TextBox?.RemoveHandler(KeyDownEvent, OnKeyDown_CaptureSelection);
+        TextBox?.RemoveHandler(KeyUpEvent, OnKeyUp_ApplyCaretPosition);
     }
 
     //...
@@ -221,35 +221,67 @@ public partial class CustomTextBox : UserControl {
         base.OnApplyTemplate(e);
 
         TextBox = e.NameScope.Find<TextBox>("PART_TextBox");
+        DisplayTextBlock = e.NameScope.Find<TextBlock>("PART_DisplayTextBlock");
         BackgroundBorder = e.NameScope.Find<Border>("PART_BorderElement");
-        _lastEntry = TextBox?.Text ?? string.Empty;
-        _initializedEntry = TextBox?.Text ?? string.Empty;
+        _lastEntry = Text;
+
+        if (TextBox is not null) {
+            TextBox.Text = Text;
+        }
+
+        SetEditingState(false);
+    }
+
+    public void BeginEdit(bool selectAll = true) {
+        if (TextBox is null) return;
+
+        _lastEntry = Text;
+        _selectAllOnNextFocus = selectAll;
+        TextBox.Text = Text;
+        SetEditingState(true);
+        _ = FocusEditorAsync();
+    }
+
+    /// <summary>
+    /// Tunnel phase: captures selection edge positions before the TextBox processes the key.
+    /// Only intervenes for bare Left/Right with an active selection — Avalonia collapses
+    /// to the caret position instead of the correct edge. All other combinations
+    /// (Ctrl, Shift, Ctrl+Shift) are left to the TextBox's native handling.
+    /// </summary>
+    private void OnKeyDown_CaptureSelection(object? sender, KeyEventArgs e) {
+        if (TextBox is null) return;
+        if (e.Key is not (Key.Left or Key.Right)) return;
+        if (e.KeyModifiers is not KeyModifiers.None) return;
+        if (TextBox.SelectedText.Length == 0) return;
+
+        _pendingCaretPosition = e.Key is Key.Left
+            ? Math.Min(TextBox.SelectionStart, TextBox.SelectionEnd)
+            : Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd);
+    }
+
+    /// <summary>
+    /// Bubble phase (KeyUp): the TextBox has finished processing. Apply the corrected caret position.
+    /// </summary>
+    private void OnKeyUp_ApplyCaretPosition(object? sender, KeyEventArgs e) {
+        if (TextBox is null) return;
+        if (_pendingCaretPosition < 0) return;
+        if (e.Key is not (Key.Left or Key.Right)) return;
+
+        TextBox.CaretIndex = _pendingCaretPosition;
+        _pendingCaretPosition = -1;
     }
 
     public void OnKeyDown(object? sender, KeyEventArgs e) {
         if (TextBox is null) return;
+        if (HasFocus is false) return;
 
         switch (e.Key) {
             case Key.Enter:
-                if (sender != TextBox) return;
+                if (AcceptsReturn && e.KeyModifiers.HasFlag(KeyModifiers.Shift)) return;
                 AcceptEntry();
                 break;
             case Key.Escape:
                 CancelEntry();
-                break;
-            case Key.Right:
-                if (TextBox.SelectedText.Length == 0) return;
-                TextBox.CaretIndex = Math.Max(TextBox.SelectionStart, TextBox.SelectionEnd);
-                TextBox.SelectionStart = TextBox.CaretIndex;
-                TextBox.SelectionEnd = TextBox.CaretIndex;
-                TextBox.Focus();
-                break;
-            case Key.Left:
-                if (TextBox.SelectedText.Length == 0) return;
-                TextBox.CaretIndex = Math.Min(TextBox.SelectionStart, TextBox.SelectionEnd);
-                TextBox.SelectionStart = TextBox.CaretIndex;
-                TextBox.SelectionEnd = TextBox.CaretIndex;
-                TextBox.Focus();
                 break;
             default:
                 return;
@@ -260,34 +292,41 @@ public partial class CustomTextBox : UserControl {
     private void AcceptEntry() {
         if (TextBox == null) return;
 
-        Text = TextBox.Text?.Trim() ?? string.Empty;
-        _lastEntry = Text;
+        var trimmedText = TextBox.Text?.Trim() ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(Text)) {
-            Text = _initializedEntry;
-            _lastEntry = _initializedEntry;
+        if (string.IsNullOrWhiteSpace(trimmedText)) {
+            trimmedText = _lastEntry;
+            TextBox.Text = trimmedText;
+        }
+
+        /// Compare against last accepted value
+        bool changed = (trimmedText != _lastEntry);
+
+        _accepted = true;
+        _lastEntry = trimmedText;
+        Text = trimmedText;
+        TextBox.Text = trimmedText;
+
+        if (changed) {
+            OnAccept?.Invoke();
         }
 
         TextBox.CaretIndex = 0;
         TextBox.ScrollToLine(0);
-        _parentWindow?.FocusManager?.ClearFocus();
 
-        if (Text != _initializedEntry) {
-            _accepted = true;
-            OnAccept?.Invoke();
-        }
-        else {
-            CancelEntry();
-        }
-
+        EndEditing(redirectFocus: true);
     }
 
-    private void CancelEntry() {
+    private void CancelEntry(bool redirectFocus = true) {
         Text = _lastEntry;
         if (TextBox is not null) {
-            TextBox.Text = _lastEntry; 
+            TextBox.Text = _lastEntry;
         }
+
+        _accepted = true;
         OnCancel?.Invoke();
+
+        EndEditing(redirectFocus);
     }
 
     /// Skip the initial value. Avoid callbacks on the default value at start.
@@ -306,8 +345,14 @@ public partial class CustomTextBox : UserControl {
         if (IsPointerInsideControl(e)) return;
 
         if (AcceptWithDismiss) AcceptEntry(); else CancelEntry();
+    }
 
-        _parentWindow?.FocusManager?.ClearFocus();
+    private void OnControlPointerPressed(object? sender, PointerPressedEventArgs args) {
+        if (_isEditing) return;
+        if (args.GetCurrentPoint(this).Properties.IsLeftButtonPressed is false) return;
+
+        BeginEdit();
+        args.Handled = true;
     }
 
     private bool IsPointerInsideControl(PointerPressedEventArgs e) {
@@ -335,30 +380,16 @@ public partial class CustomTextBox : UserControl {
     /// <remarks>
     /// - Monitors window for clicks off the control.
     /// </remarks>
-    private async void OnGotFocus(object? sender, GotFocusEventArgs args) {
+    private void OnGotFocus(object? sender, GotFocusEventArgs args) {
+        SetEditingState(true);
         _accepted = false;
-        _parentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
-        _parentWindow?.AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
+        ParentWindow?.AddHandler(KeyDownEvent, OnKeyDown, RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+        ParentWindow?.AddHandler(PointerPressedEvent, OnWindowPointerPressed, RoutingStrategies.Tunnel);
 
         var color = (PointerOverColor as SolidColorBrush)?.Color
             ?? (PointerOverColor as IImmutableSolidColorBrush)?.Color
             ?? Colors.White;
         Background = new SolidColorBrush(new Color(10, color.R, color.G, color.B));
-
-        try {
-            /// Wait till click is finished, then select all for the user.
-            await Dispatcher.UIThread.Invoke(async () => {
-                await Task.Delay(50);
-                TextBox?.SelectAll();
-                /// For some reason focus is sometimes stolen to keyboard navigation 
-                /// when pressing left arrow calling focus seems to handle this.
-                TextBox?.Focus();
-            }, DispatcherPriority.Background);
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) {
-            throw new Exception($"Method: {nameof(OnGotFocus)} has thrown the following.", ex);
-        }
     }
 
     /// <summary>
@@ -368,13 +399,62 @@ public partial class CustomTextBox : UserControl {
     /// - Cancels entry if not already accepted.
     /// </remarks>
     private void OnLostFocus(object? sender, RoutedEventArgs args) {
-        _parentWindow?.RemoveHandler(KeyDownEvent, OnKeyDown);
-        _parentWindow?.RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
+        ParentWindow?.RemoveHandler(KeyDownEvent, OnKeyDown);
+        ParentWindow?.RemoveHandler(PointerPressedEvent, OnWindowPointerPressed);
 
         Background = PointerOver ? PointerOverColor : _initializedBrush ?? Brushes.Transparent;
 
         /// If you click outside the control, it's detected OnWindowPointerPressed. But if you click another button directly
         /// then it appears there is a new value in this text box, but the backing still has the old, so if not accepted already, cancel.
-        if (!_accepted) CancelEntry();
+        if (!_accepted) {
+            CancelEntry(redirectFocus: false);
+            return;
+        }
+
+        SetEditingState(false);
+    }
+
+    private void EndEditing(bool redirectFocus) {
+        SetEditingState(false);
+
+        if (redirectFocus) {
+            Focus();
+        }
+    }
+
+    private void SetEditingState(bool isEditing) {
+        _isEditing = isEditing;
+
+        if (TextBox is not null) {
+            TextBox.IsVisible = isEditing;
+            TextBox.IsHitTestVisible = isEditing;
+        }
+
+        if (DisplayTextBlock is not null) {
+            DisplayTextBlock.IsVisible = !isEditing;
+        }
+    }
+
+    private async Task FocusEditorAsync() {
+        if (TextBox is null) return;
+
+        try {
+            await Dispatcher.UIThread.Invoke(async () => {
+                await Task.Delay(50);
+
+                if (TextBox is null) return;
+
+                TextBox.Focus();
+
+                if (_selectAllOnNextFocus) {
+                    TextBox.SelectAll();
+                }
+                else {
+                    TextBox.CaretIndex = TextBox.Text?.Length ?? 0;
+                }
+            }, DispatcherPriority.Background);
+        }
+        catch (OperationCanceledException) { }
     }
 }
+

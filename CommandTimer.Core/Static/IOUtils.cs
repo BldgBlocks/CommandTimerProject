@@ -1,13 +1,11 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
-using CommandTimer.Core.Utilities;
-using System;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
+
 public static class IOUtils {
 
     /// <summary>
@@ -89,13 +87,13 @@ public static class IOUtils {
             }
         }
         catch (UnauthorizedAccessException ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"Access denied when trying to access or create directories/files: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access denied when trying to access or create directories/files: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
         catch (IOException ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"An I/O error occurred: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
         catch (Exception ex) {
-            MessageRelay.OnMessagePosted("IO Utility", $"Unexpected error during initialization: {ex.Message}", MessageRelay.MessageCategory.Exception);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Unexpected error during initialization: {ex.Message}", MessageRelay.MessageCategory.Exception);
         }
     }
 
@@ -113,7 +111,7 @@ public static class IOUtils {
             await writer.WriteLineAsync(text);
         }
         catch (Exception ex) {
-            MessageRelay.OnMessagePosted("Core", $"Failed to write to log: {ex.Message}", MessageRelay.MessageCategory.User, 0);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Failed to write to log: {ex.Message}", MessageRelay.MessageCategory.User, 0);
         }
         finally {
             semaphore.Release();
@@ -126,14 +124,15 @@ public static class IOUtils {
                 Directory.GetFiles(folderPath).ForEach(File.Delete);
             }
             else {
-                Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"The directory '{folderPath}' was not found.", MessageRelay.MessageCategory.User);
+                MessageRelay.OnMessagePosted(nameof(IOUtils), $"The directory '{folderPath}' was not found.", MessageRelay.MessageCategory.User);
             }
         }
         catch (UnauthorizedAccessException ex) {
-            Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access to the path '{folderPath}' is denied. {ex.Message}", MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"Access to the path '{folderPath}' is denied. {ex.Message}", MessageRelay.MessageCategory.User);
         }
         catch (IOException ex) {
-            Core.MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred while deleting files: {ex.Message}", MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(nameof(IOUtils), $"An I/O error occurred while deleting files: {ex.Message}", MessageRelay.MessageCategory.User);
         }
     }
 }
+

@@ -1,10 +1,10 @@
-﻿using System;
 using System.IO;
-using static CommandTimer.Core.MessageRelay;
+using static CommandTimer.Core.Static.MessageRelay;
 
 namespace CommandTimer.Core.Utilities;
+
 public class MessageLogger {
-    
+
     //...
     private const int CATEGORY_MIN_WIDTH = 10;
     private const int SENDER_MIN_WIDTH = 25;
@@ -14,7 +14,7 @@ public class MessageLogger {
     //...
     public static MessageLogger Create(string logFilePath, MessageCategory category = MessageCategory.Any) {
         if (Path.GetDirectoryName(logFilePath) is string directoryPath) {
-            Core.IOUtils.CreateFileAtPath(directoryPath, logFilePath);
+            IOUtils.CreateFileAtPath(directoryPath, logFilePath);
         }
         return new() {
             _logPath = logFilePath,
@@ -22,17 +22,17 @@ public class MessageLogger {
         };
     }
 
-    public void StartLogging() 
+    public void StartLogging()
         => MessagePosted += MessageRelay_MessagePosted;
 
-    public void StopLogging() 
+    public void StopLogging()
         => MessagePosted -= MessageRelay_MessagePosted;
 
     //...
     private async void MessageRelay_MessagePosted(object? sender, MessageEventArgs args) {
         if (File.Exists(_logPath) is false) return;
         if (args.Category < _category) return;
-        if (Core.Settings.ShouldLog.Value is false && args.Category <= MessageCategory.User) return;
+        if (Settings.ShouldLog.Value is false && args.Category <= MessageCategory.User) return;
 
         try {
             var senderString = sender?.ToString() ?? string.Empty;
@@ -41,7 +41,7 @@ public class MessageLogger {
             var category = $"[Category] {args.Category.ToString().PadRight(CATEGORY_MIN_WIDTH)}";
             var message = $"[Message] {args.Message}";
 
-            await Core.IOUtils.AppendToFile(_logPath, $"{date} {send} {category} {message}");
+            await IOUtils.AppendToFile(_logPath, $"{date} {send} {category} {message}");
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) {
@@ -49,3 +49,4 @@ public class MessageLogger {
         }
     }
 }
+

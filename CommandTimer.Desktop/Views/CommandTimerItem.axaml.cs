@@ -1,7 +1,5 @@
-using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -9,11 +7,10 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
-using CommandTimer.Core;
+using CommandTimer.Core.Static.Exceptions;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using CommandTimer.Core.ViewModels.MenuItems;
-using CommandTimer.Desktop.Utilities;
 using CommunityToolkit.Mvvm.Input;
 using ControlsLibrary;
 using Material.Icons;
@@ -28,6 +25,8 @@ public partial class CommandTimerItem : UserControl {
 
     //... Fields
 
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+
     private NumericUpDownBinding? _secondsFlyoutBinding;
     private NumericUpDownBinding? _daysFlyoutBinding;
     private FlyoutBase? _colorBarFlyout;
@@ -35,6 +34,7 @@ public partial class CommandTimerItem : UserControl {
     private ThicknessTransition? _slideInTransition;
     private BindingExpressionBase? _slideInTransitionToken;
     private BindingExpressionBase? _fadeInTransitionToken;
+    private readonly List<(Control Control, EventHandler<PointerEventArgs> Handler)> _toolTipPointerEnteredHandlers = [];
 
     private readonly Styles _accentStyle;
 
@@ -51,7 +51,7 @@ public partial class CommandTimerItem : UserControl {
         colorBarOnHover.Connect();
 
         /// Animation Presets - Avoid rendering issues by setting early in the constructor.
-        if (Core.Settings.ShouldAnimate.Value is Core.Settings.AnimationChoice.All) {
+        if (Settings.ShouldAnimate.Value is Settings.AnimationChoice.All) {
             this.Opacity = 0;
             this.Padding = new Thickness(1400, 0, 0, 0);
         }
@@ -64,11 +64,11 @@ public partial class CommandTimerItem : UserControl {
         viewModel.PaddingLeft = new Thickness(1400, 0, 0, 0);
 
         /// Get Controls
-        var secondsFlyout = FlyoutBase.GetAttachedFlyout(SecondsButton) ?? throw new Core.Exceptions.ControlNotFoundException($"A flyout child control of ${SecondsButton} was not found.");
+        var secondsFlyout = FlyoutBase.GetAttachedFlyout(SecondsButton) ?? throw new Exceptions.ControlNotFoundException($"A flyout child control of ${SecondsButton} was not found.");
         _secondsFlyoutBinding = SecondsSelectionView.Bind(secondsFlyout, SecondsButton);
         _secondsFlyoutBinding.Accept += Seconds_OnAccept;
 
-        var daysFlyout = FlyoutBase.GetAttachedFlyout(DaysButton) ?? throw new Core.Exceptions.ControlNotFoundException($"A flyout child control of ${DaysButton} was not found.");
+        var daysFlyout = FlyoutBase.GetAttachedFlyout(DaysButton) ?? throw new Exceptions.ControlNotFoundException($"A flyout child control of ${DaysButton} was not found.");
         _daysFlyoutBinding = DaysSelectionView.Bind(daysFlyout, DaysButton);
         _daysFlyoutBinding.Accept += Days_OnAccept;
 
@@ -110,19 +110,19 @@ public partial class CommandTimerItem : UserControl {
         CommandBlock.OnAccept += KeyHandler_AcceptCommand;
 
         /// Global Setting
-        Core.Settings.ShouldAnimate.ValueChanged += GlobalSetting_ShouldAnimate;
-        if (Core.Settings.ShouldAnimate.Value is Core.Settings.AnimationChoice.All) {
+        Settings.ShouldAnimate.ValueChanged += GlobalSetting_ShouldAnimate;
+        if (Settings.ShouldAnimate.Value is Settings.AnimationChoice.All) {
             BindAnimations();
         }
         Application.Current!.ActualThemeVariantChanged += EventHandler_ActualThemeVariantChanged;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged += GlobalSetting_ShouldExecuteOnTimer;
-        Core.Settings.MaxLines.ValueChanged += GlobalSetting_MaxLines;
-        Core.Settings.AccentColorSelection.ValueChanged += GlobalSetting_AccentColorSelectionChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged += GlobalSetting_ExpandColorBar;
+        Settings.ShouldExecuteOnTimer.ValueChanged += GlobalSetting_ShouldExecuteOnTimer;
+        Settings.MaxLines.ValueChanged += GlobalSetting_MaxLines;
+        Settings.AccentColorSelection.ValueChanged += GlobalSetting_AccentColorSelectionChanged;
+        Settings.ShouldExpandColorBar.ValueChanged += GlobalSetting_ExpandColorBar;
 
         /// Finish
-        GlobalSetting_MaxLines(Core.Settings.MaxLines.Value);
-        GlobalSetting_ExpandColorBar(Core.Settings.ShouldExpandColorBar.Value);
+        GlobalSetting_MaxLines(Settings.MaxLines.Value);
+        GlobalSetting_ExpandColorBar(Settings.ShouldExpandColorBar.Value);
         UpdateUI();
 
         base.OnLoaded(e);
@@ -132,7 +132,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         var contextMenu = new ContextMenu {
-            Background = Core.Colors.ApplicationBrush_Background
+            Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Background.Value.AsBrush()
         };
         var copyItem = new MenuItem() { Header = "Copy" };
         var pasteItem = new MenuItem() { Header = "Paste" };
@@ -148,8 +148,8 @@ public partial class CommandTimerItem : UserControl {
         pasteItem.Click += async (s, e) => {
             if (await App.CopyFromClipboardAsync() is string cast) {
                 try {
-                    var color = Core.Colors.ParseHexToColor(cast);
-                    viewModel.ColorBarColor = new SolidColorBrush(color);
+                    var color = ColorUtilities.ParseHexToColor(cast);
+                    viewModel.ColorBarColor = color;
                     UpdateControl_AccentColors();
                 }
                 catch (FormatException) {
@@ -171,7 +171,7 @@ public partial class CommandTimerItem : UserControl {
             flyout.Items.ForEach(menuFlyoutItem => {
                 if (menuFlyoutItem is MenuItem menuItem) {
                     if (string.Equals(menuItem.Header?.ToString(), viewModel.TimeMode.ToString(), StringComparison.OrdinalIgnoreCase)) {
-                        menuItem.Background = Core.Colors.ApplicationBrush_Accent;
+                        menuItem.Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value.AsBrush();
                     }
                     else menuItem.Background = Brushes.Transparent;
                 }
@@ -182,6 +182,7 @@ public partial class CommandTimerItem : UserControl {
     protected override void OnUnloaded(RoutedEventArgs e) {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
+        ClearCustomToolTipHandlers();
         viewModel.PropertyChanged -= ViewModel_PropertyChanged;
 
         LibraryManager.LibraryAdded -= LibraryManager_LibraryNamesChanged;
@@ -199,11 +200,11 @@ public partial class CommandTimerItem : UserControl {
         if (Application.Current is not null) {
             Application.Current.ActualThemeVariantChanged -= EventHandler_ActualThemeVariantChanged;
         }
-        Core.Settings.ShouldAnimate.ValueChanged -= GlobalSetting_ShouldAnimate;
-        Core.Settings.ShouldExecuteOnTimer.ValueChanged -= GlobalSetting_ShouldExecuteOnTimer;
-        Core.Settings.MaxLines.ValueChanged -= GlobalSetting_MaxLines;
-        Core.Settings.AccentColorSelection.ValueChanged -= GlobalSetting_AccentColorSelectionChanged;
-        Core.Settings.ShouldExpandColorBar.ValueChanged -= GlobalSetting_ExpandColorBar;
+        Settings.ShouldAnimate.ValueChanged -= GlobalSetting_ShouldAnimate;
+        Settings.ShouldExecuteOnTimer.ValueChanged -= GlobalSetting_ShouldExecuteOnTimer;
+        Settings.MaxLines.ValueChanged -= GlobalSetting_MaxLines;
+        Settings.AccentColorSelection.ValueChanged -= GlobalSetting_AccentColorSelectionChanged;
+        Settings.ShouldExpandColorBar.ValueChanged -= GlobalSetting_ExpandColorBar;
 
         UnbindAnimations();
 
@@ -231,11 +232,10 @@ public partial class CommandTimerItem : UserControl {
         }
     }
 
-    private void GlobalSetting_AccentColorSelectionChanged(SolidColorBrush brush) {
-        if (DataContext is not CommandTimerViewModel viewModel) return;
-        if (Core.Settings.ShouldExpandColorBar.Value) return;
+    private void GlobalSetting_AccentColorSelectionChanged(AppColor brush) {
+        if (DataContext is not CommandTimerViewModel) return;
+        if (Settings.ShouldExpandColorBar.Value) return;
 
-        viewModel.Accent = brush;
         UpdateUI();
     }
 
@@ -258,10 +258,10 @@ public partial class CommandTimerItem : UserControl {
         var copyCommand = new RelayCommand<object?>(Command_CopyTimerTo);
         var moveCommand = new RelayCommand<object?>(Command_MoveTimerTo);
 
-        List<MenuItemViewModel> copySubMenu = LibraryManager.LibrariesByName
+        List<MenuItemViewModel> copySubMenu = LibraryManager.LibraryNames
             .Select(libraryName => new MenuItemViewModel(libraryName, [], copyCommand))
             .ToList();
-        List<MenuItemViewModel> moveSubMenu = LibraryManager.LibrariesByName
+        List<MenuItemViewModel> moveSubMenu = LibraryManager.LibraryNames
             .Where(libraryName => libraryName != viewModel.LibraryName)
             .Select(libraryName => new MenuItemViewModel(libraryName, [], moveCommand))
             .ToList();
@@ -299,13 +299,13 @@ public partial class CommandTimerItem : UserControl {
     private void GlobalSetting_ShouldExecuteOnTimer(bool value)
         => UpdateControl_StartStop();
 
-    public void GlobalSetting_ShouldAnimate(Core.Settings.AnimationChoice choice) {
+    public void GlobalSetting_ShouldAnimate(Settings.AnimationChoice choice) {
         switch (choice) {
-            case Core.Settings.AnimationChoice.None:
+            case Settings.AnimationChoice.None:
                 UnbindAnimations();
                 UpdateUI();
                 break;
-            case Core.Settings.AnimationChoice.All:
+            case Settings.AnimationChoice.All:
                 BindAnimations();
                 UpdateUI();
                 break;
@@ -332,7 +332,7 @@ public partial class CommandTimerItem : UserControl {
 
     private void SetAccentToGlobal(CommandTimerViewModel viewModel) {
         this.Styles.Remove(_accentStyle);
-        viewModel.Accent = Core.Colors.ApplicationBrush_Accent;
+        viewModel.Accent = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Accent.Value;
     }
 
     public async void BindAnimations() {
@@ -429,6 +429,7 @@ public partial class CommandTimerItem : UserControl {
     private void UpdateUI() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
+        UpdateControl_AccentColors();
         UpdateControl_Text();
         UpdateControl_Favorite();
         UpdateControl_StartStop();
@@ -443,7 +444,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         /// Accent Theming
-        if (Core.Settings.ShouldExpandColorBar.Value) {
+        if (Settings.ShouldExpandColorBar.Value) {
             SetAccentToColorBar(viewModel);
         }
         else {
@@ -451,7 +452,8 @@ public partial class CommandTimerItem : UserControl {
         }
 
         /// Command Block
-        Color highlight = viewModel.Accent.Color;
+        var accentBrush = viewModel.Accent.AsBrush();
+        Color highlight = accentBrush.Color;
         CommandBlock.Background = new LinearGradientBrush {
             StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
             EndPoint = new RelativePoint(0.5, 1, RelativeUnit.Relative),
@@ -466,7 +468,7 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         /// Text Colors - CustomTextBox Immutable brush must be set in code-behind.
-        var textColor = Core.Colors.ApplicationBrush_Text;
+        var textColor = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value.AsBrush();
         NameBlock.Foreground = textColor;
         DescriptionBlock.Foreground = textColor;
         CommandBlock.Foreground = textColor;
@@ -477,13 +479,13 @@ public partial class CommandTimerItem : UserControl {
 
         viewModel.Update_Countdown();
         if (viewModel.IsActive is true) {
-            ActiveIndicatorIcon.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
-            CountdownBlock.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
+            StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value.AsBrush();
+            CountdownBlock.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value.AsBrush();
             CountdownBlock.FontWeight = FontWeight.SemiBold;
         }
         else {
-            ActiveIndicatorIcon.Foreground = Core.Colors.ApplicationBrush_Inconspicuous;
-            CountdownBlock.Foreground = Core.Colors.ApplicationBrush_Inconspicuous;
+            StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value.AsBrush();
+            CountdownBlock.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value.AsBrush();
             CountdownBlock.FontWeight = FontWeight.Light;
         }
     }
@@ -495,16 +497,16 @@ public partial class CommandTimerItem : UserControl {
             StartStopIcon.Height = 27;
             StartStopIcon.Width = 27;
             StartStopIcon.Kind = MaterialIconKind.Stop;
-            StartStopIcon.Foreground = Core.Colors.ApplicationBrush_Bad;
+            StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value.AsBrush();
             StartStopIcon.IsHitTestVisible = true;
             StartStopButton.IsHitTestVisible = true;
         }
         else {
-            if (Core.Settings.ShouldExecuteOnTimer.Value) {
+            if (Settings.ShouldExecuteOnTimer.Value) {
                 StartStopIcon.Height = 27;
                 StartStopIcon.Width = 27;
                 StartStopIcon.Kind = MaterialIconKind.Play;
-                StartStopIcon.Foreground = Core.Colors.ApplicationBrush_DoThingIntended;
+                StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_DoThingIntended.Value.AsBrush();
                 StartStopIcon.IsHitTestVisible = true;
                 StartStopButton.IsHitTestVisible = true;
             }
@@ -512,7 +514,7 @@ public partial class CommandTimerItem : UserControl {
                 StartStopIcon.Height = 20;
                 StartStopIcon.Width = 20;
                 StartStopIcon.Kind = MaterialIconKind.No;
-                StartStopIcon.Foreground = Core.Colors.ApplicationBrush_Bad;
+                StartStopIcon.Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Bad.Value.AsBrush();
                 StartStopIcon.IsHitTestVisible = false;
                 StartStopButton.IsHitTestVisible = false;
             }
@@ -522,13 +524,13 @@ public partial class CommandTimerItem : UserControl {
     private void UpdateControl_Favorite() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        FavoriteIcon.Foreground = viewModel.IsFavorite ? Core.Colors.ApplicationBrush_Highlight : Core.Colors.ApplicationBrush_Contrast;
+        FavoriteIcon.Foreground = viewModel.IsFavorite ? ServiceProvider.Get<IColorProvider>().ApplicationBrush_Highlight.Value.AsBrush() : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Contrast.Value.AsBrush();
     }
 
     private void UpdateControl_PromptForExecute() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        PromptExecuteIcon.Foreground = viewModel.IsPromptForExecute ? Brushes.Red : Core.Colors.ApplicationBrush_Inconspicuous;
+        PromptExecuteIcon.Foreground = viewModel.IsPromptForExecute ? Brushes.Red : ServiceProvider.Get<IColorProvider>().ApplicationBrush_Inconspicuous.Value.AsBrush();
     }
 
 
@@ -597,7 +599,7 @@ public partial class CommandTimerItem : UserControl {
 
     private void Sync_ColorPick() {
         ColorApplyButton.Background = new SolidColorBrush(ColorPickerControl.Color);
-        ColorApplyButton.Foreground = new SolidColorBrush(Core.Colors.GetSlidingContrastColor(ColorPickerControl.Color));
+        ColorApplyButton.Foreground = new SolidColorBrush(ColorUtilities.GetSlidingContrastColor(new AppColor(ColorPickerControl.Color.A, ColorPickerControl.Color.R, ColorPickerControl.Color.G, ColorPickerControl.Color.B)).AsBrush().Color);
     }
 
     private void Tapped_ColorBar(object sender, TappedEventArgs args) {
@@ -627,7 +629,7 @@ public partial class CommandTimerItem : UserControl {
     private void ColorPick_ApplyColor() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        viewModel.ColorBarColor = new SolidColorBrush(ColorPickerControl.Color);
+        viewModel.ColorBarColor = new AppColor(ColorPickerControl.Color.A, ColorPickerControl.Color.R, ColorPickerControl.Color.G, ColorPickerControl.Color.B);
         UpdateControl_AccentColors();
     }
 
@@ -639,7 +641,7 @@ public partial class CommandTimerItem : UserControl {
     private void ColorPick_CancelColor() {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
-        ColorPickerControl.Color = viewModel.ColorBarColor.Color;
+        ColorPickerControl.Color = viewModel.ColorBarColor.AsBrush().Color;
     }
 
     private void Tapped_FavoriteItem(object sender, TappedEventArgs args) {
@@ -679,16 +681,16 @@ public partial class CommandTimerItem : UserControl {
         if (DataContext is not CommandTimerViewModel viewModel) return;
 
         try {
-            if (viewModel.IsPromptForExecute || Core.Settings.ShouldPromptByDefault.Value) {
+            if (viewModel.IsPromptForExecute || Settings.ShouldPromptByDefault.Value) {
                 if (TopLevel.GetTopLevel(this) is not MainWindow window) return;
 
                 bool? result = await ConfirmationDialog.Create()
                                                        .WithMessage($"Run command: {viewModel.Name}?")
-                                                       .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                       .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                        .Show(window.MainWindowLayout);
                 if (result is false) return;
             }
-            Core.MessageRelay.OnMessagePosted(this, $"Executing [{viewModel.Name}]", Core.MessageRelay.MessageCategory.User);
+            MessageRelay.OnMessagePosted(this, $"Executing [{viewModel.Name}]", MessageRelay.MessageCategory.User);
 
             viewModel.ExecuteCommand();
         }
@@ -708,7 +710,7 @@ public partial class CommandTimerItem : UserControl {
 
                 bool? result = await ConfirmationDialog.Create()
                                                        .WithTitle("Disable Confirmation Prompt?")
-                                                       .WithPasswordEntry(Core.Settings.ShouldUsePasswordConfirmation.Value)
+                                                       .WithPasswordEntry(Settings.ShouldUsePasswordConfirmation.Value)
                                                        .Show(window.MainWindowLayout);
                 if (result is false) return;
             }
@@ -757,67 +759,44 @@ public partial class CommandTimerItem : UserControl {
     /// Built-in tooltip is not flexible, flicker and crash in linux.
     /// </summary>
     private void SetupCustomToolTips() {
+        ClearCustomToolTipHandlers();
+
         var properties = ToolTipDefaults.GetDefaults();
         var tooltip = ServiceProvider.Get<IShowToolTip>();
 
-        TimePickerControl.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Choose a time as duration or absolute", properties);
+        RegisterToolTip(TimePickerControl, "Choose a time as duration or absolute");
+        RegisterToolTip(NameBlock, "Enter a unique name");
+        RegisterToolTip(CopyMoveLibrary, "Copy or move to another library");
+        RegisterToolTip(DescriptionBlock, $"A place for description or notes{Environment.NewLine}Check the settings menu to expand this field");
+        RegisterToolTip(CopyButton, "Copy to Clipboard");
+        RegisterToolTip(PromptExecuteButton, "Prompt for confirmation upon manual execution");
+        RegisterToolTip(ExecuteNowButton, "Run the command right now");
+        RegisterToolTip(CommandBlockAndBorderPanel, $"Enter the command exactly as in a terminal{Environment.NewLine}Check the Settings menu to expand this field");
+        RegisterToolTip(FavoriteButton, "Favorites are always filtered to the top when relevant");
+        RegisterToolTip(RemoveButton, "Delete");
+        RegisterToolTip(TimeStrategySelection, "'Duration' is a timer, 'Time' is a clock time for execution, 'Date' is a day and time");
+        RegisterToolTip(SecondsButton, "Enter a seconds value.");
+        RegisterToolTip(DaysButton, "Enter a days value.");
+        RegisterToolTip(CountdownBlock, "DD:HH:MM:SS -> Days/Hours/Minutes/Seconds");
+        RegisterToolTip(LogStackPanel, "Should activity be logged.");
+        RegisterToolTip(ShowTerminalStackPanel, "Open a terminal to show command output");
+        RegisterToolTip(LoopToggleStackPanel, "Loop or repeat the timer continuously. Daily for time, or every duration.");
+        RegisterToolTip(AutoStartToggleStackPanel, "Start the timer automatically upon program start");
+        RegisterToolTip(ActiveIndicator, "Active Status");
+        RegisterToolTip(StartStopButton, "Start/Stop timer");
 
-        NameBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a unique name", properties);
+        void RegisterToolTip(Control control, string message) {
+            EventHandler<PointerEventArgs> handler = (s, args) => tooltip.OnPointerOver(control, message, properties);
+            control.PointerEntered += handler;
+            _toolTipPointerEnteredHandlers.Add((control, handler));
+        }
+    }
 
-        CopyMoveLibrary.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Copy or move to another library", properties);
+    private void ClearCustomToolTipHandlers() {
+        foreach (var (control, handler) in _toolTipPointerEnteredHandlers) {
+            control.PointerEntered -= handler;
+        }
 
-        DescriptionBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"A place for description or notes{Environment.NewLine}Check the settings menu to expand this field", properties);
-
-        CopyButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Copy to Clipboard", properties);
-
-        PromptExecuteButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Prompt for confirmation upon manual execution", properties);
-
-        ExecuteNowButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Run the command right now", properties);
-
-        CommandBlockAndBorderPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, $"Enter the command exactly as in a terminal{Environment.NewLine}Check the Settings menu to expand this field", properties);
-
-        FavoriteButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Favorites are always filtered to the top when relevant", properties);
-
-        RemoveButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Delete", properties);
-
-        TimeStrategySelection.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "'Duration' is a timer, 'Time' is a clock time for execution, 'Date' is a day and time", properties);
-
-        SecondsButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a seconds value.", properties);
-
-        DaysButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Enter a days value.", properties);
-
-        CountdownBlock.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Countdown/Total Time", properties);
-
-        LogStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Should activity be logged.", properties);
-
-        ShowTerminalStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Open a terminal to show command output", properties);
-
-        LoopToggleStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Loop or repeat the timer continuously. Daily for time, or every duration.", properties);
-
-        AutoStartToggleStackPanel.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Start the timer automatically upon program start", properties);
-
-        ActiveIndicator.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Active Status", properties);
-
-        StartStopButton.PointerEntered += (s, args)
-            => tooltip.OnPointerOver((Control)s!, "Start/Stop timer", properties);
+        _toolTipPointerEnteredHandlers.Clear();
     }
 }

@@ -1,6 +1,6 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Interfaces;
 
 public interface IShowToolTip {
     public void OnPointerOver(Control control, string tooltip, IShowToolTipProperties properties);
@@ -10,3 +10,4 @@ public interface IShowToolTip {
     public void Disable();
     public bool IsOpen();
 }
+

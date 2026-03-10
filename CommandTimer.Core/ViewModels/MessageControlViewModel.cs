@@ -1,8 +1,6 @@
-﻿using Avalonia;
 using Avalonia.Media;
-using System;
+using CommandTimer.Core.Utilities;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace CommandTimer.Core.ViewModels;
 
@@ -12,7 +10,7 @@ public partial class MessageControlViewModel : ViewModelBase {
     public int lifetimeRemaining;
 
     private event Func<Task> Remove = async delegate { await Task.Yield(); };
-    
+
     //...
 
 
@@ -31,7 +29,7 @@ public partial class MessageControlViewModel : ViewModelBase {
     private string _Message = "This is a test.";
     [JsonIgnore]
     public string Message {
-        get => _Message; 
+        get => _Message;
         set => SetProperty(ref _Message, value, Save.No, Notify.Yes);
     }
 
@@ -58,13 +56,13 @@ public partial class MessageControlViewModel : ViewModelBase {
 
 
     [JsonInclude]
-    private IBrush _Background = Core.Colors.ApplicationBrush_Overlay;
+    private AppColor _Background = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Overlay.Value;
     [JsonIgnore]
-    public IBrush Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
+    public AppColor Background { get => _Background; set => SetProperty(ref _Background, value, Save.No, Notify.Yes); }
 
     [JsonInclude]
-    private IBrush _Foreground = Core.Colors.ApplicationBrush_Text;
+    private AppColor _Foreground = ServiceProvider.Get<IColorProvider>().ApplicationBrush_Text.Value;
     [JsonIgnore]
-    public IBrush Foreground { get => _Foreground; set => SetProperty(ref _Foreground, value, Save.No, Notify.Yes); }
-
+    public AppColor Foreground { get => _Foreground; set => SetProperty(ref _Foreground, value, Save.No, Notify.Yes); }
 }
+

@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Input;
 
 namespace ControlsLibrary;
@@ -17,3 +17,4 @@ public class ShowEditableOnHover(Control target, StandardCursorType onHover = St
     public void Entered(object? sender, PointerEventArgs args) => target.Cursor = new Cursor(onHover);
     public void Exited(object? sender, PointerEventArgs args) => target.Cursor = new Cursor(StandardCursorType.Arrow);
 }
+

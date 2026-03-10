@@ -18,7 +18,7 @@
                 Orientation="Horizontal">
 
         <Border Margin="0,0,0,0"
-                Background="{Binding Background}"
+                Background="{Binding Background, Converter={StaticResource AppColorToBrushConverter}}"
                 BorderBrush="{DynamicResource ApplicationBrush_Accent}"
                 BorderThickness="8,0,0,1"
                 CornerRadius="6,0,6,0">
@@ -34,7 +34,7 @@
                        Background="Transparent"
                        FontSize="{DynamicResource ApplicationFontSize_Text}"
                        FontWeight="{DynamicResource ApplicationFontWeight_Medium}"
-                       Foreground="{Binding Foreground}"
+                       Foreground="{Binding Foreground, Converter={StaticResource AppColorToBrushConverter}}"
                        LineSpacing="3"
                        MaxLines="5"
                        Text="{Binding Message}"

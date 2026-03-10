@@ -1,22 +1,12 @@
-﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommandTimer.Core;
 using CommandTimer.Core.Utilities;
-using CommandTimer.Core.Utilities.DependencyInversion;
-using CommandTimer.Core.ViewModels;
-using CommandTimer.Desktop.Utilities;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 
 namespace CommandTimer.Desktop.Views;
 
 public partial class MainWindow : Window {
 
-    public static Window? Instance { get; private set; }
-    public static Panel? Layout { get; private set; }
-
     public MainWindow() {
-        Instance = this;
-        Layout = ContentPresenter;
-
         ServiceProvider.Set<IShowToolTip>(RegisterCustomToolTip());
         ServiceProvider.Set<IAskTheUser>(new AskTheUserForMe());
         ServiceProvider.Set<IDefaultTimerCollection>(new DefaultTimers_Simple(SystemInteraction.Platform.Get()));
@@ -57,8 +47,11 @@ public partial class MainWindow : Window {
     }
 
     private static void AddDefaultTimers() {
-        LibraryManager.LoadLibraryToCurrent(LibraryManager.DEFAULT_LIBRARY);
+        var libraryManager = ServiceProvider.Get<ILibraryManager>();
+        libraryManager.SetCurrent(Settings.Keys.DefaultLibrary);
         ServiceProvider.Get<IDefaultTimerCollection>().Timers
-                       .ForEach(timer => LibraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
+                       .ForEach(timer => libraryManager.GetLibrary(timer.LibraryName).AddToLibrary(timer));
     }
 }
+
+

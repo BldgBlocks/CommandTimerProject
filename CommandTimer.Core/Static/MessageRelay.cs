@@ -1,8 +1,8 @@
-﻿using System;
-
-namespace CommandTimer.Core;
+namespace CommandTimer.Core.Static;
 
 public static class MessageRelay {
+
+    public const int StickyPriority = 100;
 
     /// <summary>
     /// Cascading priority selection, all categories with higher priority will be included.
@@ -32,3 +32,4 @@ public static class MessageRelay {
         public int Priority { get; set; }
     }
 }
+

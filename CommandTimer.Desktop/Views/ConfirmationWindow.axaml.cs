@@ -1,5 +1,3 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using System;
@@ -32,7 +30,7 @@ public partial class ConfirmationWindow : Window {
     }
 
     public new void Close() {
-        base.Close();  
+        base.Close();
     }
 
     public ConfirmationWindow() {
@@ -106,7 +104,7 @@ public partial class ConfirmationWindow : Window {
         return this;
     }
 
-    public ConfirmationWindow WithBackground(IBrush brush) { 
+    public ConfirmationWindow WithBackground(IBrush brush) {
         PART_BorderRoot.Background = brush;
         return this;
     }
@@ -122,3 +120,4 @@ public partial class ConfirmationWindow : Window {
         return this;
     }
 }
+

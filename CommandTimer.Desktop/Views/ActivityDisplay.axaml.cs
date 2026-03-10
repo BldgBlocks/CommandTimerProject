@@ -1,7 +1,5 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
-using CommandTimer.Core.Utilities;
-using CommandTimer.Core.ViewModels;
+using CommandTimer.Core.Utilities.ExtensionMethods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +7,9 @@ using System.Linq;
 namespace CommandTimer.Desktop.Views;
 
 public partial class ActivityDisplay : UserControl {
+
+    private static ILibraryManager LibraryManager => ServiceProvider.Get<ILibraryManager>();
+    private static ITimerProvider TimerProvider => ServiceProvider.Get<ITimerProvider>();
 
     public ActivityDisplay() {
         InitializeComponent();
@@ -19,13 +20,13 @@ public partial class ActivityDisplay : UserControl {
     protected override void OnLoaded(RoutedEventArgs e) {
         base.OnLoaded(e);
 
-        WillCall.Subscribe(Core.Settings.Keys.WillCall_Key_OnOneSecond, Core.Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
+        TimerProvider.Subscribe(Settings.Keys.WillCall_Key_OnOneSecond, Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
     }
 
     protected override void OnUnloaded(RoutedEventArgs e) {
         base.OnUnloaded(e);
 
-        WillCall.Unsubscribe(Core.Settings.Keys.WillCall_Key_OnOneSecond, Core.Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
+        TimerProvider.Unsubscribe(Settings.Keys.WillCall_Key_OnOneSecond, Settings.Keys.WillCall_Interval_OnOneSecond, EventHandler_UpdateUI);
     }
 
     private void EventHandler_UpdateUI(object? sender, EventArgs e) {
@@ -58,3 +59,4 @@ public partial class ActivityDisplay : UserControl {
         CurrentTimeValue.Text = $"({DateTime.Now})";
     }
 }
+

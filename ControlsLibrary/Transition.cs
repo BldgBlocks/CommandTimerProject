@@ -3,7 +3,6 @@ using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Data;
-using System;
 
 namespace ControlsLibrary;
 
@@ -94,3 +93,4 @@ public static class Transition {
         token.Dispose();
     }
 }
+

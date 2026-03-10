@@ -1,5 +1,3 @@
-﻿using CommandTimer.Core;
-using CommandTimer.Core.Utilities.DependencyInversion;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -10,7 +8,7 @@ namespace CommandTimer.Desktop.Utilities;
 /// Simple access control for preventing accidental command execution.
 /// This is a UI speed bump, not a security boundary.
 /// The hash is stored in the user's config JSON alongside other settings.
-/// A user with filesystem access can bypass this by editing the config — this is by design.
+/// A user with filesystem access can bypass this by editing the config � this is by design.
 /// OS-level credential storage (keyring/keychain) was deliberately avoided to prevent
 /// platform keyring dependencies, popups, and failures on minimal Linux installs.
 /// </summary>
@@ -43,7 +41,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
         Deserialize();
         /// Global Action
         ActionRelay.ActionPosted += (o, a) => {
-            if (a.ActionKey == Core.Settings.Keys.ActionRelay_Serialization) {
+            if (a.ActionKey == Settings.Keys.ActionRelay_Serialization) {
                 Serialize();
             }
         };
@@ -51,10 +49,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
 
     private static (byte[] Salt, byte[] Hash) Encrypt(string password) {
         byte[] salt = RandomNumberGenerator.GetBytes(16);
-
-        using var deriveBytes = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
-        var hash = deriveBytes.GetBytes(32);
-
+        byte[] hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100000, HashAlgorithmName.SHA256, 32);
         return (salt, hash);
     }
 
@@ -74,8 +69,7 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
         var storedSalt = new byte[storedSaltLength];
         Array.Copy(_data, storedSalt, storedSaltLength);
 
-        using var deriveBytes = new Rfc2898DeriveBytes(password, storedSalt, 100000, HashAlgorithmName.SHA256);
-        var trialHash = deriveBytes.GetBytes(32);
+        byte[] trialHash = Rfc2898DeriveBytes.Pbkdf2(password, storedSalt, 100000, HashAlgorithmName.SHA256, 32);
 
         var storedHash = new byte[32];
         Array.Copy(_data, storedSaltLength, storedHash, 0, 32);
@@ -104,10 +98,12 @@ public class PasswordManager : IPasswordValidation, IPasswordFormatValidation {
     }
 
     public bool IsSet() {
-        var value = _serializer.Deserialize<byte[]>(DATA_KEY, Core.Settings.DEFAULT_DATA_FILE);
+        var value = _serializer.Deserialize<byte[]>(DATA_KEY, Settings.DEFAULT_DATA_FILE);
         return value != null && value.Length != 0;
     }
 
     public string Reason => string.Join(", ", _Reasons);
 
 }
+
+

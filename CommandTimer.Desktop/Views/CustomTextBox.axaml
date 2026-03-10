@@ -8,6 +8,7 @@
              xmlns:vm="clr-namespace:CommandTimer.Core.ViewModels;assembly=CommandTimer.Core"
              d:DesignHeight="100"
              d:DesignWidth="800"
+             Focusable="True"
              mc:Ignorable="d">
 
     <UserControl.Styles>
@@ -35,18 +36,26 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="views:CustomTextBox">
-                        <Border BorderBrush="Transparent"
+                        <Border Background="Transparent"
+                                BorderBrush="Transparent"
                                 BorderThickness="0"
                                 CornerRadius="0">
-                            <Grid>
+                            <Grid Background="Transparent">
 
-                                <!--  ContentPresenter for fallback content  -->
-                                <ContentPresenter Name="PART_ContentPresenter"
-                                                  Margin="5"
-                                                  Padding="0"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Stretch"
-                                                  IsVisible="True" />
+                                <TextBlock Name="PART_DisplayTextBlock"
+                                           Margin="5"
+                                           Padding="5,0,0,0"
+                                           HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Stretch"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           FontStyle="{TemplateBinding FontStyle}"
+                                           FontWeight="{TemplateBinding FontWeight}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           IsHitTestVisible="False"
+                                           MaxLines="{TemplateBinding MaxLines}"
+                                           Text="{TemplateBinding Text}"
+                                           TextAlignment="{TemplateBinding TextAlignment}"
+                                           TextWrapping="{TemplateBinding TextWrapping}" />
 
                                 <Border Name="PART_BorderElement"
                                         Margin="5,2,0,2"
@@ -76,6 +85,7 @@
                                          FontWeight="{TemplateBinding FontWeight}"
                                          Foreground="{TemplateBinding Foreground}"
                                          GotFocus="OnGotFocus"
+                                         IsVisible="False"
                                          LostFocus="OnLostFocus"
                                          MaxLength="{TemplateBinding MaxLength}"
                                          MaxLines="{TemplateBinding MaxLines}"

@@ -1,17 +1,20 @@
-﻿// Ignore Spelling: Serializable
+// Ignore Spelling: Serializable
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace CommandTimer.Core.ViewModels;
 
-public class ViewModelBase : ObservableObject {
+public class ViewModelBase : ObservableObject, IJsonOnSerializing, IJsonOnSerialized, IJsonOnDeserializing, IJsonOnDeserialized {
 
 
-    // TODO: Should this really be static or per class?
-    protected static bool ShouldSerialize { get; set; } = true;
+    /// NOTE: This suppression flag and the JSON lifecycle hook surface are intentionally kept on the base class even
+    /// though the current project now deserializes more Data objects than ViewModels directly. The base class is meant
+    /// to remain a reusable foundation for future ViewModels, batch updates, initialization paths, or external projects
+    /// that may still need a built-in "notify but do not persist" mechanism.
+    protected bool ShouldSerialize { get; set; } = true;
     protected enum Notify { Yes, No }
     protected enum Save { Yes, No }
 
@@ -34,7 +37,58 @@ public class ViewModelBase : ObservableObject {
         return true;
     }
 
+    /// <summary>
+    /// Save + Notify: value already written elsewhere. Fires PropertyChanged and serializes if changed.
+    /// Override when delegated data writes need custom post-change behavior.
+    /// </summary>
+    protected virtual bool SetPropertySaveNotify<T>(T oldValue, T newValue, [CallerMemberName] string? propertyName = null) {
+        if (EqualityComparer<T>.Default.Equals(oldValue, newValue)) {
+            return false;
+        }
+
+        OnPropertyChanged(propertyName);
+        if (ShouldSerialize) {
+            Serialize();
+        }
+
+        return true;
+    }
+
     //... Callbacks
+
+    /// <summary>
+    /// Called by the JSON serialization pipeline before writing. Overrides should call base to preserve lifecycle broadcasts.
+    /// </summary>
+    protected virtual void PreSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreSerialize);
+
+    /// <summary>
+    /// Called by the JSON serialization pipeline after writing. Overrides should call base to preserve lifecycle broadcasts.
+    /// </summary>
+    protected virtual void PostSerialize() => ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostSerialize);
+
+    /// <summary>
+    /// Called by the JSON serialization pipeline before reading. Overrides should call base to preserve serialization suppression and lifecycle broadcasts.
+    /// </summary>
+    protected virtual void PreDeserialize() {
+        ShouldSerialize = false;
+        ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PreDeserialize);
+    }
+
+    /// <summary>
+    /// Called by the JSON serialization pipeline after reading. Overrides should call base to restore serialization and preserve lifecycle broadcasts.
+    /// </summary>
+    protected virtual void PostDeserialize() {
+        ActionRelay.OnActionPosted(this, Settings.Keys.ActionRelay_PostDeserialize);
+        ShouldSerialize = true;
+    }
+
+    void IJsonOnSerializing.OnSerializing() => PreSerialize();
+
+    void IJsonOnSerialized.OnSerialized() => PostSerialize();
+
+    void IJsonOnDeserializing.OnDeserializing() => PreDeserialize();
+
+    void IJsonOnDeserialized.OnDeserialized() => PostDeserialize();
 
     /// <summary>
     /// No default implementation. No need to call base.
@@ -51,3 +105,4 @@ public class ViewModelBase : ObservableObject {
     }
 
 }
+

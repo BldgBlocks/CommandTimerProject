@@ -1,13 +1,10 @@
-﻿// Ignore Spelling: Deserialized
+// Ignore Spelling: Deserialized
 
 using CommandTimer.Core.ViewModels;
 using ControlsLibrary;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
-namespace CommandTimer.Core.Utilities;
+namespace CommandTimer.Core.Utilities.ExtensionMethods;
 
 public static partial class CommandTimerItemSortExtensions {
 
@@ -21,7 +18,7 @@ public static partial class CommandTimerItemSortExtensions {
         return collection;
     }
 
-    public static void AddRange<T>(this ObservableCollection<T> collection, ObservableCollection<T> range) 
+    public static void AddRange<T>(this ObservableCollection<T> collection, ObservableCollection<T> range)
         => range.ForEach(collection.Add);
     public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> range)
         => range.ForEach(collection.Add);
@@ -115,3 +112,4 @@ public static partial class CommandTimerItemSortExtensions {
         return list.OrderBy(x => getString(x), _naturalComparer);
     }
 }
+
